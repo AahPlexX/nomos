@@ -8,31 +8,38 @@ All material repository changes are recorded here. This file tracks project stat
 
 - Lossless repository preservation of the user-supplied PRD through a SHA-256 manifest plus four verbatim ordered source fragments.
 - Repository continuation protocol and interim governance.
-- Phase 0 project status and ordered TODO ledger.
-- Formal `.nomos` EBNF contract draft.
-- Machine-readable root runtime API budget and additive learning levels.
-- Ten representative `.nomos` fixtures spanning learning levels 0–7.
-- No-dependency Node contract tests for API budget, level additivity, grammar coverage, and representative-fixture presence.
-- Reactive contract, capability-gauntlet specification, learnability-study protocol, and initial ADR records.
-- Normative traceability ledger for 239 PRD obligations with stable requirement/test IDs and owning phases.
-- Deterministic normative extraction checker that fails on ledger omission or drift.
-- Parser contract corpus with seven valid and four invalid/adversarial `.nomos` fixtures.
-- HTML/CSS-aligned whitespace semantics, five whitespace fixtures, and ADR-0003.
+- Formal `.nomos` EBNF contract draft, root runtime API budget, additive learning levels, and ten representative `.nomos` fixtures.
+- Reactive contract, capability-gauntlet specification, learnability-study protocol, parser contract corpus, whitespace semantics, and ADR-0001 through ADR-0003.
+- Normative traceability ledger for 239 PRD obligations with deterministic extraction and reserved conformance-test IDs.
 - Machine-readable register for all eleven PRD Open Decisions.
-- Phase 0 contradiction audit and five-external-reviewer packet/rubric.
+- Phase 0 contradiction audit and an external-review packet that is now retained as optional historical review material.
 
 ### Verified
 
-- Test-first red state: five Phase 0 contract tests failed before required artifacts existed.
-- Green state after initial implementation: five passed, zero failed.
-- Traceability RED: three tests failed before `spec/requirements.json` and parser corpus existed.
-- Completeness-gate RED: traceability suite failed when the independent normative extractor was absent.
-- Traceability GREEN: three tests pass after the 239-row ledger, extractor, and parser corpus were added.
-- Semantics RED: three tests failed before open-decision registration, provisional API marking, and whitespace policy existed.
-- Semantics GREEN: three tests pass after those contracts and fixtures were added.
+- Initial contract TDD: RED 5 failures -> GREEN 5/5.
+- Traceability/parser TDD: RED 3 failures plus completeness-gate RED -> GREEN 3/3.
+- Semantics TDD: RED 3 failures -> GREEN 3/3.
 - Remote PRD reconstruction after the boundary-byte repair equals the uploaded 52,982-byte source and SHA-256 exactly.
-- Current Vite/TypeScript/Volar/pnpm registry baseline and selected official web-platform/accessibility constraints rechecked on 2026-10-08.
 
-### Not complete
+## 2026-10-08 — Product-owner Phase 0 gate amendment
 
-- Phase 0 remains gated by five completed qualified external reviews and resolution of any contradictions they identify. Runtime/compiler conformance rows remain `planned`.
+### Changed
+
+- Added `docs/prd/amendments/0001-remove-phase0-external-review-gate.md` to record the owner's explicit instruction to disregard the unavailable five-external-reviewer requirement.
+- Updated `PRD.md` so preserved source remains immutable provenance while explicit numbered amendments take precedence only within their stated scope.
+- Retained the Phase 0 requirement that conformance drafts reveal no contradictory semantics.
+- Reclassified `docs/phase-0/EXTERNAL-REVIEW-PACKET.md` as optional historical material rather than a blocking gate.
+- Added `spec/phase-status.json` as machine-readable phase authority and opened Phase 1.
+- Updated governance, continuation instructions, status, decisions, TODO, README, contradiction audit, validation tooling, and tests to prevent a future agent from reintroducing the superseded gate.
+
+### TDD evidence
+
+- Governance transition test: RED 3/3 before the amendment, manifest-precedence rule, and phase-state record existed.
+- Governance transition test: GREEN 3/3 after the synchronized implementation.
+- Preserved source re-hash remains `b07950df46be388b10497063c5aabc01a20402a13dcebea0c8ec847869147690`.
+
+### Current state
+
+- Phase 0 is complete under the effective amended PRD.
+- Phase 1 — Vertical Slice is active.
+- Runtime/compiler conformance rows remain `planned` until executable evidence lands in their owning phases.

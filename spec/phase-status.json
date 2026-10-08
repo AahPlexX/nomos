@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "asOf": "2026-10-08",
+  "sourcePrdPreserved": true,
+  "sourcePrdSha256": "b07950df46be388b10497063c5aabc01a20402a13dcebea0c8ec847869147690",
+  "effectiveAmendments": [
+    "docs/prd/amendments/0001-remove-phase0-external-review-gate.md"
+  ],
+  "currentPhase": 1,
+  "phase0": {
+    "name": "Thesis",
+    "status": "complete",
+    "externalReviewRequired": false,
+    "externalReviewOverride": "docs/prd/amendments/0001-remove-phase0-external-review-gate.md",
+    "contradictionAudit": "passed",
+    "openPhase0Blockers": []
+  },
+  "phase1": {
+    "name": "Vertical Slice",
+    "status": "in-progress",
+    "allowed": true,
+    "exitCriterion": "A TodoMVC-class application passes deterministic browser tests, preserves valid state through HMR, and cleans up every owned effect."
+  }
+}

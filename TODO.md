@@ -1,49 +1,53 @@
 # Nomos execution queue
 
 **Last updated:** 2026-10-08  
-**Binding scope:** `PRD.md`  
-**Current phase:** Phase 0 — Thesis
+**Binding scope:** `PRD.md` plus effective amendments  
+**Current phase:** Phase 1 — Vertical Slice
 
 Status keys: `[x]` verified complete, `[>]` in progress, `[ ]` not complete, `[!]` blocked by an explicit decision/gate.
 
-## Phase 0 deliverables
+## Phase 0 — Thesis
 
-- [x] Formal component grammar.
-  - [x] Initial EBNF contract checked in.
-  - [x] Parser-valid fixture corpus.
-  - [x] Parser-invalid/adversarial fixture corpus.
-  - [x] Whitespace/HTML-ownership grammar fixtures.
-    - [x] HTML-ownership adversarial fixture reserved as `NOMOS-PARSE-HTML-OWNERSHIP`.
-    - [x] Whitespace policy and five source/expectation fixtures ratified by ADR-0003.
-- [x] One-page reactive contract drafted from the PRD.
-- [x] Ten representative `.nomos` components present.
+- [x] Formal component grammar, valid/invalid parser corpus, and whitespace/HTML-ownership fixtures.
+- [x] One-page reactive contract.
+- [x] Ten representative `.nomos` components.
 - [x] Architecture decision records required by current Phase 0 decisions.
-  - [x] Toolchain/API compatibility baseline recorded.
-  - [x] Direct-to-main/document-freshness execution policy recorded.
-  - [x] Whitespace semantics recorded in ADR-0003.
-  - [x] All eleven PRD Open Decisions machine-registered as unresolved; future resolutions require new ADR/RFC evidence.
-- [x] Learning-level definitions encoded.
-- [x] Additivity test proves every higher level contains prior concepts.
-- [x] Public root API budget encoded and tested (`<= 12`; proposed root currently 10).
-- [x] Capability-gauntlet specification drafted.
-- [x] Learnability-study protocol drafted.
-- [>] Normative requirement traceability.
-  - [x] Extract all PRD `MUST` / `MUST NOT` obligations into 239 stable requirement IDs.
-  - [x] Map every requirement to an automated conformance test id or explicit future-phase planned test id.
-  - [x] Add a checker that independently re-extracts the PRD and rejects omitted or drifted mappings.
-  - [ ] Promote requirement rows from `planned` to `passing` only as executable conformance tests land in their owning phases.
+- [x] Learning-level definitions and additivity test.
+- [x] Public root API budget test (`<= 12`; proposed root currently 10).
+- [x] Capability-gauntlet specification.
+- [x] Learnability-study protocol.
+- [x] Normative requirement extraction and traceability infrastructure for all 239 uppercase `MUST` / `MUST NOT` operators.
+  - Runtime/compiler rows remain `planned` until their owning implementation phases provide executable conformance evidence; this does not reopen Phase 0.
 
-## Phase 0 exit gate
+## Phase 0 exit gate — CLOSED
 
-- [ ] Five experienced external reviewers can predict component behavior from examples.
-- [>] Conformance drafts reveal no contradictory semantics.
+- [x] External-review prerequisite removed by product owner in `docs/prd/amendments/0001-remove-phase0-external-review-gate.md`.
+- [x] Conformance drafts reveal no known contradictory semantics.
   - [x] Internal contradiction audit completed; one provisional-status ambiguity (`state.snapshot`) fixed.
-  - [ ] Reopen/fix if any external reviewer identifies a semantic contradiction.
-- [x] Five-reviewer packet and evidence rubric prepared.
-- [ ] Exit review recorded with five completed external reviewer records and any resulting PRD/ADR changes.
+  - [x] All eleven PRD Open Decisions remain explicitly unresolved rather than silently chosen.
+- [x] Original PRD source remains byte-for-byte preserved; amendment precedence is explicit in `PRD.md`.
+- [x] Machine phase state records Phase 0 complete and Phase 1 allowed.
 
-**Phase 0 must remain IN PROGRESS until every exit-gate item above is evidenced.**
+## Phase 1 — Vertical Slice
 
-## Phase 1 — do not start yet
+- [>] Establish Phase 1 implementation architecture and deterministic conformance harness from the Phase 0 contracts.
+- [ ] Parser and source maps.
+- [ ] State, derivation, synchronization, and ownership.
+- [ ] Text and attribute bindings.
+- [ ] Events and native-control bindings.
+- [ ] Conditions and keyed lists.
+- [ ] Components and live inputs.
+- [ ] Scoped CSS.
+- [ ] Vite integration and HMR.
+- [ ] Levels 0 through 3 integrated end-to-end.
+- [ ] TodoMVC-class reference application passes deterministic browser tests.
+- [ ] HMR preserves valid state across compatible updates.
+- [ ] Every owned effect is proven to clean up on disposal.
 
-The Phase 1 vertical slice is queued but gated by Phase 0 exit. Do not begin parser/runtime implementation merely because the Phase 0 document list exists.
+**Phase 1 exit criterion:** the TodoMVC-class application passes deterministic browser tests, preserves valid state through HMR, and cleans up every owned effect.
+
+## Continuing controls
+
+- [>] Promote each `spec/requirements.json` row from `planned` to `passing` only when its executable conformance evidence lands.
+- [>] Keep all eleven `spec/open-decisions.json` items open until an explicit ADR/RFC resolution is approved.
+- [>] Keep `docs/STATUS.md`, this queue, `CHANGELOG.md`, decision records, and affected specs synchronized on every material change.

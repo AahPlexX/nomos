@@ -2,9 +2,15 @@
 
 **Last updated:** 2026-10-08
 
-This register records decision status. The PRD's Open Decisions remain open unless an approved ADR/RFC explicitly changes the authoritative PRD and `spec/open-decisions.json` together.
+This register records product amendments and architecture decision status. The PRD's Open Decisions remain open unless an approved ADR/RFC explicitly changes the effective PRD and `spec/open-decisions.json` together.
 
-## Accepted decisions
+## Product-owner amendments
+
+| ID | Decision | Status | Record |
+|---|---|---|---|
+| PRD-A0001 | Remove the five-external-reviewer requirement from the Phase 0 exit gate; retain contradiction-free semantics | Effective | `docs/prd/amendments/0001-remove-phase0-external-review-gate.md` |
+
+## Accepted architecture decisions
 
 | ID | Decision | Status | Record |
 |---|---|---|---|
@@ -14,6 +20,6 @@ This register records decision status. The PRD's Open Decisions remain open unle
 
 ## PRD Open Decisions
 
-The machine-readable authority for the eleven still-open items is `spec/open-decisions.json`. Every entry is currently `open` with `resolution: null`.
+The machine-readable authority for the eleven still-open items is `spec/open-decisions.json`. Every entry remains `open` with `resolution: null`.
 
-No implementation artifact may silently close an item. In particular, `state.snapshot` remains present in the proposed API while `OD-004` explicitly marks its final namespace placement provisional.
+PRD-A0001 changes no Open Decision. In particular, `state.snapshot` remains present in the proposed API while `OD-004` explicitly marks its final namespace placement provisional.

@@ -1,64 +1,22 @@
 # Phase 0 external reviewer packet
 
-**Gate status:** NOT YET SATISFIED  
-**Required by PRD:** five experienced external reviewers must be able to predict component behavior from the Phase 0 examples, and contradictions discovered during review must be resolved.
+**Status:** OPTIONAL / NON-BLOCKING HISTORICAL REVIEW MATERIAL  
+**Superseded gate:** PRD Amendment 0001 removed the five-experienced-external-reviewer requirement from Phase 0 exit on 2026-10-08.
 
-## Reviewer qualification
+This packet is retained because it can still be useful for voluntary usability/predictability review. It must not be interpreted by a future agent as a current phase gate.
 
-Use five independent reviewers who were not authors of the Phase 0 contracts and who have meaningful professional experience building or reviewing front-end frameworks, compilers, reactive UI systems, or equivalent production web infrastructure.
+## Optional reviewer qualification
 
-Record each reviewer's role/background at a non-identifying level sufficient to establish experience. Do not record unnecessary personal data.
+If voluntary external review is performed, prefer independent reviewers with meaningful professional experience building or reviewing front-end frameworks, compilers, reactive UI systems, or equivalent production web infrastructure. Record only non-identifying background needed to contextualize feedback.
 
 ## Frozen review inputs
 
-Each reviewer receives the same repository commit and reads, in order:
-
-1. `PRD.md` and its four authoritative source fragments.
-2. `docs/phase-0/REACTIVE-CONTRACT.md`.
-3. `spec/nomos.ebnf`.
-4. `spec/whitespace.json` and `docs/adr/0003-whitespace-semantics.md`.
-5. `spec/levels.json` and `spec/runtime-api.json`.
-6. all ten `examples/phase-0/*.nomos` files.
-7. `tests/fixtures/parser/manifest.json` plus whitespace fixtures.
-8. `spec/open-decisions.json`.
-
-Do not give reviewers implementation code, because Phase 0 is testing predictability of the public model rather than familiarity with internals.
+A voluntary reviewer may read: `PRD.md` plus preserved source/amendments, the reactive contract, grammar, whitespace contract/ADR, levels/runtime API, representative Phase 0 examples, parser fixtures, and open-decision register.
 
 ## Prediction prompts
 
-Each reviewer answers independently before group discussion:
+The original twelve prompts remain useful for checking predictability: component setup/rerender behavior; scheduling; illegal derive writes; keyed-list state preservation; live inputs; query cancellation/stale results; Boundary ownership; native form/focus behavior; owner-disposal ordering; inline whitespace; leading LF in `pre`/`textarea`; and recognition that none of the eleven Open Decisions are resolved.
 
-1. Which source sections execute once per component instance, and is there a component rerender phase?
-2. After synchronous state writes, when do DOM updates and `sync()` reruns occur?
-3. Can a `derive()` write reactive state, and what should happen if it tries?
-4. When keyed list items reorder, which existing browser state should survive where browser behavior permits?
-5. If a parent updates an input destructured from `inputs<T>()`, does the child read stay live?
-6. If a query key changes while an older request is pending, what happens to unneeded work and to a late stale result?
-7. What does a `Boundary` catch, and which event/detached async errors are outside its ownership?
-8. In the form example, which native semantics remain present and what is the required failed-validation focus behavior?
-9. When an owner is disposed, in what order do child owners, cleanup, and DOM removal occur?
-10. For `<p>Hello <strong>Nomos</strong> world</p>`, which literal spaces exist as DOM text data, and who controls whether whitespace visually collapses?
-11. What happens to one source LF immediately following a `<pre>` or `<textarea>` start tag?
-12. Which of the eleven Open Decisions are already resolved by the examples? (Canonical answer: none.)
+## Evidence use
 
-## Evidence form
-
-For each reviewer record:
-
-- frozen commit SHA;
-- reviewer experience category;
-- answer to each prompt;
-- confidence (low/medium/high);
-- any line they found ambiguous or contradictory;
-- any behavior they could not predict from the frozen inputs.
-
-## Gate rule
-
-Do not close the Phase 0 reviewer gate unless:
-
-- all five qualified reviewers completed the packet independently;
-- every reviewer correctly predicts every safety/correctness-critical behavior represented by a normative `MUST`/`MUST NOT` in the prompts;
-- each reviewer is correct on at least 90% of all prediction prompts; and
-- every ambiguity or contradiction report has either been resolved with synchronized PRD/ADR/test/documentation changes or explicitly shown not to conflict with the authoritative contract.
-
-Store the resulting evidence in a dated review record. Never substitute an AI self-review for this external-review gate.
+Any voluntary review finding that exposes a real contradiction or ambiguity must enter the normal PRD/ADR/spec/test/documentation workflow. There is no minimum reviewer count and no reviewer-completion threshold for Phase 0 or Phase 1 entry.
