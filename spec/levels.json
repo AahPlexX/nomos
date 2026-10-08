@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "levels": [
+    {
+      "level": 0,
+      "introduces": ["html", "css", "static-pages", "links"],
+      "available": ["html", "css", "static-pages", "links"]
+    },
+    {
+      "level": 1,
+      "introduces": ["script-constants", "interpolation"],
+      "available": ["html", "css", "static-pages", "links", "script-constants", "interpolation"]
+    },
+    {
+      "level": 2,
+      "introduces": ["state", "assignment", "event-handling"],
+      "available": ["html", "css", "static-pages", "links", "script-constants", "interpolation", "state", "assignment", "event-handling"]
+    },
+    {
+      "level": 3,
+      "introduces": ["derive", "conditions", "lists", "bindings"],
+      "available": ["html", "css", "static-pages", "links", "script-constants", "interpolation", "state", "assignment", "event-handling", "derive", "conditions", "lists", "bindings"]
+    },
+    {
+      "level": 4,
+      "introduces": ["components", "inputs", "callbacks", "slots"],
+      "available": ["html", "css", "static-pages", "links", "script-constants", "interpolation", "state", "assignment", "event-handling", "derive", "conditions", "lists", "bindings", "components", "inputs", "callbacks", "slots"]
+    },
+    {
+      "level": 5,
+      "introduces": ["dynamic-routes", "loaders", "queries", "async-regions", "boundaries"],
+      "available": ["html", "css", "static-pages", "links", "script-constants", "interpolation", "state", "assignment", "event-handling", "derive", "conditions", "lists", "bindings", "components", "inputs", "callbacks", "slots", "dynamic-routes", "loaders", "queries", "async-regions", "boundaries"]
+    },
+    {
+      "level": 6,
+      "introduces": ["actions", "forms", "fields", "accessible-ui-primitives"],
+      "available": ["html", "css", "static-pages", "links", "script-constants", "interpolation", "state", "assignment", "event-handling", "derive", "conditions", "lists", "bindings", "components", "inputs", "callbacks", "slots", "dynamic-routes", "loaders", "queries", "async-regions", "boundaries", "actions", "forms", "fields", "accessible-ui-primitives"]
+    },
+    {
+      "level": 7,
+      "introduces": ["sync", "attachments", "context", "shared-state", "state.raw", "state.snapshot", "untrack", "raw-html", "custom-element-output"],
+      "available": ["html", "css", "static-pages", "links", "script-constants", "interpolation", "state", "assignment", "event-handling", "derive", "conditions", "lists", "bindings", "components", "inputs", "callbacks", "slots", "dynamic-routes", "loaders", "queries", "async-regions", "boundaries", "actions", "forms", "fields", "accessible-ui-primitives", "sync", "attachments", "context", "shared-state", "state.raw", "state.snapshot", "untrack", "raw-html", "custom-element-output"]
+    }
+  ]
+}

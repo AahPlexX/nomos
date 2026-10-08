@@ -1,0 +1,10 @@
+<!-- nomos-level: 0 -->
+<article class="card">
+  <h2>Field notes</h2>
+  <p>Plain HTML and CSS remain valid Nomos.</p>
+  <a href="/notes">Read notes</a>
+</article>
+
+<style>
+  .card { max-inline-size: 42rem; padding: 1rem; }
+</style>

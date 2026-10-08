@@ -1,0 +1,9 @@
+<!-- nomos-level: 3 -->
+<script>
+  import { derive, state } from 'nomos';
+  let quantity = state(2);
+  const total = derive(() => quantity * 12);
+</script>
+
+<label>Quantity <input type="number" min="1" bind:value={quantity} /></label>
+<p>Total {total}</p>

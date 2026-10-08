@@ -4,7 +4,7 @@ This repository is designed to be resumable by another engineer or coding agent 
 
 ## Read order before making changes
 
-1. `PRD.md` — product authority and public behavioral contract.
+1. `PRD.md` — source manifest; then read its four ordered `docs/prd/source-part-*.md` fragments, whose concatenation is the product authority and public behavioral contract.
 2. `docs/STATUS.md` — current verified repository state and immediate handoff.
 3. `TODO.md` — ordered work queue and acceptance evidence.
 4. `docs/GOVERNANCE.md` — decision, branch, documentation, and release rules.

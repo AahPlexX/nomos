@@ -1,0 +1,10 @@
+<!-- nomos-level: 6 -->
+<script>
+  import { Dialog } from 'nomos/ui';
+</script>
+
+<Dialog>
+  <button slot="trigger" type="button">Open details</button>
+  <h2>Details</h2>
+  <p>Focus behavior belongs to the primitive contract.</p>
+</Dialog>

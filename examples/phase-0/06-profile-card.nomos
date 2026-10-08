@@ -1,0 +1,11 @@
+<!-- nomos-level: 4 -->
+<script>
+  import { inputs } from 'nomos';
+  const { displayName, onSelect } = inputs<{ displayName: string; onSelect?: () => void }>();
+</script>
+
+<article>
+  <h2>{displayName}</h2>
+  <button type="button" on:click={onSelect}>Select</button>
+  <slot />
+</article>

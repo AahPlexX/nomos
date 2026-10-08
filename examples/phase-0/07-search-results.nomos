@@ -1,0 +1,17 @@
+<!-- nomos-level: 5 -->
+<script>
+  import { query, state } from 'nomos';
+  let term = state('nomos');
+  const results = query(() => `/api/search?q=${encodeURIComponent(term)}`);
+</script>
+
+<input type="search" aria-label="Search" bind:value={term} />
+{#await results}
+  <p>Loading…</p>
+{:then data}
+  <p>{data.length} results</p>
+{:empty}
+  <p>No results</p>
+{:catch error}
+  <p role="alert">{error.message}</p>
+{/await}

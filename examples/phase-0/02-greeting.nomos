@@ -1,0 +1,6 @@
+<!-- nomos-level: 1 -->
+<script>
+  const greeting = 'Hello from Nomos';
+</script>
+
+<h1>{greeting}</h1>

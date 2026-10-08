@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "package": "nomos",
+  "budget": 12,
+  "exports": [
+    "inputs",
+    "state",
+    "derive",
+    "sync",
+    "untrack",
+    "context",
+    "query",
+    "action",
+    "Boundary",
+    "mount"
+  ],
+  "nested": {
+    "state": ["raw", "snapshot"]
+  },
+  "status": "phase-0-contract"
+}

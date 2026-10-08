@@ -6,6 +6,7 @@ All material repository changes are recorded here. This file tracks project stat
 
 ### Added
 
+- Lossless repository preservation of the user-supplied PRD through a SHA-256 manifest plus four verbatim ordered source fragments.
 - Repository continuation protocol and interim governance.
 - Phase 0 project status and ordered TODO ledger.
 - Formal `.nomos` EBNF contract draft.

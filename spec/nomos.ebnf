@@ -1,0 +1,62 @@
+(* Nomos 1.0 component grammar — Phase 0 contract draft.
+   TypeScriptExpression and CssStylesheet are delegated to their host grammars.
+   The parser MUST preserve exact source spans for every production. *)
+
+Component         = { Section } ;
+Section           = ScriptBlock | StyleBlock | TopLevelNode ;
+(* Semantic constraint: at most one top-level ScriptBlock. Section order is not restricted by this Phase 0 grammar. *)
+ScriptBlock       = "<script", [ ScriptLanguage ], ">", TypeScriptModule, "</script>" ;
+ScriptLanguage    = S, "lang", S?, "=", S?, QuotedJs ;
+QuotedJs          = '"js"' | "'js'" ;
+StyleBlock        = "<style", [ StyleGlobal ], ">", CssStylesheet, "</style>" ;
+StyleGlobal       = S, "global" ;
+
+TopLevelNode      = Element | Text | Interpolation | StructuralBlock | RawHtml ;
+Node              = Element | Text | Interpolation | StructuralBlock | RawHtml ;
+
+Element           = HtmlElement | ComponentElement | CustomElement ;
+HtmlElement       = "<", HtmlName, { S, Attribute }, S?, ( "/>" | ">", { Node }, "</", HtmlName, ">" ) ;
+ComponentElement  = "<", ComponentName, { S, Attribute }, S?, ( "/>" | ">", { Node }, "</", ComponentName, ">" ) ;
+CustomElement     = "<", CustomElementName, { S, Attribute }, S?, ( "/>" | ">", { Node }, "</", CustomElementName, ">" ) ;
+
+Attribute         = StaticAttribute | DynamicAttribute | MixedAttribute | ShorthandAttribute | SpreadAttribute | Directive ;
+StaticAttribute   = AttributeName, [ "=", QuotedText ] ;
+DynamicAttribute  = AttributeName, "=", "{", TypeScriptExpression, "}" ;
+MixedAttribute    = AttributeName, "=", '"', { TextChunk | Interpolation }, '"' ;
+ShorthandAttribute= "{", Identifier, "}" ;
+SpreadAttribute   = "{...", TypeScriptExpression, "}" ;
+Directive         = EventDirective | BindDirective | UseDirective | LetDirective ;
+EventDirective    = "on:", EventName, "=", "{", TypeScriptExpression, "}" ;
+BindDirective     = "bind:", BindName, [ "=", "{", TypeScriptExpression, "}" ] ;
+UseDirective      = "use:", Identifier, [ "=", "{", TypeScriptExpression, "}" ] ;
+LetDirective      = "let:", Identifier ;
+
+StructuralBlock   = IfBlock | EachBlock | AwaitBlock ;
+IfBlock           = "{#if", S, TypeScriptExpression, "}", { Node },
+                    { "{:else if", S, TypeScriptExpression, "}", { Node } },
+                    [ "{:else}", { Node } ], "{/if}" ;
+EachBlock         = "{#each", S, TypeScriptExpression, S, "as", S, BindingPattern,
+                    [ S, ",", S?, Identifier ], [ S, "(", TypeScriptExpression, ")" ], "}",
+                    { Node }, [ "{:else}", { Node } ], "{/each}" ;
+AwaitBlock        = "{#await", S, TypeScriptExpression, "}", { Node },
+                    [ "{:then", [ S, BindingPattern ], "}", { Node } ],
+                    [ "{:empty}", { Node } ],
+                    [ "{:catch", [ S, BindingPattern ], "}", { Node } ], "{/await}" ;
+RawHtml           = "{@html", S, TypeScriptExpression, "}" ;
+Interpolation     = "{", TypeScriptExpression, "}" ;
+
+Text              = TextChunk, { TextChunk } ;
+TextChunk         = ? any character sequence not beginning a Nomos delimiter ? ;
+QuotedText        = '"', ? attribute text ?, '"' | "'", ? attribute text ?, "'" ;
+BindingPattern    = Identifier | ? TypeScript binding pattern ? ;
+Identifier        = ? ECMAScript IdentifierName accepted by TypeScript ? ;
+TypeScriptModule  = ? TypeScript module source ? ;
+TypeScriptExpression = ? TypeScript expression, never a statement ? ;
+CssStylesheet     = ? CSS stylesheet source ? ;
+HtmlName          = ? valid built-in HTML/SVG/MathML element name ? ;
+ComponentName     = ? imported PascalCase component binding ? ;
+CustomElementName = ? valid custom-element name containing a hyphen ? ;
+AttributeName     = ? valid HTML attribute name, including class, for, tabindex, aria-* and data-* ? ;
+EventName         = ? native event name passed through unchanged ? ;
+BindName          = "value" | "checked" | "group" | "files" | "open" | "this" ;
+S                 = ? one or more ASCII whitespace characters ? ;

@@ -17,13 +17,14 @@
 
 ## Current Phase 0 implementation state
 
-Implemented in this slice locally and queued for the same `main` delivery commit:
+Implemented in the current Phase 0 slice and being delivered directly to `main`:
 
 - formal `.nomos` component grammar draft (`spec/nomos.ebnf`);
 - root runtime API budget contract (`spec/runtime-api.json`);
 - additive learning-level contract (`spec/levels.json`);
 - ten representative `.nomos` component fixtures (`examples/phase-0/`);
 - executable Phase 0 contract tests (`tests/phase0-contracts.test.mjs`);
+- lossless repository preservation of the supplied PRD as four ordered source fragments plus a SHA-256 manifest/checker;
 - living governance/handoff documentation;
 - reactive contract, capability-gauntlet specification, and learnability-study protocol;
 - dated toolchain architecture record based on current official sources and registry checks.
@@ -66,7 +67,6 @@ All PRD Open Decisions remain open unless an ADR explicitly says otherwise. In p
 
 ## Immediate next action
 
-1. Deliver this Phase 0 control-plane/contract slice to `origin/main` without a PR.
-2. Re-read the resulting tree and commit.
-3. Add parser conformance fixtures/tests that exercise valid and invalid grammar ownership cases without yet building the Phase 1 compiler.
-4. Begin requirement-to-conformance traceability extraction so every normative PRD statement has an explicit test mapping or planned test id.
+1. Re-read the resulting `origin/main` tree and verify no files or PRs were left outside `main`.
+2. Add parser conformance fixtures/tests that exercise valid and invalid grammar ownership cases without yet building the Phase 1 compiler.
+3. Begin requirement-to-conformance traceability extraction so every normative PRD statement has an explicit test mapping or planned test id.

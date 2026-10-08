@@ -1,0 +1,11 @@
+<!-- nomos-level: 7 -->
+<script>
+  import { state, sync } from 'nomos';
+  let now = state(new Date());
+  sync(() => {
+    const timer = setInterval(() => { now = new Date(); }, 1000);
+    return () => clearInterval(timer);
+  });
+</script>
+
+<time>{now.toLocaleTimeString()}</time>

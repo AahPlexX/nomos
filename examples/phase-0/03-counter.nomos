@@ -1,0 +1,8 @@
+<!-- nomos-level: 2 -->
+<script>
+  import { state } from 'nomos';
+  let count = state(0);
+  function increment() { count += 1; }
+</script>
+
+<button type="button" on:click={increment}>Count {count}</button>

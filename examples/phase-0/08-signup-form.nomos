@@ -1,0 +1,10 @@
+<!-- nomos-level: 6 -->
+<script>
+  import { action } from 'nomos';
+  const submit = action(async (form) => saveUser(form));
+</script>
+
+<form action={submit}>
+  <label>Email <input name="email" type="email" required /></label>
+  <button type="submit">Create account</button>
+</form>

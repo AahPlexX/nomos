@@ -1,0 +1,17 @@
+{
+  "name": "nomos-framework",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Nomos framework monorepo",
+  "type": "module",
+  "packageManager": "pnpm@12.10.1",
+  "engines": {
+    "node": ">=22.13.0"
+  },
+  "scripts": {
+    "test": "node --test tests/*.test.mjs",
+    "check:phase0": "node tools/validate-phase0.mjs",
+    "check": "pnpm test && pnpm check:prd && pnpm check:phase0",
+    "check:prd": "node tools/verify-prd-source.mjs"
+  }
+}

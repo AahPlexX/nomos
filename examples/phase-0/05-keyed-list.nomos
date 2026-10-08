@@ -1,0 +1,13 @@
+<!-- nomos-level: 3 -->
+<script>
+  import { state } from 'nomos';
+  let items = state([{ id: 'a', label: 'Alpha' }, { id: 'b', label: 'Beta' }]);
+</script>
+
+<ul>
+  {#each items as item (item.id)}
+    <li>{item.label}</li>
+  {:else}
+    <li>No items</li>
+  {/each}
+</ul>
