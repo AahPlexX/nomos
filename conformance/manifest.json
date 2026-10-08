@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "publicRoot": "conformance/",
+  "tests": [
+    {
+      "id": "NCON-NREQ-0145",
+      "requirementId": "NREQ-0145",
+      "file": "conformance/compiler/NCON-NREQ-0145.test.mjs",
+      "environments": ["node"],
+      "status": "wired-unverified"
+    }
+  ]
+}

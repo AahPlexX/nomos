@@ -16,8 +16,9 @@
     "name": "Vertical Slice",
     "status": "in-progress",
     "allowed": true,
-    "activeSlice": "parser-and-source-maps",
+    "activeSlice": "parser-source-maps-and-conformance",
     "parserAndSourceMaps": "in-progress",
+    "conformanceInfrastructure": "foundation-implemented",
     "parserImplemented": [
       "top-level-section-partitioning",
       "exact-raw-source-spans",
@@ -31,17 +32,23 @@
     "parserRemaining": [
       "embedded-typescript-and-css-adapter-implementation",
       "broader-html-tree-construction-validation",
-      "stage-local-source-map-composer-implementation",
-      "public-ncon-conformance-wiring"
+      "stage-local-source-map-composer-implementation"
     ],
+    "conformance": {
+      "contract": "docs/adr/0007-public-conformance-promotion.md",
+      "machineSpec": "spec/conformance.json",
+      "seedTest": "NCON-NREQ-0145",
+      "seedTestStatus": "wired-unverified",
+      "passingRequirementCount": 0
+    },
     "wayfinderMap": "https://github.com/AahPlexX/nomos/issues/1",
     "resolvedWayfinderDecisions": [
       "https://github.com/AahPlexX/nomos/issues/2",
-      "https://github.com/AahPlexX/nomos/issues/3"
+      "https://github.com/AahPlexX/nomos/issues/3",
+      "https://github.com/AahPlexX/nomos/issues/5"
     ],
     "openWayfinderDecisions": [
-      "https://github.com/AahPlexX/nomos/issues/4",
-      "https://github.com/AahPlexX/nomos/issues/5"
+      "https://github.com/AahPlexX/nomos/issues/4"
     ],
     "exitCriterion": "A TodoMVC-class application passes deterministic browser tests, preserves valid state through HMR, and cleans up every owned effect."
   }

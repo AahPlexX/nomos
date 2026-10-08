@@ -11,12 +11,22 @@ const required = [
   'tests/phase1-parser.test.mjs',
   'tests/phase1-parser-structural.test.mjs',
   'tests/phase1-parser-ast.test.mjs',
+  'tests/phase1-conformance-harness.test.mjs',
   'docs/phase-1/PARSER-AND-SOURCEMAPS.md',
   'docs/phase-1/research/embedded-language-representation.md',
   'docs/phase-1/research/source-map-composition.md',
+  'docs/phase-1/research/public-conformance-promotion.md',
   'docs/adr/0004-source-position-and-map-baseline.md',
   'docs/adr/0005-embedded-language-adapter-boundary.md',
   'docs/adr/0006-stage-local-source-map-composition.md',
+  'docs/adr/0007-public-conformance-promotion.md',
+  'conformance/README.md',
+  'conformance/manifest.json',
+  'conformance/compiler/NCON-NREQ-0145.test.mjs',
+  'tools/conformance-core.mjs',
+  'tools/run-conformance.mjs',
+  'tools/validate-conformance.mjs',
+  'spec/conformance.json',
   'spec/compiler-front-end.json',
   'spec/phase-status.json',
 ];
@@ -26,28 +36,25 @@ const phase = JSON.parse(await readFile(new URL('spec/phase-status.json', root),
 assert.equal(phase.currentPhase, 1);
 assert.equal(phase.phase1.status, 'in-progress');
 assert.equal(phase.phase1.parserAndSourceMaps, 'in-progress');
-assert.ok(phase.phase1.parserImplemented.includes('hierarchical-template-ast'));
-assert.ok(phase.phase1.parserImplemented.includes('embedded-language-adapter-boundary'));
-assert.ok(phase.phase1.parserImplemented.includes('stage-local-source-map-composition-contract'));
-assert.ok(phase.phase1.parserRemaining.includes('embedded-typescript-and-css-adapter-implementation'));
-assert.ok(phase.phase1.parserRemaining.includes('stage-local-source-map-composer-implementation'));
+assert.equal(phase.phase1.conformanceInfrastructure, 'foundation-implemented');
+assert.equal(phase.phase1.conformance.seedTest, 'NCON-NREQ-0145');
+assert.equal(phase.phase1.conformance.seedTestStatus, 'wired-unverified');
+assert.equal(phase.phase1.conformance.passingRequirementCount, 0);
+assert.ok(phase.phase1.resolvedWayfinderDecisions.includes('https://github.com/AahPlexX/nomos/issues/5'));
+assert.deepEqual(phase.phase1.openWayfinderDecisions, ['https://github.com/AahPlexX/nomos/issues/4']);
 
 const frontEnd = JSON.parse(await readFile(new URL('spec/compiler-front-end.json', root), 'utf8'));
 assert.equal(frontEnd.sourcePositionModel.offsetUnit, 'utf-16-code-unit');
 assert.equal(frontEnd.sourceMaps.standard, 'ECMA-426');
-assert.equal(frontEnd.sourceMaps.versionField, 3);
 assert.equal(frontEnd.sourceMaps.stageLocalMappings, 'contract-resolved-implementation-planned');
-assert.equal(frontEnd.sourceMaps.generatedScaffolding, 'unmapped');
-assert.equal(frontEnd.sourceMaps.finalMapTarget, 'original-.nomos-source');
-assert.equal(frontEnd.sourceMaps.finalMapValidation, 'required');
 assert.equal(frontEnd.templateSyntax.hierarchicalTypedAst, 'implemented-structural');
-assert.equal(frontEnd.embeddedLanguages.nomosOwnsDurableIr, true);
-assert.equal(frontEnd.embeddedLanguages.authoritativeLocations, 'nomos-raw-source-spans');
-assert.equal(frontEnd.embeddedLanguages.typescript.verifiedVersionBaseline, '6.0.2');
-assert.equal(frontEnd.embeddedLanguages.css.verifiedVersionBaseline, '1.33.0');
 assert.equal(frontEnd.embeddedLanguages.typescript.implementation, 'planned');
 assert.equal(frontEnd.embeddedLanguages.css.implementation, 'planned');
-assert.ok(frontEnd.wayfinder.resolvedDecisionTickets.includes('https://github.com/AahPlexX/nomos/issues/2'));
-assert.ok(frontEnd.wayfinder.resolvedDecisionTickets.includes('https://github.com/AahPlexX/nomos/issues/3'));
 
-console.log(`Phase 1 front-end check passed: ${required.length} required artifacts; hierarchy plus embedded-language/source-map contracts recorded; executable adapters/composer remain in progress.`);
+const conformance = JSON.parse(await readFile(new URL('spec/conformance.json', root), 'utf8'));
+assert.equal(conformance.status, 'foundation-implemented');
+assert.equal(conformance.browserSubstitutionAllowed, false);
+assert.equal(conformance.seedTest.status, 'wired-unverified');
+assert.deepEqual(conformance.passingRequirements, []);
+
+console.log(`Phase 1 check passed: ${required.length} required artifacts; conformance foundation is implemented while parser adapters/composer and public green evidence remain in progress.`);

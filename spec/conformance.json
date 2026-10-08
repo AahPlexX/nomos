@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "status": "foundation-implemented",
+  "publicRoot": "conformance/",
+  "manifest": "conformance/manifest.json",
+  "runner": "tools/run-conformance.mjs",
+  "validator": "tools/validate-conformance.mjs",
+  "promotionPolicy": "all-declared-environments-green-same-evidence-set",
+  "ledgerMutation": "explicit-after-green-evidence",
+  "browserSubstitutionAllowed": false,
+  "passingRequirements": [],
+  "seedTest": {
+    "id": "NCON-NREQ-0145",
+    "requirementId": "NREQ-0145",
+    "status": "wired-unverified",
+    "reasonNotPassing": "The public test file is wired, but this execution environment has not run it against a complete authenticated repository checkout."
+  }
+}

@@ -24,7 +24,12 @@ Status keys: `[x]` verified complete, `[>]` in progress, `[ ]` not complete, `[!
   - [ ] Implement `EmbeddedStylesheet` adapter using exact-pinned Lightning CSS after fresh dependency recheck.
   - [ ] Implement decoded segment maps + stage composition + final validation per ADR-0006.
   - [ ] Broaden HTML ownership checks beyond the certified paragraph auto-close case.
-  - [ ] Wire exact public `NCON-*` parser/source-map tests before promoting requirement rows.
+- [>] Public conformance infrastructure.
+  - [x] ADR-0007 public `NCON-*` identity/environment/promotion contract.
+  - [x] Public `conformance/` manifest, runner, validator, machine contract, and harness-core tests.
+  - [x] Wire first public compiler test `NCON-NREQ-0145`.
+  - [ ] Execute `NCON-NREQ-0145` against a complete checkout/CI evidence set; keep `NREQ-0145` planned until then.
+  - [ ] Add real-browser environment profiles when the browser harness exists; never substitute unit-only DOM emulation.
 - [ ] State, derivation, synchronization, and ownership.
 - [ ] Text and attribute bindings.
 - [ ] Events and native-control bindings.
@@ -46,10 +51,10 @@ Map: https://github.com/AahPlexX/nomos/issues/1
 - [x] Issue 2 — embedded TypeScript/CSS boundary → ADR-0005.
 - [x] Issue 3 — generated source-map composition → ADR-0006.
 - [ ] Issue 4 — runtime ownership/scheduler architecture.
-- [ ] Issue 5 — public conformance-harness promotion workflow.
+- [x] Issue 5 — public conformance-harness promotion workflow → ADR-0007.
 
 ## Continuing controls
 
-- [>] Requirement rows move from `planned` to `passing` only when their exact reserved public `NCON-*` test is executable and green.
+- [>] Requirement rows move from `planned` to `passing` only when their exact reserved public `NCON-*` test is green in every manifest-declared environment for the same evidence set.
 - [>] Keep all eleven `spec/open-decisions.json` entries open until explicit ADR/RFC approval changes one.
 - [>] Keep `docs/STATUS.md`, this queue, `CHANGELOG.md`, decision records, machine specs, Wayfinder map, and Handoff synchronized on every material change.

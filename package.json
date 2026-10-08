@@ -13,7 +13,9 @@
     "check:phase0": "node tools/validate-phase0.mjs",
     "check:phase1": "node tools/validate-phase1.mjs",
     "check:phase1:parser": "node --test \"tests/phase1-parser*.test.mjs\"",
-    "check": "pnpm test && pnpm check:prd && pnpm check:phase0 && pnpm check:phase1",
+    "check:conformance": "node tools/validate-conformance.mjs",
+    "test:conformance": "node tools/run-conformance.mjs",
+    "check": "pnpm test && pnpm check:prd && pnpm check:phase0 && pnpm check:phase1 && pnpm check:conformance",
     "check:prd": "node tools/verify-prd-source.mjs",
     "check:traceability": "node --test tests/phase0-traceability.test.mjs",
     "check:semantics": "node --test tests/phase0-semantics.test.mjs"

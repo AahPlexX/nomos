@@ -65,15 +65,23 @@
     },
     "dependencyInstallation": "deferred-until-executable-adapter-slice"
   },
+  "conformance": {
+    "decision": "docs/adr/0007-public-conformance-promotion.md",
+    "machineSpec": "spec/conformance.json",
+    "manifest": "conformance/manifest.json",
+    "status": "foundation-implemented",
+    "seedTest": "NCON-NREQ-0145",
+    "seedTestStatus": "wired-unverified"
+  },
   "wayfinder": {
     "map": "https://github.com/AahPlexX/nomos/issues/1",
     "resolvedDecisionTickets": [
       "https://github.com/AahPlexX/nomos/issues/2",
-      "https://github.com/AahPlexX/nomos/issues/3"
+      "https://github.com/AahPlexX/nomos/issues/3",
+      "https://github.com/AahPlexX/nomos/issues/5"
     ],
     "openDecisionTickets": [
-      "https://github.com/AahPlexX/nomos/issues/4",
-      "https://github.com/AahPlexX/nomos/issues/5"
+      "https://github.com/AahPlexX/nomos/issues/4"
     ]
   }
 }

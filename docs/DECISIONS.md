@@ -20,9 +20,10 @@ This register records product amendments and architecture decision status. The P
 | ADR-0004 | Preserve raw UTF-16 source offsets, expose one-based diagnostic coordinates, and use ECMA-426 source maps with UTF-16 JavaScript/CSS columns | Accepted for Phase 1 compiler front end | `docs/adr/0004-source-position-and-map-baseline.md` |
 | ADR-0005 | Keep embedded TypeScript/CSS in Nomos-owned wrappers and treat TypeScript/Lightning CSS structures as opaque adapter internals | Accepted for Phase 1 compiler front end | `docs/adr/0005-embedded-language-adapter-boundary.md` |
 | ADR-0006 | Emit stage-local mappings, explicitly leave compiler scaffolding unmapped, and compose/validate a final ECMA-426 map back to the original `.nomos` source | Accepted for Phase 1 compiler front end | `docs/adr/0006-stage-local-source-map-composition.md` |
+| ADR-0007 | Bind each reserved `NCON-*` identity to a public test/environment manifest and require all declared environments green before explicit ledger promotion | Accepted for Phase 1 conformance infrastructure | `docs/adr/0007-public-conformance-promotion.md` |
 
 ## PRD Open Decisions
 
 The machine-readable authority for the eleven still-open items is `spec/open-decisions.json`. Every entry remains `open` with `resolution: null`.
 
-PRD-A0001 and ADR-0001 through ADR-0006 close no Open Decision. ADR-0005 does not settle `OD-009` (TypeScript 7.1+ API adoption timing), and ADR-0006 does not settle `OD-003` (exact HMR compatibility signature). `state.snapshot` remains provisional under `OD-004`, and the product/extension name remains provisional under `OD-011`.
+PRD-A0001 and ADR-0001 through ADR-0007 close no Open Decision. ADR-0005 does not settle `OD-009` (TypeScript 7.1+ API adoption timing), ADR-0006 does not settle `OD-003` (exact HMR compatibility signature), and ADR-0007 only defines conformance evidence/promotion mechanics. `state.snapshot` remains provisional under `OD-004`, and the product/extension name remains provisional under `OD-011`.
