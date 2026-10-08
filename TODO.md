@@ -17,7 +17,7 @@ Status keys: `[x]` verified complete, `[>]` in progress, `[ ]` not complete, `[!
 - [x] Capability-gauntlet specification.
 - [x] Learnability-study protocol.
 - [x] Normative requirement extraction and traceability infrastructure for all 239 uppercase `MUST` / `MUST NOT` operators.
-  - Runtime/compiler rows remain `planned` until their owning implementation phases provide executable conformance evidence; this does not reopen Phase 0.
+  - Runtime/compiler rows remain `planned` until their owning public conformance IDs provide executable evidence; this does not reopen Phase 0.
 
 ## Phase 0 exit gate — CLOSED
 
@@ -31,7 +31,21 @@ Status keys: `[x]` verified complete, `[>]` in progress, `[ ]` not complete, `[!
 ## Phase 1 — Vertical Slice
 
 - [>] Establish Phase 1 implementation architecture and deterministic conformance harness from the Phase 0 contracts.
-- [ ] Parser and source maps.
+- [>] Parser and source maps.
+  - [x] Lossless top-level section partitioning with arbitrary section order.
+  - [x] Exact raw UTF-16 offsets and one-based diagnostic line/column positions, including CRLF handling.
+  - [x] Reject a second top-level script with `NOMOS-PARSE-DUPLICATE-SCRIPT`.
+  - [x] Reject unclosed top-level script/style sections with `NOMOS-PARSE-UNCLOSED-SECTION`.
+  - [x] Ignore script/style-like markup nested inside element or structural-block ownership when identifying component sections.
+  - [x] ECMA-426 version-3 identity line-start source-map primitive with embedded `sourcesContent`.
+  - [x] ADR-0004 and `spec/compiler-front-end.json` define the coordinate/map contract for continuation.
+  - [ ] Parse template nodes, attributes, directives, interpolation, and structural blocks into the typed internal AST.
+  - [ ] Implement `NOMOS-PARSE-HTML-OWNERSHIP` against the Phase 0 adversarial fixture.
+  - [ ] Implement `NOMOS-PARSE-UNTERMINATED-BLOCK` against the Phase 0 adversarial fixture.
+  - [ ] Implement `NOMOS-PARSE-UNKNOWN-DIRECTIVE` against the Phase 0 adversarial fixture.
+  - [ ] Parse embedded TypeScript and CSS into typed/structured compiler representations.
+  - [ ] Compose token-level generated-code source maps rather than only pass-through line-start mappings.
+  - [ ] Certify all seven valid and four invalid Phase 0 parser fixtures against the executable parser.
 - [ ] State, derivation, synchronization, and ownership.
 - [ ] Text and attribute bindings.
 - [ ] Events and native-control bindings.
@@ -48,6 +62,6 @@ Status keys: `[x]` verified complete, `[>]` in progress, `[ ]` not complete, `[!
 
 ## Continuing controls
 
-- [>] Promote each `spec/requirements.json` row from `planned` to `passing` only when its executable conformance evidence lands.
+- [>] Promote each `spec/requirements.json` row from `planned` to `passing` only when its exact public `NCON-*` conformance ID is wired and green. Development tests alone do not promote a row.
 - [>] Keep all eleven `spec/open-decisions.json` items open until an explicit ADR/RFC resolution is approved.
 - [>] Keep `docs/STATUS.md`, this queue, `CHANGELOG.md`, decision records, and affected specs synchronized on every material change.

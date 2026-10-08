@@ -43,3 +43,28 @@ All material repository changes are recorded here. This file tracks project stat
 - Phase 0 is complete under the effective amended PRD.
 - Phase 1 — Vertical Slice is active.
 - Runtime/compiler conformance rows remain `planned` until executable evidence lands in their owning phases.
+
+## 2026-10-08 — Phase 1 parser/source-map slice 1
+
+### Added
+
+- `packages/compiler/src/parser.mjs` lossless top-level component section parser.
+- `packages/compiler/src/source-map.mjs` ECMA-426 version-3 identity line-start source-map primitive.
+- `packages/compiler/src/index.mjs` compiler-front-end entrypoint for the current slice.
+- Stable duplicate-script and unclosed-section diagnostics with dedicated documentation.
+- ADR-0004 defining raw UTF-16 source positions, CRLF handling, diagnostic coordinates, and source-map conventions.
+- `spec/compiler-front-end.json` machine-readable parser/source-map implementation state.
+- `tools/validate-phase1.mjs` and package scripts for the active Phase 1 artifact gate.
+- `tests/phase1-parser.test.mjs` with eight executable parser/source-map cases, including the preserved Phase 0 duplicate-script fixture.
+
+### TDD evidence
+
+- Initial parser test RED: compiler entry modules absent.
+- First GREEN: 5/5 tests after section parser/source-map baseline implementation.
+- Regression RED: nested script/style content was incorrectly classified as a component section (5 passed / 1 failed).
+- Regression GREEN plus Unicode/fixture coverage: 8/8 passed under Node `v22.16.0`.
+
+### Still in progress
+
+- Typed template AST, HTML ownership validation, structural-block termination, directive validation, embedded TypeScript/CSS structures, full Phase 0 parser-corpus certification, and token-level generated-code source-map composition remain required before `Parser and source maps` can be marked complete.
+- `NREQ-0145` / `NREQ-0150` remain `planned` until their exact public `NCON-*` conformance IDs are wired; development tests do not silently promote traceability rows.

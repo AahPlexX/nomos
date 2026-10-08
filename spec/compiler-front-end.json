@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "status": "phase-1-in-progress",
+  "entrypoint": "packages/compiler/src/index.mjs",
+  "sourcePositionModel": {
+    "rawSourcePreserved": true,
+    "offsetBase": 0,
+    "offsetUnit": "utf-16-code-unit",
+    "diagnosticLineBase": 1,
+    "diagnosticColumnBase": 1,
+    "diagnosticColumnUnit": "utf-16-code-unit",
+    "crlfLogicalLines": "single-line-break"
+  },
+  "sectionKinds": ["script", "style", "template"],
+  "implementedDiagnostics": [
+    "NOMOS-PARSE-DUPLICATE-SCRIPT",
+    "NOMOS-PARSE-UNCLOSED-SECTION"
+  ],
+  "sourceMaps": {
+    "standard": "ECMA-426",
+    "versionField": 3,
+    "columnUnitForJavaScriptAndCss": "utf-16-code-unit",
+    "sourcesContent": true,
+    "currentPrimitive": "identity-line-start",
+    "tokenLevelGeneratedMappings": "planned"
+  },
+  "phase0ParserCorpus": {
+    "duplicateScript": "implemented",
+    "htmlOwnership": "planned",
+    "unterminatedStructuralBlock": "planned",
+    "unknownDirective": "planned",
+    "allValidFixtures": "not-yet-certified"
+  }
+}

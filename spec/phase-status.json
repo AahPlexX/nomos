@@ -19,6 +19,24 @@
     "name": "Vertical Slice",
     "status": "in-progress",
     "allowed": true,
+    "activeSlice": "parser-and-source-maps",
+    "parserAndSourceMaps": "in-progress",
+    "parserImplemented": [
+      "top-level-section-partitioning",
+      "exact-raw-source-spans",
+      "duplicate-script-diagnostic",
+      "unclosed-section-diagnostic",
+      "ecma-426-identity-line-start-map"
+    ],
+    "parserRemaining": [
+      "typed-template-ast",
+      "html-ownership-validation",
+      "unterminated-structural-block-diagnostic",
+      "unknown-directive-diagnostic",
+      "typed-typescript-and-css-structures",
+      "token-level-generated-source-map-composition",
+      "full-phase0-parser-corpus-certification"
+    ],
     "exitCriterion": "A TodoMVC-class application passes deterministic browser tests, preserves valid state through HMR, and cleans up every owned effect."
   }
 }
