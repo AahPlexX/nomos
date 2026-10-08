@@ -9,8 +9,9 @@ This repository is designed to be resumable by another engineer or coding agent 
 3. `TODO.md` — ordered work queue and acceptance evidence.
 4. `docs/GOVERNANCE.md` — decision, branch, documentation, and release rules.
 5. `docs/DECISIONS.md` and `docs/adr/` — ratified and still-open architecture decisions.
-6. `spec/requirements.json` — append-only normative requirement IDs, owning phase, and conformance-test mappings.
-7. `CHANGELOG.md` — completed material changes.
+6. `spec/open-decisions.json` — machine guard against silently resolving the PRD's eleven open decisions.
+7. `spec/requirements.json` — append-only normative requirement IDs, owning phase, and conformance-test mappings.
+8. `CHANGELOG.md` — completed material changes.
 
 ## Mandatory continuation rules
 

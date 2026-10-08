@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "policy": "html-source-compatible",
+  "lineEndingNormalization": "CRLF-or-CR-to-LF",
+  "compilerTrimming": "none",
+  "visualWhitespaceProcessing": "CSS",
+  "preTextareaLeadingLf": "strip-one",
+  "templateDelimitersEmitText": false,
+  "interpolationTrimsAdjacentLiteralText": false,
+  "notes": [
+    "Literal text-node whitespace is preserved after HTML newline normalization unless an explicitly documented HTML syntax exception applies.",
+    "Nomos structural delimiters do not create text, but literal whitespace around them remains author text.",
+    "Rendering collapse and wrapping are controlled by CSS white-space processing, not by aesthetic compiler trimming."
+  ]
+}

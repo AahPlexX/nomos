@@ -10,7 +10,11 @@ const required = [
   'docs/phase-0/LEARNABILITY-STUDY.md',
   'docs/phase-0/REQUIREMENT-TRACEABILITY.md',
   'docs/phase-0/PARSER-CORPUS.md',
+  'docs/phase-0/CONTRADICTION-AUDIT.md',
+  'docs/phase-0/EXTERNAL-REVIEW-PACKET.md',
+  'docs/adr/0003-whitespace-semantics.md',
   'spec/nomos.ebnf', 'spec/runtime-api.json', 'spec/levels.json', 'spec/requirements.json',
+  'spec/open-decisions.json', 'spec/whitespace.json',
   'tests/fixtures/parser/manifest.json'
 ];
 

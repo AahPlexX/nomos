@@ -15,7 +15,13 @@
     "mount"
   ],
   "nested": {
-    "state": ["raw", "snapshot"]
+    "state": [
+      "raw",
+      "snapshot"
+    ]
   },
-  "status": "phase-0-contract"
+  "status": "phase-0-contract",
+  "provisionalDecisions": [
+    "OD-004"
+  ]
 }

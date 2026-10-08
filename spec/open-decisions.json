@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "policy": "Open decisions may be explored by prototypes but are not resolved until an ADR or public RFC records compatibility impact, test plan, and documentation change.",
+  "decisions": [
+    { "id": "OD-001", "sourceLine": 953, "text": "Exact slot-presence API without expanding the core budget.", "status": "open", "resolution": null },
+    { "id": "OD-002", "sourceLine": 954, "text": "Whether empty arrays trigger the asynchronous empty branch.", "status": "open", "resolution": null },
+    { "id": "OD-003", "sourceLine": 955, "text": "Exact HMR compatibility signature.", "status": "open", "resolution": null },
+    { "id": "OD-004", "sourceLine": 956, "text": "Whether `state.snapshot` remains on the root state namespace.", "status": "open", "resolution": null },
+    { "id": "OD-005", "sourceLine": 957, "text": "Whether exhaustive pattern matching warrants another structural block.", "status": "open", "resolution": null },
+    { "id": "OD-006", "sourceLine": 958, "text": "Canonical query-key serialization.", "status": "open", "resolution": null },
+    { "id": "OD-007", "sourceLine": 959, "text": "Canonical SSG data-serialization format and CSP envelope.", "status": "open", "resolution": null },
+    { "id": "OD-008", "sourceLine": 960, "text": "Exact custom-element pre-upgrade property behavior.", "status": "open", "resolution": null },
+    { "id": "OD-009", "sourceLine": 961, "text": "TypeScript 7.1-or-later API adoption timing.", "status": "open", "resolution": null },
+    { "id": "OD-010", "sourceLine": 962, "text": "Framework-file support status in external linters.", "status": "open", "resolution": null },
+    { "id": "OD-011", "sourceLine": 963, "text": "Final product and extension name.", "status": "open", "resolution": null }
+  ]
+}

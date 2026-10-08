@@ -1,6 +1,6 @@
 # Project status and handoff
 
-**Last verified:** 2026-10-08 12:58 America/Chicago  
+**Last verified:** 2026-10-08 (America/Chicago)  
 **Remote:** `AahPlexX/nomos`  
 **Required delivery branch:** `origin/main`  
 **Phase:** 0 — Thesis  
@@ -9,81 +9,75 @@
 
 ## Verified repository baseline
 
-- Default/only branch observed: `main`.
-- Initial remote baseline: `b7d1d58875365b7193d8ccd8765a37ec63601c8c` (`Initial commit`), containing `LICENSE` only.
-- Current verified pre-traceability head: `41b95da774e6637e9e18beb133b44815707743a8`.
-- Open pull requests observed before this delivery: none.
-- No prior hidden implementation branch was found through the connected GitHub repository state.
+- Default/only branch observed after traceability delivery: `main`.
+- Current delivered traceability head before this semantics slice: `45b1310aad645708f7a997683b64ff14412df03e`.
+- Open pull requests observed after that delivery: none.
+- Authoritative PRD reconstruction: 52,982 bytes, SHA-256 `b07950df46be388b10497063c5aabc01a20402a13dcebea0c8ec847869147690`, byte-for-byte equal to the uploaded source.
 
 ## Current Phase 0 state
 
-Already on `main` before the current delivery:
+Delivered on `main` through `45b1310`:
 
-- formal `.nomos` component grammar draft (`spec/nomos.ebnf`);
-- root runtime API budget contract (`spec/runtime-api.json`);
-- additive learning-level contract (`spec/levels.json`);
-- ten representative `.nomos` component fixtures (`examples/phase-0/`);
-- executable Phase 0 contract tests (`tests/phase0-contracts.test.mjs`);
-- lossless repository preservation of the supplied PRD as four ordered source fragments plus a SHA-256 manifest/checker;
-- governance, decisions, continuation protocol, reactive contract, capability-gauntlet specification, learnability-study protocol, and dated toolchain ADRs.
+- formal `.nomos` grammar draft, API budget, additive levels, and ten representative components;
+- reactive contract, capability-gauntlet specification, learnability protocol, governance, and ADR-0001/0002;
+- 239 operator-level normative requirement IDs with deterministic PRD extraction and reserved conformance IDs;
+- seven valid plus four invalid/adversarial structural parser fixtures;
+- synchronized continuation/TODO/changelog/status controls.
 
-Included in the current direct-to-`main` delivery:
+Included in the current semantics/consistency delivery:
 
-- `spec/requirements.json` with **239 operator-level normative obligations** (195 `MUST`, 44 `MUST NOT`) and one reserved conformance ID per obligation;
-- deterministic independent extraction in `tools/normative-requirements.mjs` that fails on omission/drift and retains governing clauses for inherited list requirements;
-- Phase 0 parser contract corpus with seven valid and four invalid/adversarial fixtures;
-- synchronized `AGENTS.md`, `README.md`, `TODO.md`, `CHANGELOG.md`, traceability docs, parser-corpus docs, and Phase 0 validator updates.
+- explicit HTML/CSS-aligned whitespace semantics in `spec/whitespace.json`, ADR-0003, and five whitespace fixtures;
+- all eleven PRD Open Decisions in `spec/open-decisions.json`, each still `open` with no resolution;
+- `spec/runtime-api.json` machine-marking `OD-004` so proposed `state.snapshot` placement cannot be mistaken for a ratified decision;
+- `docs/phase-0/CONTRADICTION-AUDIT.md`, which found and fixed that provisional-status ambiguity and found no other current silent open-decision resolution;
+- `docs/phase-0/EXTERNAL-REVIEW-PACKET.md`, defining frozen inputs, prediction prompts, evidence fields, and a conservative closure rule for the required five experienced external reviewers;
+- `tests/phase0-semantics.test.mjs` guarding all of the above.
 
-Phase 0 is **not complete**. The whitespace-behavior fixture, contradiction audit, and five-reviewer external exit gate remain open, and no runtime/compiler implementation is claimed. All implementation conformance rows remain `planned`.
+Phase 0 is **not complete**. Five qualified external reviewers have not yet completed the required evidence packet; no AI/self-review is counted as a substitute. Any contradiction they identify must be resolved before exit.
 
 ## Verification evidence
 
-Initial Phase 0 TDD:
+TDD evidence preserved across Phase 0:
 
 ```text
-node --test tests/phase0-contracts.test.mjs
-RED before contract artifacts: 5 failures.
-GREEN after contract artifacts: 5 passed; 0 failed.
+Initial contracts: RED 5 failures -> GREEN 5/5.
+Traceability/parser corpus: RED 3 failures -> completeness-gate RED -> GREEN 3/3.
+Semantics/open decisions/whitespace: RED 3 failures -> GREEN 3/3.
 ```
 
-Traceability TDD:
+Current combined local gate before semantics delivery:
 
 ```text
-node --test tests/phase0-traceability.test.mjs
-RED: 3 failures while requirements ledger and parser manifest were absent.
-RED after completeness tightening: independent normative extractor absent.
-GREEN after ledger, extractor, parser corpus, and operator-level compound-clause fix: 3 passed; 0 failed.
+node --test tests/phase0-contracts.test.mjs tests/phase0-traceability.test.mjs tests/phase0-semantics.test.mjs
+11 passed; 0 failed.
+node tools/verify-prd-source.mjs
+PRD source verified: 52,982 bytes; authoritative SHA-256 matched.
+node tools/validate-phase0.mjs
+Phase 0 structural/documentation gate passed.
 ```
 
-Combined pre-delivery suite:
-
-```text
-node --test tests/phase0-contracts.test.mjs tests/phase0-traceability.test.mjs
-8 passed; 0 failed.
-```
-
-Remote PRD integrity was rechecked after correcting one fragment-boundary newline: the four downloaded remote fragments concatenate to exactly 52,982 bytes and SHA-256 `b07950df46be388b10497063c5aabc01a20402a13dcebea0c8ec847869147690`, byte-for-byte equal to the uploaded source.
-
-The current execution container has Node `v22.16.0` but no `pnpm` executable, so verification here runs the repository's zero-dependency Node commands directly rather than weakening the pnpm policy.
+The execution container has Node `v22.16.0` but no `pnpm` executable, so the underlying zero-dependency Node commands are run directly without weakening the repository's pnpm policy.
 
 ## Current verified external baseline
 
 On 2026-10-08:
 
-- Vite 8 is the active stable major and supports custom transform, virtual-module, and HMR hooks suitable for compiler integration.
-- Vite's documented Node requirement is 20.19+ or 22.12+.
-- TypeScript 7.0 is released, while API-dependent tooling may still use `@typescript/typescript6` until the new programmatic API is stable and validated.
-- Registry checks observed `vite@8.3.4`, `typescript@7.0.2`, `@typescript/typescript6@6.0.2`, `@volar/language-core@2.4.28`, `@volar/language-service@2.4.28`, and `pnpm@12.10.1`; the checked set returned no known vulnerabilities from the connected vulnerability source.
-- WCAG 2.2 SC 1.4.10 still requires content/functionality without two-dimensional scrolling at the equivalent of 320 CSS px for vertical-scrolling content, except intrinsically two-dimensional content.
+- Vite 8 remains the intended build-integration line; current official documentation exposes custom transform, virtual-module, and HMR hooks appropriate for compiler integration.
+- TypeScript 7.0 is released; API-dependent internal tooling remains allowed to use the TS6 compatibility package until a stable TS7 programmatic API satisfies Nomos and the migration is validated.
+- Registry checks previously observed exact current versions recorded in ADR-0001 with no known vulnerabilities in the checked set.
+- WHATWG HTML, W3C CSS Text, and MDN documentation were rechecked for whitespace semantics: DOM text preserves source whitespace subject to HTML syntax normalization/exceptions, while CSS controls visual whitespace collapse/wrapping.
 
-These version facts are implementation constraints, not source-language semantics. Revalidate before dependency installation or a Nomos minor release.
+Third-party/toolchain facts remain revalidation inputs, not source-language semantics.
 
-## Known blockers / intentionally open decisions
+## Open decisions and blockers
 
-All PRD Open Decisions remain open unless an ADR explicitly says otherwise. In particular this slice does not settle query-key serialization, SSG serialization/CSP envelope, HMR compatibility signature, slot-presence API, custom-element pre-upgrade property behavior, TS 7.1+ API adoption timing, pattern matching, external-linter framework-file support, or final naming.
+- All eleven PRD Open Decisions remain open in `spec/open-decisions.json`.
+- Final product and extension naming remain provisional.
+- External-contribution governance/license ratification remains separate from the existing license file.
+- Phase 1 implementation remains gated until the Phase 0 external-review exit condition is actually evidenced.
 
 ## Immediate next action
 
-1. Re-read `origin/main`, verify the complete suite against the delivered files, and confirm `main` remains the only branch with zero open PRs.
-2. Define the required whitespace behavior fixture without resolving any unrelated PRD Open Decision.
-3. Run the Phase 0 contradiction audit and prepare the five-reviewer external review packet required by the PRD exit gate.
+1. Re-read the delivered semantics commit, rerun/confirm all 11 Phase 0 tests and validators against the exact delivered payload, and confirm only `main` exists with zero open PRs.
+2. Keep Phase 0 open pending five qualified external reviewer records.
+3. Incorporate any reviewer ambiguity/contradiction feedback through synchronized PRD/ADR/spec/test/docs changes before Phase 1 begins.

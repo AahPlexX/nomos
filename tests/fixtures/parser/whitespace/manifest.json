@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "policy": "spec/whitespace.json",
+  "cases": [
+    { "id": "WS-001", "file": "01-inline.nomos", "expectedTextSegments": ["Hello ", "Nomos", " world"] },
+    { "id": "WS-002", "file": "02-indentation.nomos", "expectedTextSegments": ["\n  ", "One", "\n  ", "Two", "\n"] },
+    { "id": "WS-003", "file": "03-interpolation.nomos", "expectedTextSegments": ["Hello ", " !"] },
+    { "id": "WS-004", "file": "04-pre-leading-newline.nomos", "expectedTextSegments": ["line one\n  line two"], "htmlException": "strip-one-leading-LF-after-pre-start-tag" },
+    { "id": "WS-005", "file": "05-textarea-leading-newline.nomos", "expectedTextSegments": ["line one\nline two"], "htmlException": "strip-one-leading-LF-after-textarea-start-tag" }
+  ]
+}
