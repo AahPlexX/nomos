@@ -9,14 +9,15 @@ This repository is designed to be resumable by another engineer or coding agent 
 3. `TODO.md` — ordered work queue and acceptance evidence.
 4. `docs/GOVERNANCE.md` — decision, branch, documentation, and release rules.
 5. `docs/DECISIONS.md` and `docs/adr/` — ratified and still-open architecture decisions.
-6. `CHANGELOG.md` — completed material changes.
+6. `spec/requirements.json` — append-only normative requirement IDs, owning phase, and conformance-test mappings.
+7. `CHANGELOG.md` — completed material changes.
 
 ## Mandatory continuation rules
 
 - Work from and deliver to `origin/main`. Do not leave feature branches or open pull requests unless the owner explicitly changes this rule.
 - Fetch/re-read remote state immediately before a write. Do not infer repository state from chat history.
-- Treat `PRD.md` as binding. Do not silently resolve an item listed under **Open Decisions** in the PRD.
-- Every `MUST` and `MUST NOT` ultimately requires automated conformance coverage. New normative behavior must add or update its traceability entry and test evidence.
+- Treat the `PRD.md` manifest plus its four ordered `docs/prd/source-part-*.md` fragments as the binding PRD. Do not silently resolve an item listed under **Open Decisions** in that source.
+- Every `MUST` and `MUST NOT` ultimately requires automated conformance coverage. `spec/requirements.json` is the traceability ledger; IDs are append-only, `planned` reserves a test ID, and only executable evidence may promote a row to `passing`.
 - Use test-first development for executable behavior. Record the red and green commands in `docs/STATUS.md` or the relevant task record.
 - Keep internal documentation synchronized in the same commit as the code/spec change it describes. At minimum update `docs/STATUS.md`, `TODO.md`, and `CHANGELOG.md` when material state changes.
 - Do not claim a phase, feature, or requirement complete without executable evidence and the PRD-defined exit gate.

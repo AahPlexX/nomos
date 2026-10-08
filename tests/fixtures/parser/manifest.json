@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "purpose": "Phase 0 parser contract corpus. These fixtures define accepted/rejected source shapes before Phase 1 parser implementation.",
+  "coverage": [
+    "interpolation",
+    "dynamic-attribute",
+    "mixed-attribute",
+    "shorthand-attribute",
+    "spread-attribute",
+    "if",
+    "else-if",
+    "else",
+    "keyed-list",
+    "positional-list",
+    "empty-list",
+    "await-pending",
+    "await-success",
+    "await-empty",
+    "await-error",
+    "component",
+    "custom-element",
+    "raw-html",
+    "on-directive",
+    "bind-directive",
+    "use-directive",
+    "let-directive",
+    "script-typescript",
+    "script-javascript",
+    "scoped-style",
+    "global-style",
+    "svg",
+    "mathml"
+  ],
+  "valid": [
+    { "file": "01-sections-and-scripts.nomos", "proves": ["section-order", "interpolation", "script-typescript", "scoped-style"] },
+    { "file": "02-attributes-and-directives.nomos", "proves": ["dynamic-attribute", "mixed-attribute", "shorthand-attribute", "spread-attribute", "on-directive", "bind-directive", "use-directive"] },
+    { "file": "03-control-flow.nomos", "proves": ["if", "else-if", "else", "keyed-list", "positional-list", "empty-list"] },
+    { "file": "04-await-regions.nomos", "proves": ["await-pending", "await-success", "await-empty", "await-error"] },
+    { "file": "05-components-and-slots.nomos", "proves": ["component", "custom-element", "let-directive"] },
+    { "file": "06-raw-namespaces-and-global-style.nomos", "proves": ["raw-html", "svg", "mathml", "global-style"] },
+    { "file": "07-javascript-script.nomos", "proves": ["script-javascript"] }
+  ],
+  "invalid": [
+    { "file": "01-duplicate-script.nomos", "diagnostic": "NOMOS-PARSE-DUPLICATE-SCRIPT", "reason": "A component may contain at most one top-level script block." },
+    { "file": "02-html-ownership.nomos", "diagnostic": "NOMOS-PARSE-HTML-OWNERSHIP", "reason": "HTML parsing would rearrange the declared ownership tree." },
+    { "file": "03-unterminated-block.nomos", "diagnostic": "NOMOS-PARSE-UNTERMINATED-BLOCK", "reason": "Structural blocks must be explicitly closed." },
+    { "file": "04-unknown-directive.nomos", "diagnostic": "NOMOS-PARSE-UNKNOWN-DIRECTIVE", "reason": "Nomos 1.0 has exactly four directive prefixes." }
+  ]
+}

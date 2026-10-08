@@ -1,0 +1,11 @@
+<script>
+  const trustedHtml = '<strong>trusted fixture</strong>';
+</script>
+
+<section>{@html trustedHtml}</section>
+<svg viewBox="0 0 10 10"><circle cx="5" cy="5" r="4" /></svg>
+<math><mi>x</mi><mo>=</mo><mn>1</mn></math>
+
+<style global>
+  :root { --fixture-gap: 1rem; }
+</style>

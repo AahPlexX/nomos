@@ -10,9 +10,11 @@ Status keys: `[x]` verified complete, `[>]` in progress, `[ ]` not complete, `[!
 
 - [>] Formal component grammar.
   - [x] Initial EBNF contract checked in.
-  - [ ] Parser-valid fixture corpus.
-  - [ ] Parser-invalid/adversarial fixture corpus.
-  - [ ] Whitespace/HTML-ownership grammar fixtures.
+  - [x] Parser-valid fixture corpus.
+  - [x] Parser-invalid/adversarial fixture corpus.
+  - [>] Whitespace/HTML-ownership grammar fixtures.
+    - [x] HTML-ownership adversarial fixture reserved as `NOMOS-PARSE-HTML-OWNERSHIP`.
+    - [ ] Whitespace behavior fixture and explicit parse/render expectation.
 - [x] One-page reactive contract drafted from the PRD.
 - [x] Ten representative `.nomos` components present.
 - [>] Architecture decision records.
@@ -25,9 +27,10 @@ Status keys: `[x]` verified complete, `[>]` in progress, `[ ]` not complete, `[!
 - [x] Capability-gauntlet specification drafted.
 - [x] Learnability-study protocol drafted.
 - [>] Normative requirement traceability.
-  - [ ] Extract all PRD `MUST` / `MUST NOT` statements into stable requirement IDs.
-  - [ ] Map each requirement to an automated conformance test id or explicit future-phase planned test id.
-  - [ ] Add a checker that rejects unmapped normative requirements before release-complete status can be set.
+  - [x] Extract all PRD `MUST` / `MUST NOT` obligations into 239 stable requirement IDs.
+  - [x] Map every requirement to an automated conformance test id or explicit future-phase planned test id.
+  - [x] Add a checker that independently re-extracts the PRD and rejects omitted or drifted mappings.
+  - [ ] Promote requirement rows from `planned` to `passing` only as executable conformance tests land in their owning phases.
 
 ## Phase 0 exit gate
 

@@ -1,0 +1,4 @@
+<p>
+  Intro
+  <div>This causes the HTML parser to close the paragraph early.</div>
+</p>

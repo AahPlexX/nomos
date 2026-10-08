@@ -1,0 +1,9 @@
+<script>
+  import Profile from './Profile.nomos';
+</script>
+
+<Profile let:user>
+  <strong>{user.displayName}</strong>
+</Profile>
+
+<account-badge status="active" />

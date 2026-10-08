@@ -1,0 +1,3 @@
+<script>const first = 1;</script>
+<p>{first}</p>
+<script>const second = 2;</script>

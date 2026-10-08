@@ -1,0 +1,13 @@
+<script>
+  const work = Promise.resolve(['one']);
+</script>
+
+{#await work}
+  <p>Pending</p>
+{:then result}
+  <p>{result.length}</p>
+{:empty}
+  <p>Empty</p>
+{:catch error}
+  <p role="alert">{error.message}</p>
+{/await}

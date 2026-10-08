@@ -1,0 +1,1 @@
+<button type="button" show:when={ready}>Unsupported directive</button>

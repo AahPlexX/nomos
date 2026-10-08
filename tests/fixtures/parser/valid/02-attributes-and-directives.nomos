@@ -1,0 +1,18 @@
+<script>
+  import { state } from 'nomos';
+  let value = state('ready');
+  const attrs = { title: 'status' };
+  const active = true;
+  const attach = (node: HTMLElement) => () => node.removeAttribute('data-ready');
+  function handleClick() { value = 'clicked'; }
+</script>
+
+<input
+  class="field {active ? 'active' : ''}"
+  aria-label={value}
+  {active}
+  {...attrs}
+  on:click={handleClick}
+  bind:value={value}
+  use:attach
+/>

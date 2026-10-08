@@ -12,6 +12,7 @@
     "test": "node --test tests/*.test.mjs",
     "check:phase0": "node tools/validate-phase0.mjs",
     "check": "pnpm test && pnpm check:prd && pnpm check:phase0",
-    "check:prd": "node tools/verify-prd-source.mjs"
+    "check:prd": "node tools/verify-prd-source.mjs",
+    "check:traceability": "node --test tests/phase0-traceability.test.mjs"
   }
 }

@@ -1,0 +1,27 @@
+<script>
+  const score = 2;
+  const keyed = [{ id: 'a', label: 'Alpha' }];
+  const positional = [];
+</script>
+
+{#if score > 2}
+  <p>High</p>
+{:else if score === 2}
+  <p>Equal</p>
+{:else}
+  <p>Low</p>
+{/if}
+
+<ul>
+  {#each keyed as item (item.id)}
+    <li>{item.label}</li>
+  {/each}
+</ul>
+
+<ul>
+  {#each positional as item, index}
+    <li>{index}: {item}</li>
+  {:else}
+    <li>Empty</li>
+  {/each}
+</ul>

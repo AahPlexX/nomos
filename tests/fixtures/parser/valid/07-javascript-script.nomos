@@ -1,0 +1,5 @@
+<script lang="js">
+  const message = 'JavaScript opt-in';
+</script>
+
+<p>{message}</p>

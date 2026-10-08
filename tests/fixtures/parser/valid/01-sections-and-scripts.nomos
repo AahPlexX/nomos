@@ -1,0 +1,11 @@
+<style>
+  main { display: grid; gap: 1rem; }
+</style>
+
+<main>
+  <h1>{title}</h1>
+</main>
+
+<script>
+  const title: string = 'Nomos';
+</script>

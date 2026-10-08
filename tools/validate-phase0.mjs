@@ -8,7 +8,10 @@ const required = [
   'docs/phase-0/REACTIVE-CONTRACT.md',
   'docs/phase-0/CAPABILITY-GAUNTLET.md',
   'docs/phase-0/LEARNABILITY-STUDY.md',
-  'spec/nomos.ebnf', 'spec/runtime-api.json', 'spec/levels.json'
+  'docs/phase-0/REQUIREMENT-TRACEABILITY.md',
+  'docs/phase-0/PARSER-CORPUS.md',
+  'spec/nomos.ebnf', 'spec/runtime-api.json', 'spec/levels.json', 'spec/requirements.json',
+  'tests/fixtures/parser/manifest.json'
 ];
 
 for (const path of required) await access(new URL(path, root));
@@ -28,4 +31,10 @@ assert.match(todo, /Phase 0 must remain IN PROGRESS/);
 const examples = (await readdir(new URL('examples/phase-0/', root))).filter((name) => name.endsWith('.nomos'));
 assert.equal(examples.length, 10);
 
-console.log(`Phase 0 contract check passed: ${required.length} required artifacts, ${examples.length} representative components.`);
+const requirements = JSON.parse(await readFile(new URL('spec/requirements.json', root), 'utf8'));
+assert.equal(requirements.releaseComplete, false, 'Phase 0 must not claim release-complete traceability');
+const statusIndex = requirements.columns.indexOf('status');
+assert.ok(requirements.requirements.some((row) => row[statusIndex] === 'planned'));
+assert.equal(requirements.requirements.length, 239, 'normative requirement index changed without synchronized documentation');
+
+console.log(`Phase 0 contract check passed: ${required.length} required artifacts, ${examples.length} representative components, ${requirements.requirements.length} normative requirements indexed.`);

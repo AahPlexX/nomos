@@ -8,7 +8,7 @@ The binding product contract is [`PRD.md`](./PRD.md). Development state is recor
 
 ## Current phase
 
-Phase 0 establishes the language and behavioral thesis before implementation. Current checked-in artifacts include the formal component grammar draft, the additive learning-level contract, the root runtime API budget contract, ten representative `.nomos` fixtures, and executable Phase 0 contract tests.
+Phase 0 establishes the language and behavioral thesis before implementation. Current checked-in artifacts include the formal component grammar draft, the additive learning-level contract, the root runtime API budget contract, ten representative `.nomos` fixtures, a parser contract corpus, a machine-readable normative-requirement ledger, and executable Phase 0 contract tests.
 
 ## Verification
 
@@ -17,6 +17,7 @@ The repository uses pnpm and intentionally has no third-party runtime or test de
 ```bash
 pnpm test
 pnpm check:phase0
+pnpm check:traceability
 ```
 
 `pnpm` is pinned through `packageManager`; dependencies added later must use exact versions.
