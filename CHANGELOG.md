@@ -73,7 +73,6 @@ All material repository changes are recorded here. This file tracks project stat
 
 ### Added
 
-- `template-syntax.mjs` as a separate structural-analysis layer over the unchanged lossless section scanner.
 - Flat typed `TemplateSyntaxTree` nodes for element opens/closes, attributes/directives, interpolation/raw HTML, and structural block markers with exact source spans.
 - `NOMOS-PARSE-HTML-OWNERSHIP`, `NOMOS-PARSE-UNTERMINATED-BLOCK`, and `NOMOS-PARSE-UNKNOWN-DIRECTIVE` implementations and diagnostic documentation.
 - Structural executable certification for all seven valid and all four invalid Phase 0 parser fixtures.
@@ -83,8 +82,29 @@ All material repository changes are recorded here. This file tracks project stat
 
 - RED before implementation: 8 passed / 3 failed.
 - GREEN after implementation: 11 passed / 0 failed under Node `v22.16.0`.
-- Phase 1 artifact validator is green while explicitly keeping `Parser and source maps` IN PROGRESS.
 
 ### Still in progress
 
 - Final hierarchical typed template AST, embedded TypeScript/CSS structures, broader HTML tree-construction validation, token-level source-map composition, and public `NCON-*` wiring remain open.
+
+## 2026-10-08 — Phase 1 hierarchical template AST slice
+
+### Added
+
+- `packages/compiler/src/template-ast.mjs`, a separate transform from the certified flat syntax stream into hierarchical template ownership structures.
+- Hierarchical `Template`, `Element`, `Text`, `Interpolation`, `RawHtml`, `IfBlock`, `EachBlock`, `AwaitBlock`, and `Branch` structures while preserving exact source spans.
+- Element-owned attribute/directive metadata, component/custom-element categories, self-closing/void handling, and recovered literal text nodes.
+- `tests/phase1-parser-ast.test.mjs` with three focused hierarchy/ownership cases.
+- Wayfinder Phase 1 architecture map and decision tickets under GitHub issues 1–5; unresolved architecture is now explicit instead of implicit in continuation prose.
+
+### TDD evidence
+
+- Hierarchical AST regression RED: removing the new transform produces `ERR_MODULE_NOT_FOUND` and test exit 1.
+- Hierarchical AST GREEN: 3/3 focused hierarchy tests pass under Node `v22.16.0`.
+- Existing flat structural syntax remains a separate input layer; the hierarchy transform does not rewrite the certified scanner/structural analyzer.
+
+### Still in progress
+
+- Embedded TypeScript/CSS typed structures, broader HTML tree-construction validation, token/segment source-map composition, and exact public `NCON-*` wiring remain open.
+- `Parser and source maps` remains IN PROGRESS.
+

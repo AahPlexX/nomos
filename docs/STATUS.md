@@ -9,71 +9,63 @@
 **Phase 0:** COMPLETE under PRD Amendment 0001  
 **Product name:** provisional; clearance not complete
 
-## Authority and phase transition
+## Authority
 
-The original October 7 PRD remains byte-for-byte preserved in four source fragments with SHA-256 `b07950df46be388b10497063c5aabc01a20402a13dcebea0c8ec847869147690`.
+The October 7 PRD remains byte-for-byte preserved in four source fragments with SHA-256 `b07950df46be388b10497063c5aabc01a20402a13dcebea0c8ec847869147690`. PRD Amendment 0001 removes only the unavailable five-external-reviewer Phase 0 gate; all other effective requirements and all eleven Open Decisions remain intact. `spec/phase-status.json` is the machine-readable phase handoff.
 
-On 2026-10-08 the product owner explicitly instructed the project to disregard the Phase 0 requirement for five experienced external reviewers because none are available. `docs/prd/amendments/0001-remove-phase0-external-review-gate.md` records that directive without rewriting historical source. The amendment removes only that review prerequisite; the contradiction-free semantic gate remains.
+## Phase 1 parser/source-map state
 
-`spec/phase-status.json` is the machine-readable phase handoff. Phase 0 is complete and Phase 1 is active.
+Implemented under `packages/compiler/src/`:
 
-## Phase 1 parser/source-map implementation
+- lossless top-level section scanner with exact raw UTF-16 offsets and CRLF-aware one-based diagnostic coordinates;
+- flat `TemplateSyntaxTree` structural stream and stable parser diagnostics;
+- structural certification of all seven valid and all four invalid Phase 0 parser fixtures;
+- hierarchical `Template` AST as a separate transform, preserving the flat stream for diagnostics/debugging;
+- hierarchical parent/child elements, element-owned attributes/directives, literal text recovery, interpolation/raw-HTML leaves, and explicit `if` / `each` / `await` branches with exact spans;
+- component/custom-element categories, self-closing and HTML-void handling;
+- ECMA-426 version-3 identity line-start source-map primitive with `sourcesContent`;
+- ADR-0004 plus `spec/compiler-front-end.json` as the coordinate/map and implemented/planned boundary.
 
-The executable compiler front end under `packages/compiler/src/` currently provides:
+The parser/source-map deliverable remains **IN PROGRESS**. Typed embedded TypeScript/CSS structures, broader HTML tree-construction ownership validation, token/segment generated-map composition, and exact public `NCON-*` conformance wiring remain open.
 
-- `parser.mjs` for lossless top-level script/style/template section partitioning without source normalization;
-- raw zero-based UTF-16 offsets plus one-based line/column coordinates, with CRLF treated as one logical line break while retaining both raw code units;
-- top-level ownership scanning that does not mistake script/style-like markup nested inside elements or structural blocks for component sections;
-- `template-syntax.mjs` as a separate structural-analysis layer so the verified section scanner remains unchanged;
-- a flat typed `TemplateSyntaxTree` with exact-span element open/close, attribute/directive, interpolation/raw-HTML, and structural-block marker nodes;
-- structural acceptance of all seven Phase 0 valid parser fixtures;
-- the expected stable diagnostic for all four Phase 0 invalid parser fixtures: `NOMOS-PARSE-DUPLICATE-SCRIPT`, `NOMOS-PARSE-HTML-OWNERSHIP`, `NOMOS-PARSE-UNTERMINATED-BLOCK`, and `NOMOS-PARSE-UNKNOWN-DIRECTIVE`;
-- `NOMOS-PARSE-UNCLOSED-SECTION` for an unclosed top-level script/style section;
-- diagnostics carrying code, severity, message, explanation, repair, span, level, documentation URL, JSON, SARIF, disableability, and autofix metadata;
-- `source-map.mjs` with a deterministic ECMA-426 version-3 identity line-start map and embedded `sourcesContent` for pass-through/virtual-code stages;
-- ADR-0004 plus `spec/compiler-front-end.json` as the durable coordinate/map and implemented/planned boundary.
-
-The parser/source-map deliverable is intentionally **not complete**. The flat structural syntax tree must still become the final hierarchical typed AST; embedded TypeScript/CSS representations, broader HTML tree-construction ownership validation, token-level generated mappings, and exact public `NCON-*` conformance wiring remain open in `TODO.md` and `docs/phase-1/PARSER-AND-SOURCEMAPS.md`.
-
-## Current TDD evidence
+## Current TDD / verification evidence
 
 ```text
-Initial parser RED: compiler entry modules absent.
-First parser GREEN: 5 passed / 0 failed.
-Nested-section regression RED: 5 passed / 1 failed.
-Scanner/Unicode/fixture GREEN: 8 passed / 0 failed.
-Second structural-parser RED: 8 passed / 3 failed before template syntax and remaining adversarial diagnostics existed.
-Second structural-parser GREEN: 11 passed / 0 failed after implementation.
-
-node tools/validate-phase1.mjs
-Phase 1 front-end artifact contract passes locally while keeping parser/source-map status IN PROGRESS.
+Earlier structural parser baseline: 11 passed / 0 failed (recorded in prior commit state).
+Hierarchical AST regression RED: template-ast module removed -> ERR_MODULE_NOT_FOUND; exit 1.
+Hierarchical AST GREEN: focused hierarchy/annotator suite -> 4 passed / 0 failed under Node v22.16.0.
 ```
 
-The execution container uses Node `v22.16.0`. It still does not provide the repository's pinned `pnpm` executable, so verification for this slice uses the underlying zero-dependency Node commands rather than claiming a `pnpm check` run that did not occur.
+The environment still does not provide the repository-pinned `pnpm` executable. Do not claim a `pnpm check` run unless one is actually executed. Node 22 supports quoted test-file glob patterns, so `check:phase1:parser` now targets every `tests/phase1-parser*.test.mjs` file portably rather than the original file only.
 
-## Standards/toolchain evidence refreshed 2026-10-08
+## Wayfinder / Handoff control plane
 
-- ECMA-426 is the current authoritative source-map specification and defines JavaScript/CSS map columns in UTF-16 code units.
-- Vite's current build contract exposes standard source-map generation and expects transform/build tooling to preserve source maps rather than invent a framework-specific map format.
-- WHATWG HTML tree-construction rules inform the currently certified paragraph auto-close ownership diagnostic; this does not imply full HTML tree-construction validation yet.
-- TypeScript's current documentation continues to expose standard JavaScript/declaration source-map outputs; embedded TypeScript parsing remains a later subtask under the already-recorded TS7/TS6-compatibility ADR.
+Canonical Wayfinder map: https://github.com/AahPlexX/nomos/issues/1
 
-## Requirement traceability note
+Open decision tickets:
 
-`NREQ-0145` (parse component sections and preserve exact source positions) has development-test evidence, and `NREQ-0150` (emit source maps) has a baseline map primitive. Both rows intentionally remain `planned` until their exact public `NCON-*` conformance IDs are wired into the conformance harness. Development tests are not silently promoted to public conformance evidence.
+- embedded TypeScript/CSS representation boundary: https://github.com/AahPlexX/nomos/issues/2
+- generated source-map composition contract: https://github.com/AahPlexX/nomos/issues/3
+- runtime ownership/scheduler architecture: https://github.com/AahPlexX/nomos/issues/4
+- public conformance-harness promotion workflow: https://github.com/AahPlexX/nomos/issues/5
 
-## Open decisions and blockers
+A portable Handoff document for session transfer is maintained outside the repository at the host temporary path `/tmp/nomos-phase1-handoff.md`; it references, rather than duplicates, these canonical repo artifacts.
 
-- All eleven PRD Open Decisions remain open in `spec/open-decisions.json`; this parser slice resolves none of them.
+## Requirement traceability
+
+`NREQ-0145` (parse component sections and preserve exact source positions) has development-test evidence and `NREQ-0150` (emit source maps) has a baseline map primitive. Their ledger rows remain `planned` until exact reserved public `NCON-*` tests are wired and green. Development tests do not silently promote public conformance status.
+
+## Open decisions / blockers
+
+- All eleven PRD Open Decisions remain open in `spec/open-decisions.json`.
 - Final product and extension naming remain provisional.
 - External-contribution governance/license ratification remains separate from the existing license file.
 - No external-review dependency blocks Phase 1.
-- Parser/source-map completion is blocked only by the explicit remaining subtasks above, not by an undocumented dependency.
+- No unresolved decision blocks the already-ratified hierarchical AST transform.
 
 ## Immediate next action
 
-1. Promote the current flat `TemplateSyntaxTree` into the hierarchical typed template AST required by lowering and semantic analysis while preserving exact spans.
-2. Parse embedded TypeScript and CSS into typed/structured compiler representations using the approved toolchain baseline.
-3. Broaden HTML ownership validation beyond the certified paragraph auto-close adversarial case.
-4. Add token/segment-precision generated-code mappings and mapping composition.
-5. Wire exact public `NCON-*` tests before changing any corresponding requirement row from `planned` to `passing`.
+1. Resolve the embedded TypeScript/CSS representation ticket against current official toolchain contracts, then record the decision before coupling parser internals to it.
+2. Implement typed embedded-language structures test-first once that boundary is explicit.
+3. Continue source-map composition research in parallel through the Wayfinder ticket.
+4. Keep `TODO.md`, `CHANGELOG.md`, machine specs, decision records, Wayfinder map, and this status synchronized with every material change.

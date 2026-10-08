@@ -36,9 +36,9 @@
     "allInvalidFixtures": "certified"
   },
   "templateSyntax": {
-    "status": "structural-foundation",
-    "treeType": "TemplateSyntaxTree",
-    "nodeKinds": [
+    "status": "hierarchical-structural-ast",
+    "flatTreeType": "TemplateSyntaxTree",
+    "flatNodeKinds": [
       "ElementOpen",
       "ElementClose",
       "Attribute",
@@ -49,6 +49,27 @@
       "BlockBranch",
       "BlockClose"
     ],
-    "hierarchicalTypedAst": "planned"
+    "hierarchicalTreeType": "Template",
+    "hierarchicalNodeKinds": [
+      "Element",
+      "Text",
+      "Interpolation",
+      "RawHtml",
+      "IfBlock",
+      "EachBlock",
+      "AwaitBlock",
+      "Branch"
+    ],
+    "hierarchicalTypedAst": "implemented-structural",
+    "typedEmbeddedExpressions": "planned"
+  },
+  "wayfinder": {
+    "map": "https://github.com/AahPlexX/nomos/issues/1",
+    "openDecisionTickets": [
+      "https://github.com/AahPlexX/nomos/issues/2",
+      "https://github.com/AahPlexX/nomos/issues/3",
+      "https://github.com/AahPlexX/nomos/issues/4",
+      "https://github.com/AahPlexX/nomos/issues/5"
+    ]
   }
 }

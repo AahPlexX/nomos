@@ -6,9 +6,11 @@ const required = [
   'packages/compiler/src/index.mjs',
   'packages/compiler/src/parser.mjs',
   'packages/compiler/src/template-syntax.mjs',
+  'packages/compiler/src/template-ast.mjs',
   'packages/compiler/src/source-map.mjs',
   'tests/phase1-parser.test.mjs',
   'tests/phase1-parser-structural.test.mjs',
+  'tests/phase1-parser-ast.test.mjs',
   'docs/phase-1/PARSER-AND-SOURCEMAPS.md',
   'docs/adr/0004-source-position-and-map-baseline.md',
   'docs/diagnostics/NOMOS-PARSE-DUPLICATE-SCRIPT.md',
@@ -26,18 +28,19 @@ const phase = JSON.parse(await readFile(new URL('spec/phase-status.json', root),
 assert.equal(phase.currentPhase, 1);
 assert.equal(phase.phase1.status, 'in-progress');
 assert.equal(phase.phase1.parserAndSourceMaps, 'in-progress');
+assert.ok(phase.phase1.parserImplemented.includes('hierarchical-template-ast'));
+assert.ok(!phase.phase1.parserRemaining.includes('hierarchical-typed-template-ast'));
+assert.equal(phase.phase1.wayfinderMap, 'https://github.com/AahPlexX/nomos/issues/1');
 
 const frontEnd = JSON.parse(await readFile(new URL('spec/compiler-front-end.json', root), 'utf8'));
 assert.equal(frontEnd.sourcePositionModel.offsetUnit, 'utf-16-code-unit');
 assert.equal(frontEnd.sourceMaps.standard, 'ECMA-426');
 assert.equal(frontEnd.sourceMaps.versionField, 3);
-assert.equal(frontEnd.phase0ParserCorpus.duplicateScript, 'implemented');
-assert.equal(frontEnd.phase0ParserCorpus.htmlOwnership, 'implemented');
-assert.equal(frontEnd.phase0ParserCorpus.unterminatedStructuralBlock, 'implemented');
-assert.equal(frontEnd.phase0ParserCorpus.unknownDirective, 'implemented');
 assert.equal(frontEnd.phase0ParserCorpus.allValidFixtures, 'certified-structural');
 assert.equal(frontEnd.phase0ParserCorpus.allInvalidFixtures, 'certified');
-assert.equal(frontEnd.templateSyntax.status, 'structural-foundation');
-assert.equal(frontEnd.templateSyntax.hierarchicalTypedAst, 'planned');
+assert.equal(frontEnd.templateSyntax.status, 'hierarchical-structural-ast');
+assert.equal(frontEnd.templateSyntax.hierarchicalTypedAst, 'implemented-structural');
+assert.equal(frontEnd.templateSyntax.typedEmbeddedExpressions, 'planned');
+assert.equal(frontEnd.wayfinder.map, 'https://github.com/AahPlexX/nomos/issues/1');
 
-console.log(`Phase 1 front-end check passed: ${required.length} required artifacts; parser/source-map slice remains in progress.`);
+console.log(`Phase 1 front-end check passed: ${required.length} required artifacts; hierarchical AST implemented; parser/source-map slice remains in progress.`);

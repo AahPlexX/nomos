@@ -41,7 +41,8 @@ Status keys: `[x]` verified complete, `[>]` in progress, `[ ]` not complete, `[!
   - [x] ADR-0004 and `spec/compiler-front-end.json` define the coordinate/map contract for continuation.
   - [>] Parse template nodes, attributes, directives, interpolation, and structural blocks into the typed internal AST.
     - [x] Flat structural `TemplateSyntaxTree` records element opens/closes, attributes/directives, interpolation/raw HTML, and structural block markers with exact spans.
-    - [ ] Promote the structural tree into the final hierarchical typed AST used by lowering/analysis.
+    - [x] Promote the structural stream into a hierarchical typed template AST used by lowering/analysis, with parent/child element ownership, element-owned metadata, recovered text nodes, structural branches, and exact spans.
+    - [ ] Enrich template expression payloads with typed TypeScript representations once the embedded-language boundary decision is resolved.
   - [x] Implement `NOMOS-PARSE-HTML-OWNERSHIP` against the Phase 0 adversarial fixture.
   - [x] Implement `NOMOS-PARSE-UNTERMINATED-BLOCK` against the Phase 0 adversarial fixture.
   - [x] Implement `NOMOS-PARSE-UNKNOWN-DIRECTIVE` against the Phase 0 adversarial fixture.
@@ -61,6 +62,16 @@ Status keys: `[x]` verified complete, `[>]` in progress, `[ ]` not complete, `[!
 - [ ] Every owned effect is proven to clean up on disposal.
 
 **Phase 1 exit criterion:** the TodoMVC-class application passes deterministic browser tests, preserves valid state through HMR, and cleans up every owned effect.
+
+## Wayfinder control plane
+
+- [>] Canonical Phase 1 decision map: https://github.com/AahPlexX/nomos/issues/1
+  - [ ] Embedded TypeScript/CSS representation boundary: https://github.com/AahPlexX/nomos/issues/2
+  - [ ] Generated source-map composition contract: https://github.com/AahPlexX/nomos/issues/3
+  - [ ] Runtime ownership/scheduler architecture: https://github.com/AahPlexX/nomos/issues/4
+  - [ ] Public conformance-harness promotion workflow: https://github.com/AahPlexX/nomos/issues/5
+
+Already-ratified bounded implementation may continue without reopening these tickets. Unresolved architecture must not be selected silently in code.
 
 ## Continuing controls
 

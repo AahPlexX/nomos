@@ -28,16 +28,19 @@
       "unclosed-section-diagnostic",
       "ecma-426-identity-line-start-map",
       "structural-template-syntax-tree",
+      "hierarchical-template-ast",
       "html-ownership-validation",
       "unterminated-structural-block-diagnostic",
       "unknown-directive-diagnostic",
       "full-phase0-structural-parser-corpus-certification"
     ],
     "parserRemaining": [
-      "hierarchical-typed-template-ast",
       "typed-typescript-and-css-structures",
-      "token-level-generated-source-map-composition"
+      "broader-html-tree-construction-validation",
+      "token-level-generated-source-map-composition",
+      "public-ncon-conformance-wiring"
     ],
+    "wayfinderMap": "https://github.com/AahPlexX/nomos/issues/1",
     "exitCriterion": "A TodoMVC-class application passes deterministic browser tests, preserves valid state through HMR, and cleans up every owned effect."
   }
 }
