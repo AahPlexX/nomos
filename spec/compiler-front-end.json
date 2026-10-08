@@ -14,7 +14,10 @@
   "sectionKinds": ["script", "style", "template"],
   "implementedDiagnostics": [
     "NOMOS-PARSE-DUPLICATE-SCRIPT",
-    "NOMOS-PARSE-UNCLOSED-SECTION"
+    "NOMOS-PARSE-UNCLOSED-SECTION",
+    "NOMOS-PARSE-HTML-OWNERSHIP",
+    "NOMOS-PARSE-UNTERMINATED-BLOCK",
+    "NOMOS-PARSE-UNKNOWN-DIRECTIVE"
   ],
   "sourceMaps": {
     "standard": "ECMA-426",
@@ -26,9 +29,26 @@
   },
   "phase0ParserCorpus": {
     "duplicateScript": "implemented",
-    "htmlOwnership": "planned",
-    "unterminatedStructuralBlock": "planned",
-    "unknownDirective": "planned",
-    "allValidFixtures": "not-yet-certified"
+    "htmlOwnership": "implemented",
+    "unterminatedStructuralBlock": "implemented",
+    "unknownDirective": "implemented",
+    "allValidFixtures": "certified-structural",
+    "allInvalidFixtures": "certified"
+  },
+  "templateSyntax": {
+    "status": "structural-foundation",
+    "treeType": "TemplateSyntaxTree",
+    "nodeKinds": [
+      "ElementOpen",
+      "ElementClose",
+      "Attribute",
+      "Directive",
+      "Interpolation",
+      "RawHtml",
+      "BlockOpen",
+      "BlockBranch",
+      "BlockClose"
+    ],
+    "hierarchicalTypedAst": "planned"
   }
 }

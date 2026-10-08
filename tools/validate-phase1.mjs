@@ -5,12 +5,17 @@ const root = new URL('../', import.meta.url);
 const required = [
   'packages/compiler/src/index.mjs',
   'packages/compiler/src/parser.mjs',
+  'packages/compiler/src/template-syntax.mjs',
   'packages/compiler/src/source-map.mjs',
   'tests/phase1-parser.test.mjs',
+  'tests/phase1-parser-structural.test.mjs',
   'docs/phase-1/PARSER-AND-SOURCEMAPS.md',
   'docs/adr/0004-source-position-and-map-baseline.md',
   'docs/diagnostics/NOMOS-PARSE-DUPLICATE-SCRIPT.md',
   'docs/diagnostics/NOMOS-PARSE-UNCLOSED-SECTION.md',
+  'docs/diagnostics/NOMOS-PARSE-HTML-OWNERSHIP.md',
+  'docs/diagnostics/NOMOS-PARSE-UNTERMINATED-BLOCK.md',
+  'docs/diagnostics/NOMOS-PARSE-UNKNOWN-DIRECTIVE.md',
   'spec/compiler-front-end.json',
   'spec/phase-status.json',
 ];
@@ -27,6 +32,12 @@ assert.equal(frontEnd.sourcePositionModel.offsetUnit, 'utf-16-code-unit');
 assert.equal(frontEnd.sourceMaps.standard, 'ECMA-426');
 assert.equal(frontEnd.sourceMaps.versionField, 3);
 assert.equal(frontEnd.phase0ParserCorpus.duplicateScript, 'implemented');
-assert.equal(frontEnd.phase0ParserCorpus.htmlOwnership, 'planned');
+assert.equal(frontEnd.phase0ParserCorpus.htmlOwnership, 'implemented');
+assert.equal(frontEnd.phase0ParserCorpus.unterminatedStructuralBlock, 'implemented');
+assert.equal(frontEnd.phase0ParserCorpus.unknownDirective, 'implemented');
+assert.equal(frontEnd.phase0ParserCorpus.allValidFixtures, 'certified-structural');
+assert.equal(frontEnd.phase0ParserCorpus.allInvalidFixtures, 'certified');
+assert.equal(frontEnd.templateSyntax.status, 'structural-foundation');
+assert.equal(frontEnd.templateSyntax.hierarchicalTypedAst, 'planned');
 
 console.log(`Phase 1 front-end check passed: ${required.length} required artifacts; parser/source-map slice remains in progress.`);

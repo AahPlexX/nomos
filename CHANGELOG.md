@@ -68,3 +68,23 @@ All material repository changes are recorded here. This file tracks project stat
 
 - Typed template AST, HTML ownership validation, structural-block termination, directive validation, embedded TypeScript/CSS structures, full Phase 0 parser-corpus certification, and token-level generated-code source-map composition remain required before `Parser and source maps` can be marked complete.
 - `NREQ-0145` / `NREQ-0150` remain `planned` until their exact public `NCON-*` conformance IDs are wired; development tests do not silently promote traceability rows.
+
+## 2026-10-08 — Phase 1 parser structural validation slice
+
+### Added
+
+- `template-syntax.mjs` as a separate structural-analysis layer over the unchanged lossless section scanner.
+- Flat typed `TemplateSyntaxTree` nodes for element opens/closes, attributes/directives, interpolation/raw HTML, and structural block markers with exact source spans.
+- `NOMOS-PARSE-HTML-OWNERSHIP`, `NOMOS-PARSE-UNTERMINATED-BLOCK`, and `NOMOS-PARSE-UNKNOWN-DIRECTIVE` implementations and diagnostic documentation.
+- Structural executable certification for all seven valid and all four invalid Phase 0 parser fixtures.
+- Machine-state updates that distinguish the certified structural layer from the still-planned hierarchical typed AST and generated-code mapping work.
+
+### TDD evidence
+
+- RED before implementation: 8 passed / 3 failed.
+- GREEN after implementation: 11 passed / 0 failed under Node `v22.16.0`.
+- Phase 1 artifact validator is green while explicitly keeping `Parser and source maps` IN PROGRESS.
+
+### Still in progress
+
+- Final hierarchical typed template AST, embedded TypeScript/CSS structures, broader HTML tree-construction validation, token-level source-map composition, and public `NCON-*` wiring remain open.

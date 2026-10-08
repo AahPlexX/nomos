@@ -39,13 +39,15 @@ Status keys: `[x]` verified complete, `[>]` in progress, `[ ]` not complete, `[!
   - [x] Ignore script/style-like markup nested inside element or structural-block ownership when identifying component sections.
   - [x] ECMA-426 version-3 identity line-start source-map primitive with embedded `sourcesContent`.
   - [x] ADR-0004 and `spec/compiler-front-end.json` define the coordinate/map contract for continuation.
-  - [ ] Parse template nodes, attributes, directives, interpolation, and structural blocks into the typed internal AST.
-  - [ ] Implement `NOMOS-PARSE-HTML-OWNERSHIP` against the Phase 0 adversarial fixture.
-  - [ ] Implement `NOMOS-PARSE-UNTERMINATED-BLOCK` against the Phase 0 adversarial fixture.
-  - [ ] Implement `NOMOS-PARSE-UNKNOWN-DIRECTIVE` against the Phase 0 adversarial fixture.
+  - [>] Parse template nodes, attributes, directives, interpolation, and structural blocks into the typed internal AST.
+    - [x] Flat structural `TemplateSyntaxTree` records element opens/closes, attributes/directives, interpolation/raw HTML, and structural block markers with exact spans.
+    - [ ] Promote the structural tree into the final hierarchical typed AST used by lowering/analysis.
+  - [x] Implement `NOMOS-PARSE-HTML-OWNERSHIP` against the Phase 0 adversarial fixture.
+  - [x] Implement `NOMOS-PARSE-UNTERMINATED-BLOCK` against the Phase 0 adversarial fixture.
+  - [x] Implement `NOMOS-PARSE-UNKNOWN-DIRECTIVE` against the Phase 0 adversarial fixture.
   - [ ] Parse embedded TypeScript and CSS into typed/structured compiler representations.
   - [ ] Compose token-level generated-code source maps rather than only pass-through line-start mappings.
-  - [ ] Certify all seven valid and four invalid Phase 0 parser fixtures against the executable parser.
+  - [x] Certify all seven valid and four invalid Phase 0 parser fixtures at the current structural-validation layer.
 - [ ] State, derivation, synchronization, and ownership.
 - [ ] Text and attribute bindings.
 - [ ] Events and native-control bindings.

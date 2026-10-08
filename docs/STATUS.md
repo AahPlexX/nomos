@@ -19,30 +19,34 @@ On 2026-10-08 the product owner explicitly instructed the project to disregard t
 
 ## Phase 1 parser/source-map implementation
 
-The first executable compiler slice is implemented under `packages/compiler/src/`:
+The executable compiler front end under `packages/compiler/src/` currently provides:
 
-- `parser.mjs` partitions top-level script/style/template sections without mutating source text;
-- section spans preserve raw zero-based UTF-16 offsets plus one-based line/column coordinates;
-- CRLF counts as one logical line break while offsets retain both source code units;
-- nested element/structural-block script/style markup is not mistaken for a component section;
-- duplicate top-level scripts produce stable non-disableable `NOMOS-PARSE-DUPLICATE-SCRIPT` diagnostics;
-- unclosed top-level script/style sections produce `NOMOS-PARSE-UNCLOSED-SECTION` diagnostics;
-- parser diagnostics already expose the PRD-required shape fields needed by later centralization: code, severity, message, explanation, repair, span, level, documentation URL, JSON, SARIF, and autofix metadata;
-- `source-map.mjs` emits deterministic ECMA-426 version-3 identity line-start maps with `sourcesContent` for pass-through/virtual-code stages;
-- ADR-0004 freezes the UTF-16/source-map coordinate baseline, and `spec/compiler-front-end.json` records implemented versus planned front-end capabilities.
+- `parser.mjs` for lossless top-level script/style/template section partitioning without source normalization;
+- raw zero-based UTF-16 offsets plus one-based line/column coordinates, with CRLF treated as one logical line break while retaining both raw code units;
+- top-level ownership scanning that does not mistake script/style-like markup nested inside elements or structural blocks for component sections;
+- `template-syntax.mjs` as a separate structural-analysis layer so the verified section scanner remains unchanged;
+- a flat typed `TemplateSyntaxTree` with exact-span element open/close, attribute/directive, interpolation/raw-HTML, and structural-block marker nodes;
+- structural acceptance of all seven Phase 0 valid parser fixtures;
+- the expected stable diagnostic for all four Phase 0 invalid parser fixtures: `NOMOS-PARSE-DUPLICATE-SCRIPT`, `NOMOS-PARSE-HTML-OWNERSHIP`, `NOMOS-PARSE-UNTERMINATED-BLOCK`, and `NOMOS-PARSE-UNKNOWN-DIRECTIVE`;
+- `NOMOS-PARSE-UNCLOSED-SECTION` for an unclosed top-level script/style section;
+- diagnostics carrying code, severity, message, explanation, repair, span, level, documentation URL, JSON, SARIF, disableability, and autofix metadata;
+- `source-map.mjs` with a deterministic ECMA-426 version-3 identity line-start map and embedded `sourcesContent` for pass-through/virtual-code stages;
+- ADR-0004 plus `spec/compiler-front-end.json` as the durable coordinate/map and implemented/planned boundary.
 
-The current implementation is intentionally not yet a complete parser. Template AST construction, HTML ownership validation, structural-block termination, directive validation, embedded TypeScript/CSS structures, token-level generated mappings, and full Phase 0 corpus certification remain open and are enumerated in `TODO.md` and `docs/phase-1/PARSER-AND-SOURCEMAPS.md`.
+The parser/source-map deliverable is intentionally **not complete**. The flat structural syntax tree must still become the final hierarchical typed AST; embedded TypeScript/CSS representations, broader HTML tree-construction ownership validation, token-level generated mappings, and exact public `NCON-*` conformance wiring remain open in `TODO.md` and `docs/phase-1/PARSER-AND-SOURCEMAPS.md`.
 
 ## Current TDD evidence
 
 ```text
-node --test tests/phase1-parser.test.mjs
-Initial RED: module-not-found before compiler parser/source-map implementation.
-Nested-section regression RED: 5 passed / 1 failed when nested <script>/<style> were incorrectly classified as top-level sections.
-GREEN after scanner fix and Unicode/fixture coverage: 8 passed / 0 failed.
+Initial parser RED: compiler entry modules absent.
+First parser GREEN: 5 passed / 0 failed.
+Nested-section regression RED: 5 passed / 1 failed.
+Scanner/Unicode/fixture GREEN: 8 passed / 0 failed.
+Second structural-parser RED: 8 passed / 3 failed before template syntax and remaining adversarial diagnostics existed.
+Second structural-parser GREEN: 11 passed / 0 failed after implementation.
 
 node tools/validate-phase1.mjs
-Phase 1 front-end check passed locally: 10 required artifacts; parser/source-map slice remains IN PROGRESS.
+Phase 1 front-end artifact contract passes locally while keeping parser/source-map status IN PROGRESS.
 ```
 
 The execution container uses Node `v22.16.0`. It still does not provide the repository's pinned `pnpm` executable, so verification for this slice uses the underlying zero-dependency Node commands rather than claiming a `pnpm check` run that did not occur.
@@ -51,11 +55,12 @@ The execution container uses Node `v22.16.0`. It still does not provide the repo
 
 - ECMA-426 is the current authoritative source-map specification and defines JavaScript/CSS map columns in UTF-16 code units.
 - Vite's current build contract exposes standard source-map generation and expects transform/build tooling to preserve source maps rather than invent a framework-specific map format.
+- WHATWG HTML tree-construction rules inform the currently certified paragraph auto-close ownership diagnostic; this does not imply full HTML tree-construction validation yet.
 - TypeScript's current documentation continues to expose standard JavaScript/declaration source-map outputs; embedded TypeScript parsing remains a later subtask under the already-recorded TS7/TS6-compatibility ADR.
 
 ## Requirement traceability note
 
-`NREQ-0145` (parse component sections and preserve exact source positions) now has development-test evidence, and `NREQ-0150` (emit source maps) has a baseline map primitive. Both rows intentionally remain `planned` until their exact public `NCON-*` conformance IDs are wired into the conformance harness. This is deliberate, not stale traceability.
+`NREQ-0145` (parse component sections and preserve exact source positions) has development-test evidence, and `NREQ-0150` (emit source maps) has a baseline map primitive. Both rows intentionally remain `planned` until their exact public `NCON-*` conformance IDs are wired into the conformance harness. Development tests are not silently promoted to public conformance evidence.
 
 ## Open decisions and blockers
 
@@ -67,7 +72,8 @@ The execution container uses Node `v22.16.0`. It still does not provide the repo
 
 ## Immediate next action
 
-1. Extend `parseComponent` into the typed template AST while retaining exact spans for every production.
-2. Drive the three remaining Phase 0 invalid parser fixtures (`HTML-OWNERSHIP`, `UNTERMINATED-BLOCK`, `UNKNOWN-DIRECTIVE`) from RED to GREEN.
-3. Certify all seven Phase 0 valid fixtures against the executable parser.
-4. Only then promote the corresponding exact `NCON-*` requirement rows and mark the parser half of the Phase 1 deliverable complete; generated-code token mapping remains a separate required source-map subtask.
+1. Promote the current flat `TemplateSyntaxTree` into the hierarchical typed template AST required by lowering and semantic analysis while preserving exact spans.
+2. Parse embedded TypeScript and CSS into typed/structured compiler representations using the approved toolchain baseline.
+3. Broaden HTML ownership validation beyond the certified paragraph auto-close adversarial case.
+4. Add token/segment-precision generated-code mappings and mapping composition.
+5. Wire exact public `NCON-*` tests before changing any corresponding requirement row from `planned` to `passing`.
