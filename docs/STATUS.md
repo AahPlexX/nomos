@@ -11,61 +11,66 @@
 
 ## Authority
 
-The October 7 PRD remains byte-for-byte preserved in four source fragments with SHA-256 `b07950df46be388b10497063c5aabc01a20402a13dcebea0c8ec847869147690`. PRD Amendment 0001 removes only the unavailable five-external-reviewer Phase 0 gate; all other effective requirements and all eleven Open Decisions remain intact. `spec/phase-status.json` is the machine-readable phase handoff.
+The October 7 PRD remains byte-for-byte preserved in four source fragments with SHA-256 `b07950df46be388b10497063c5aabc01a20402a13dcebea0c8ec847869147690`. PRD Amendment 0001 removes only the unavailable five-external-reviewer Phase 0 gate. All eleven PRD Open Decisions remain open. `spec/phase-status.json` is the machine-readable phase handoff.
 
-## Phase 1 parser/source-map state
+## Current Phase 1 compiler state
 
-Implemented under `packages/compiler/src/`:
+Implemented and recorded on `main`:
 
-- lossless top-level section scanner with exact raw UTF-16 offsets and CRLF-aware one-based diagnostic coordinates;
+- lossless top-level section scanning with exact raw UTF-16 positions and CRLF-aware diagnostic coordinates;
 - flat `TemplateSyntaxTree` structural stream and stable parser diagnostics;
-- structural certification of all seven valid and all four invalid Phase 0 parser fixtures;
-- hierarchical `Template` AST as a separate transform, preserving the flat stream for diagnostics/debugging;
-- hierarchical parent/child elements, element-owned attributes/directives, literal text recovery, interpolation/raw-HTML leaves, and explicit `if` / `each` / `await` branches with exact spans;
-- component/custom-element categories, self-closing and HTML-void handling;
+- structural certification of all seven valid and four invalid Phase 0 parser fixtures;
+- separate hierarchical `Template` AST transform with element/block ownership, element-owned metadata, text recovery, component/custom-element categories, and exact spans;
 - ECMA-426 version-3 identity line-start source-map primitive with `sourcesContent`;
-- ADR-0004 plus `spec/compiler-front-end.json` as the coordinate/map and implemented/planned boundary.
+- ADR-0004 for coordinates/source maps;
+- ADR-0005 for the embedded TypeScript/CSS adapter boundary.
 
-The parser/source-map deliverable remains **IN PROGRESS**. Typed embedded TypeScript/CSS structures, broader HTML tree-construction ownership validation, token/segment generated-map composition, and exact public `NCON-*` conformance wiring remain open.
+The parser/source-map deliverable remains **IN PROGRESS**. Remaining work is the executable TypeScript/CSS adapters, broader WHATWG HTML tree-construction ownership validation, token/segment generated-map composition, and exact public `NCON-*` conformance wiring.
 
-## Current TDD / verification evidence
+## Embedded-language boundary — resolved
+
+Wayfinder ticket: https://github.com/AahPlexX/nomos/issues/2  
+Research: `docs/phase-1/research/embedded-language-representation.md`  
+Decision: `docs/adr/0005-embedded-language-adapter-boundary.md`
+
+Primary-source research established:
+
+- TypeScript 7.0 intentionally ships without a programmatic API; Microsoft provides `@typescript/typescript6` for tools requiring the TypeScript 6 API while the 7.1+ API is still changing.
+- TypeScript `SourceFile`/`Program` remain suitable current internal adapter structures, but are not Nomos's durable compiler IR.
+- Lightning CSS exposes typed rule/value visitors plus source-map input/output, but its visitor/AST/location conventions are adapter details rather than Nomos source semantics.
+- Nomos therefore owns `EmbeddedScript`, `EmbeddedExpression`, and `EmbeddedStylesheet` wrapper contracts and exact source spans. TypeScript/Lightning CSS structures remain opaque/versioned internals.
+- Current verified dependency baselines are `@typescript/typescript6@6.0.2` (Apache-2.0) and `lightningcss@1.33.0` (MPL-2.0). They are **not added yet**; dependency installation is deferred until executable adapter code consumes them and must be rechecked then.
+- ADR-0005 does not resolve `OD-009` (TypeScript 7.1+ adoption timing).
+
+## Verification evidence
 
 ```text
-Earlier structural parser baseline: 11 passed / 0 failed (recorded in prior commit state).
-Hierarchical AST regression RED: template-ast module removed -> ERR_MODULE_NOT_FOUND; exit 1.
-Hierarchical AST GREEN: focused hierarchy/annotator suite -> 4 passed / 0 failed under Node v22.16.0.
+Structural parser baseline: 11 passed / 0 failed (prior recorded delivery).
+Hierarchical AST regression RED: removing template-ast.mjs -> ERR_MODULE_NOT_FOUND; exit 1.
+Hierarchical AST GREEN: 4 passed / 0 failed under Node v22.16.0.
 ```
 
-The environment still does not provide the repository-pinned `pnpm` executable. Do not claim a `pnpm check` run unless one is actually executed. Node 22 supports quoted test-file glob patterns, so `check:phase1:parser` now targets every `tests/phase1-parser*.test.mjs` file portably rather than the original file only.
+The environment still does not provide the repository-pinned `pnpm` executable. Do not claim a `pnpm check` run unless one is actually executed. `check:phase1:parser` targets all `tests/phase1-parser*.test.mjs` files using Node 22 glob support.
 
 ## Wayfinder / Handoff control plane
 
-Canonical Wayfinder map: https://github.com/AahPlexX/nomos/issues/1
+Canonical map: https://github.com/AahPlexX/nomos/issues/1
 
-Open decision tickets:
+- Embedded TypeScript/CSS representation boundary: resolved by ADR-0005 / issue 2.
+- Generated source-map composition contract: https://github.com/AahPlexX/nomos/issues/3
+- Runtime ownership/scheduler architecture: https://github.com/AahPlexX/nomos/issues/4
+- Public conformance-harness promotion workflow: https://github.com/AahPlexX/nomos/issues/5
 
-- embedded TypeScript/CSS representation boundary: https://github.com/AahPlexX/nomos/issues/2
-- generated source-map composition contract: https://github.com/AahPlexX/nomos/issues/3
-- runtime ownership/scheduler architecture: https://github.com/AahPlexX/nomos/issues/4
-- public conformance-harness promotion workflow: https://github.com/AahPlexX/nomos/issues/5
-
-A portable Handoff document for session transfer is maintained outside the repository at the host temporary path `/tmp/nomos-phase1-handoff.md`; it references, rather than duplicates, these canonical repo artifacts.
+Portable session handoff: `/tmp/nomos-phase1-handoff.md` (temporary host artifact; canonical facts remain in this repository and Wayfinder map).
 
 ## Requirement traceability
 
-`NREQ-0145` (parse component sections and preserve exact source positions) has development-test evidence and `NREQ-0150` (emit source maps) has a baseline map primitive. Their ledger rows remain `planned` until exact reserved public `NCON-*` tests are wired and green. Development tests do not silently promote public conformance status.
-
-## Open decisions / blockers
-
-- All eleven PRD Open Decisions remain open in `spec/open-decisions.json`.
-- Final product and extension naming remain provisional.
-- External-contribution governance/license ratification remains separate from the existing license file.
-- No external-review dependency blocks Phase 1.
-- No unresolved decision blocks the already-ratified hierarchical AST transform.
+`NREQ-0145` and `NREQ-0150` have development evidence but remain `planned` until their exact reserved public `NCON-*` tests are wired and green. Development tests do not silently promote conformance status.
 
 ## Immediate next action
 
-1. Resolve the embedded TypeScript/CSS representation ticket against current official toolchain contracts, then record the decision before coupling parser internals to it.
-2. Implement typed embedded-language structures test-first once that boundary is explicit.
-3. Continue source-map composition research in parallel through the Wayfinder ticket.
-4. Keep `TODO.md`, `CHANGELOG.md`, machine specs, decision records, Wayfinder map, and this status synchronized with every material change.
+1. Implement the ADR-0005 TypeScript adapter wrappers test-first, rechecking and exact-pinning `@typescript/typescript6` only when the executable slice consumes it.
+2. Implement the CSS adapter wrapper test-first, rechecking and exact-pinning Lightning CSS only when consumed.
+3. Keep the external adapter nodes opaque and prove source-span/offset translation independently.
+4. Continue Wayfinder source-map research through issue 3 without preselecting the mapping composition contract.
+5. Synchronize TODO, changelog, decisions, machine specs, status, map, and handoff after every material slice.

@@ -18,9 +18,10 @@ This register records product amendments and architecture decision status. The P
 | ADR-0002 | Keep Phase 0 contract tests dependency-light and deliver directly to `main` while maintaining same-commit living docs | Accepted for Phase 0 | `docs/adr/0002-phase0-execution-discipline.md` |
 | ADR-0003 | Preserve author text whitespace using HTML-compatible newline/`pre`/`textarea` rules and delegate visual collapse to CSS | Accepted for 1.0 source semantics | `docs/adr/0003-whitespace-semantics.md` |
 | ADR-0004 | Preserve raw UTF-16 source offsets, expose one-based diagnostic coordinates, and use ECMA-426 source maps with UTF-16 JavaScript/CSS columns | Accepted for Phase 1 compiler front end | `docs/adr/0004-source-position-and-map-baseline.md` |
+| ADR-0005 | Keep embedded TypeScript/CSS in Nomos-owned wrappers and treat TypeScript/Lightning CSS structures as opaque adapter internals | Accepted for Phase 1 compiler front end | `docs/adr/0005-embedded-language-adapter-boundary.md` |
 
 ## PRD Open Decisions
 
 The machine-readable authority for the eleven still-open items is `spec/open-decisions.json`. Every entry remains `open` with `resolution: null`.
 
-PRD-A0001 and ADR-0004 change no Open Decision. In particular, `state.snapshot` remains present in the proposed API while `OD-004` explicitly marks its final namespace placement provisional, and the product/extension name remains provisional under `OD-011`.
+PRD-A0001 and ADR-0001 through ADR-0005 close no Open Decision. In particular, ADR-0005 does **not** settle `OD-009` (TypeScript 7.1+ API adoption timing); it defines the compatibility boundary that keeps the current parser implementation independent of that future decision. `state.snapshot` remains provisional under `OD-004`, and the product/extension name remains provisional under `OD-011`.

@@ -25,7 +25,8 @@
     "columnUnitForJavaScriptAndCss": "utf-16-code-unit",
     "sourcesContent": true,
     "currentPrimitive": "identity-line-start",
-    "tokenLevelGeneratedMappings": "planned"
+    "tokenLevelGeneratedMappings": "planned",
+    "wayfinderDecision": "https://github.com/AahPlexX/nomos/issues/3"
   },
   "phase0ParserCorpus": {
     "duplicateScript": "implemented",
@@ -61,12 +62,38 @@
       "Branch"
     ],
     "hierarchicalTypedAst": "implemented-structural",
-    "typedEmbeddedExpressions": "planned"
+    "typedEmbeddedExpressions": "boundary-resolved-implementation-planned"
+  },
+  "embeddedLanguages": {
+    "decision": "docs/adr/0005-embedded-language-adapter-boundary.md",
+    "research": "docs/phase-1/research/embedded-language-representation.md",
+    "wayfinderDecision": "https://github.com/AahPlexX/nomos/issues/2",
+    "nomosOwnsDurableIr": true,
+    "authoritativeLocations": "nomos-raw-source-spans",
+    "typescript": {
+      "wrapperKinds": ["EmbeddedScript", "EmbeddedExpression"],
+      "programmaticAdapter": "@typescript/typescript6",
+      "verifiedVersionBaseline": "6.0.2",
+      "adapterNodeExposure": "opaque-internal",
+      "semanticContext": "Program/checker-when-required",
+      "implementation": "planned"
+    },
+    "css": {
+      "wrapperKind": "EmbeddedStylesheet",
+      "programmaticAdapter": "lightningcss",
+      "verifiedVersionBaseline": "1.33.0",
+      "adapterNodeExposure": "opaque-internal",
+      "adapterLocationsAuthoritative": false,
+      "implementation": "planned"
+    },
+    "dependencyInstallation": "deferred-until-executable-adapter-slice"
   },
   "wayfinder": {
     "map": "https://github.com/AahPlexX/nomos/issues/1",
+    "resolvedDecisionTickets": [
+      "https://github.com/AahPlexX/nomos/issues/2"
+    ],
     "openDecisionTickets": [
-      "https://github.com/AahPlexX/nomos/issues/2",
       "https://github.com/AahPlexX/nomos/issues/3",
       "https://github.com/AahPlexX/nomos/issues/4",
       "https://github.com/AahPlexX/nomos/issues/5"

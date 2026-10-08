@@ -32,15 +32,24 @@
       "html-ownership-validation",
       "unterminated-structural-block-diagnostic",
       "unknown-directive-diagnostic",
-      "full-phase0-structural-parser-corpus-certification"
+      "full-phase0-structural-parser-corpus-certification",
+      "embedded-language-adapter-boundary"
     ],
     "parserRemaining": [
-      "typed-typescript-and-css-structures",
+      "embedded-typescript-and-css-adapter-implementation",
       "broader-html-tree-construction-validation",
       "token-level-generated-source-map-composition",
       "public-ncon-conformance-wiring"
     ],
     "wayfinderMap": "https://github.com/AahPlexX/nomos/issues/1",
+    "resolvedWayfinderDecisions": [
+      "https://github.com/AahPlexX/nomos/issues/2"
+    ],
+    "openWayfinderDecisions": [
+      "https://github.com/AahPlexX/nomos/issues/3",
+      "https://github.com/AahPlexX/nomos/issues/4",
+      "https://github.com/AahPlexX/nomos/issues/5"
+    ],
     "exitCriterion": "A TodoMVC-class application passes deterministic browser tests, preserves valid state through HMR, and cleans up every owned effect."
   }
 }

@@ -3,64 +3,51 @@
 **Status:** IN PROGRESS  
 **Last updated:** 2026-10-08
 
-## Implemented slices
+## Implemented layers
 
-The compiler front end in `packages/compiler/src/` now has three deliberately separate layers:
+The compiler front end deliberately separates:
 
-1. `parser.mjs` — lossless top-level script/style/template section partitioning and exact source positions.
-2. `template-syntax.mjs` — a flat structural syntax stream used for diagnostics, source ownership checks, and exact marker spans.
-3. `template-ast.mjs` — a hierarchical ownership transform consumed by lowering/semantic analysis while leaving the flat stream intact.
+1. `parser.mjs` — lossless top-level section partitioning and exact source positions.
+2. `template-syntax.mjs` — flat structural syntax used for diagnostics and marker/source ownership.
+3. `template-ast.mjs` — hierarchical template ownership consumed by lowering/semantic analysis while preserving the flat stream.
 
-Current parser guarantees:
+Current guarantees include exact UTF-16 source spans, CRLF-aware diagnostics, structural validation of the complete Phase 0 parser corpus, stable reserved parser diagnostics, hierarchical element/block ownership with exact spans, and the ADR-0004 ECMA-426 identity-map baseline.
 
-- preserves the original source string without newline normalization before span capture;
-- permits top-level `<script>`, `<style>`, and template content in arbitrary order;
-- recognizes only truly top-level script/style sections, not tags nested inside elements or structural blocks;
-- returns exact raw source slices using zero-based UTF-16 offsets and one-based diagnostic line/column coordinates;
-- treats CRLF as one logical line break while retaining both raw code units in offsets;
-- emits a flat `TemplateSyntaxTree` for every template section with exact-span element open/close, attribute/directive, interpolation/raw-HTML, and structural-block marker nodes;
-- derives `section.ast` as a hierarchical `Template` tree with parent/child `Element` ownership, element-owned attribute/directive metadata, literal `Text` recovery, interpolation/raw-HTML leaves, and explicit `IfBlock` / `EachBlock` / `AwaitBlock` branches;
-- preserves component/custom-element classification plus self-closing and HTML-void behavior in the hierarchical tree;
-- accepts all seven valid Phase 0 parser fixtures at the current structural-validation layer;
-- emits the reserved Phase 0 invalid-fixture diagnostics `NOMOS-PARSE-DUPLICATE-SCRIPT`, `NOMOS-PARSE-HTML-OWNERSHIP`, `NOMOS-PARSE-UNTERMINATED-BLOCK`, and `NOMOS-PARSE-UNKNOWN-DIRECTIVE`;
-- additionally emits `NOMOS-PARSE-UNCLOSED-SECTION` for an unclosed top-level script/style section;
-- diagnostics expose code, severity, message, explanation, repair, span, learning level, documentation URL, JSON projection, SARIF projection, and non-disableable/autofix metadata.
+## Embedded-language boundary
 
-`NOMOS-PARSE-HTML-OWNERSHIP` currently guards the paragraph auto-close ownership hazard exercised by the Phase 0 adversarial corpus. Broader WHATWG tree-construction compatibility remains required; the current rule is not a claim of full browser-equivalent parsing.
+Research: `docs/phase-1/research/embedded-language-representation.md`  
+Decision: `docs/adr/0005-embedded-language-adapter-boundary.md`  
+Wayfinder ticket: https://github.com/AahPlexX/nomos/issues/2
 
-Current source-map primitive guarantees:
+ADR-0005 establishes a Nomos-owned adapter boundary:
 
-- ECMA-426 `version: 3` JSON shape;
-- explicit generated file and original source file;
-- embedded `sourcesContent`;
-- deterministic line-start mappings for 1:1 pass-through generated text;
-- UTF-16 column semantics aligned with ECMA-426 for JavaScript/CSS maps.
+- `EmbeddedScript` and `EmbeddedExpression` own exact `.nomos` spans/raw text and isolate the current TypeScript programmatic parser behind opaque adapter handles.
+- `EmbeddedStylesheet` owns exact style-section spans/raw text and isolates Lightning CSS typed visitor/transform structures behind the same kind of boundary.
+- Nomos source spans are authoritative; third-party location objects cannot overwrite them.
+- TypeScript 6 `SourceFile` / `Program` and Lightning CSS visitor structures are implementation details, not durable/public Nomos IR.
+- The verified dependency baselines are `@typescript/typescript6@6.0.2` and `lightningcss@1.33.0`, but neither is added until executable adapter code consumes it and the dependency policy is rechecked.
+- This decision does not resolve `OD-009` (TypeScript 7.1+ API adoption timing).
 
-## TDD evidence
+## Source-map state
 
-Prior parser increments remain recorded in `CHANGELOG.md` and `docs/STATUS.md` (11/11 parser/structural cases green at the structural slice).
+The current primitive is an ECMA-426 `version: 3` identity line-start map with `sourcesContent`. Token/segment generated-code mapping and cross-stage composition remain open under Wayfinder issue 3.
 
-Hierarchical AST slice:
+## Verification history
 
-```text
-Regression RED: removing template-ast.mjs -> ERR_MODULE_NOT_FOUND; exit 1.
-GREEN: node --test tests/phase1-parser-ast.test.mjs -> 4 passed, 0 failed in the local verification harness.
-```
+- First parser slice: 8/8 green after the nested-section regression fix.
+- Structural parser slice: RED 8/3 -> GREEN 11/0.
+- Hierarchical AST slice: regression RED via missing transform module -> GREEN 4/4 focused hierarchy/annotator tests.
 
-The new tests cover hierarchical element ownership, element-owned metadata, recovered text, interpolation ownership, if/else branch ownership, component/custom-element categories, self-closing behavior, exact spans, and the annotator boundary that leaves non-template sections unchanged.
+The environment used for these slices has Node `v22.16.0` but no pinned `pnpm` executable; do not claim a full `pnpm check` run without fresh evidence.
 
-## Wayfinder control plane
+## Deliberately not complete
 
-The remaining Phase 1 architecture fog is tracked from https://github.com/AahPlexX/nomos/issues/1. Current explicit decision tickets cover embedded TypeScript/CSS representation, generated source-map composition, runtime ownership/scheduling, and public conformance-harness promotion. Already-ratified parser behavior does not wait on those tickets, but unresolved decisions must not be selected silently in implementation.
+`Parser and source maps` stays IN PROGRESS until all of the following are evidenced:
 
-## Deliberately not complete yet
+- executable TypeScript and CSS adapters behind ADR-0005;
+- broader WHATWG HTML tree-construction ownership validation beyond the certified paragraph case;
+- token/segment generated source maps and composition across lowering stages;
+- exact public `NCON-*` conformance wiring before any associated requirement row is promoted from `planned` to `passing`;
+- later Vite/HMR integration when that Phase 1 slice is reached.
 
-Do not mark the Phase 1 `Parser and source maps` deliverable complete. Remaining work includes:
-
-- resolve and implement the embedded TypeScript/CSS typed-structure boundary;
-- broaden HTML tree-construction ownership validation beyond the currently certified paragraph auto-close case;
-- produce generated-code mappings with token/segment precision and compose mappings across lowering stages;
-- wire exact public `NCON-*` conformance IDs before promoting requirement rows from `planned` to `passing`;
-- wire parser results into Vite/HMR only when that Phase 1 slice is reached.
-
-`spec/compiler-front-end.json` is the machine-readable implemented/planned boundary.
+Machine authority for the implemented/planned boundary: `spec/compiler-front-end.json` and `spec/phase-status.json`.
