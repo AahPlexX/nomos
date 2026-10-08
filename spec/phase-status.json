@@ -3,15 +3,12 @@
   "asOf": "2026-10-08",
   "sourcePrdPreserved": true,
   "sourcePrdSha256": "b07950df46be388b10497063c5aabc01a20402a13dcebea0c8ec847869147690",
-  "effectiveAmendments": [
-    "docs/prd/amendments/0001-remove-phase0-external-review-gate.md"
-  ],
+  "effectiveAmendments": ["docs/prd/amendments/0001-remove-phase0-external-review-gate.md"],
   "currentPhase": 1,
   "phase0": {
     "name": "Thesis",
     "status": "complete",
     "externalReviewRequired": false,
-    "externalReviewOverride": "docs/prd/amendments/0001-remove-phase0-external-review-gate.md",
     "contradictionAudit": "passed",
     "openPhase0Blockers": []
   },
@@ -24,29 +21,25 @@
     "parserImplemented": [
       "top-level-section-partitioning",
       "exact-raw-source-spans",
-      "duplicate-script-diagnostic",
-      "unclosed-section-diagnostic",
       "ecma-426-identity-line-start-map",
       "structural-template-syntax-tree",
       "hierarchical-template-ast",
-      "html-ownership-validation",
-      "unterminated-structural-block-diagnostic",
-      "unknown-directive-diagnostic",
-      "full-phase0-structural-parser-corpus-certification",
-      "embedded-language-adapter-boundary"
+      "phase0-structural-parser-corpus-certification",
+      "embedded-language-adapter-boundary",
+      "stage-local-source-map-composition-contract"
     ],
     "parserRemaining": [
       "embedded-typescript-and-css-adapter-implementation",
       "broader-html-tree-construction-validation",
-      "token-level-generated-source-map-composition",
+      "stage-local-source-map-composer-implementation",
       "public-ncon-conformance-wiring"
     ],
     "wayfinderMap": "https://github.com/AahPlexX/nomos/issues/1",
     "resolvedWayfinderDecisions": [
-      "https://github.com/AahPlexX/nomos/issues/2"
+      "https://github.com/AahPlexX/nomos/issues/2",
+      "https://github.com/AahPlexX/nomos/issues/3"
     ],
     "openWayfinderDecisions": [
-      "https://github.com/AahPlexX/nomos/issues/3",
       "https://github.com/AahPlexX/nomos/issues/4",
       "https://github.com/AahPlexX/nomos/issues/5"
     ],

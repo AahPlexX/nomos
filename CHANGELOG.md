@@ -27,7 +27,7 @@ All material repository changes are recorded here. This file tracks project stat
 
 - Added PRD Amendment 0001 recording removal of the unavailable five-external-reviewer prerequisite while retaining contradiction-free semantics.
 - Added explicit amendment precedence without modifying preserved PRD source fragments.
-- Added `spec/phase-status.json`, synchronized governance/handoff records, and opened Phase 1.
+- Added machine phase state, synchronized governance/handoff records, and opened Phase 1.
 
 ### TDD evidence
 
@@ -67,7 +67,7 @@ All material repository changes are recorded here. This file tracks project stat
 
 - `packages/compiler/src/template-ast.mjs`, a separate transformation from the certified flat stream into hierarchical ownership structures.
 - Hierarchical `Template`, `Element`, `Text`, `Interpolation`, `RawHtml`, `IfBlock`, `EachBlock`, `AwaitBlock`, and `Branch` structures with exact spans.
-- Element-owned attribute/directive metadata, component/custom-element categories, self-closing/void handling, literal text recovery, and template-only integration.
+- Element-owned metadata, categories, self-closing/void handling, literal text recovery, and template-only integration.
 - `tests/phase1-parser-ast.test.mjs` with **four** focused hierarchy/ownership/integration cases.
 - Wayfinder Phase 1 architecture map and decision tickets under GitHub issues 1–5.
 
@@ -75,24 +75,38 @@ All material repository changes are recorded here. This file tracks project stat
 
 - Regression RED: removing the transform produces `ERR_MODULE_NOT_FOUND`; exit 1.
 - GREEN: **4/4** focused hierarchy/annotator tests pass under Node `v22.16.0`.
-- Flat structural syntax remains a separate input layer and is not rewritten by the hierarchy transform.
 
 ## 2026-10-08 — Embedded-language representation decision
 
 ### Added
 
-- `docs/phase-1/research/embedded-language-representation.md` with primary-source research for TypeScript and CSS parser boundaries.
-- ADR-0005 defining Nomos-owned `EmbeddedScript`, `EmbeddedExpression`, and `EmbeddedStylesheet` wrapper contracts while keeping third-party AST/visitor structures opaque and internal.
-- Machine-state records for the resolved Wayfinder embedded-language decision.
+- Primary-source embedded-language research and ADR-0005.
+- Nomos-owned `EmbeddedScript`, `EmbeddedExpression`, and `EmbeddedStylesheet` wrapper contract; third-party parser objects remain opaque/internal.
+- Machine state for resolved Wayfinder issue 2.
 
 ### Decision evidence
 
-- TypeScript 7.0 has no programmatic API; Microsoft provides `@typescript/typescript6` for tools needing the TypeScript 6 API during the transition and expects a different API in TypeScript 7.1+.
-- Lightning CSS exposes typed visitor structures and source-map input/output, but Nomos retains its own exact source-span authority and durable compiler IR.
-- Verified package baselines at decision time: `@typescript/typescript6@6.0.2` (Apache-2.0) and `lightningcss@1.33.0` (MPL-2.0). Dependencies remain uninstalled until executable adapter code consumes them and they are rechecked.
-- ADR-0005 explicitly does not resolve `OD-009` or any other PRD Open Decision.
+- TypeScript 7.0 has no programmatic API; Microsoft provides `@typescript/typescript6` during the transition.
+- Lightning CSS exposes typed visitor structures/source-map input-output, while Nomos retains exact source-span authority.
+- Verified baselines: `@typescript/typescript6@6.0.2` (Apache-2.0), `lightningcss@1.33.0` (MPL-2.0); dependencies remain uninstalled pending consuming code + fresh recheck.
+- ADR-0005 does not resolve `OD-009`.
+
+## 2026-10-08 — Generated source-map composition decision
+
+### Added
+
+- `docs/phase-1/research/source-map-composition.md` with ECMA-426, Vite/Rolldown, Rollup, and Parcel primary-source evidence.
+- ADR-0006 establishing stage-local decoded mappings, explicit unmapped compiler scaffolding, ordered composition back to the original `.nomos` source, `sourcesContent`, and strict final map validation before Vite/Rolldown handoff.
+- Machine-state records for resolved Wayfinder issue 3.
+
+### Decision evidence
+
+- ECMA-426 explicitly represents generated code with no original source using unmapped segments.
+- Vite 8 custom-file transforms return code plus a source map when available and build on Rolldown's plugin interface.
+- Rolldown validates source/name indices while ingesting maps, so malformed references are a build failure rather than a tolerable implementation detail.
+- The contract chooses no source-map library and does not resolve `OD-003` or any other PRD Open Decision.
 
 ### Still in progress
 
-- Executable embedded TypeScript/CSS adapters, broader HTML tree-construction validation, token/segment source-map composition, and exact public `NCON-*` wiring remain open.
+- Executable embedded-language adapters, broader HTML tree-construction validation, the stage-local segment/composition implementation, and public `NCON-*` wiring remain open.
 - `Parser and source maps` remains IN PROGRESS.

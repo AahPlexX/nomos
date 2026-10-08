@@ -3,51 +3,47 @@
 **Status:** IN PROGRESS  
 **Last updated:** 2026-10-08
 
-## Implemented layers
-
-The compiler front end deliberately separates:
+## Implemented compiler-front-end layers
 
 1. `parser.mjs` — lossless top-level section partitioning and exact source positions.
-2. `template-syntax.mjs` — flat structural syntax used for diagnostics and marker/source ownership.
-3. `template-ast.mjs` — hierarchical template ownership consumed by lowering/semantic analysis while preserving the flat stream.
+2. `template-syntax.mjs` — flat structural syntax stream for diagnostics and source ownership.
+3. `template-ast.mjs` — hierarchical ownership transform for lowering/semantic analysis while preserving the flat stream.
+4. `source-map.mjs` — current ECMA-426 identity line-start primitive for genuinely 1:1 pass-through code.
 
-Current guarantees include exact UTF-16 source spans, CRLF-aware diagnostics, structural validation of the complete Phase 0 parser corpus, stable reserved parser diagnostics, hierarchical element/block ownership with exact spans, and the ADR-0004 ECMA-426 identity-map baseline.
+The executable parser structurally certifies all seven valid and four invalid Phase 0 fixtures and provides the stable parser diagnostics recorded under `docs/diagnostics/`.
 
-## Embedded-language boundary
+## Embedded TypeScript/CSS boundary
 
-Research: `docs/phase-1/research/embedded-language-representation.md`  
-Decision: `docs/adr/0005-embedded-language-adapter-boundary.md`  
-Wayfinder ticket: https://github.com/AahPlexX/nomos/issues/2
+ADR-0005 and `docs/phase-1/research/embedded-language-representation.md` resolve Wayfinder issue 2. Nomos owns stable source-span/raw-text wrapper IR. TypeScript `SourceFile`/`Program` and Lightning CSS visitor structures are opaque adapter internals. Executable adapters remain unimplemented. Current verified dependency baselines (`@typescript/typescript6@6.0.2`, `lightningcss@1.33.0`) are not installed until consuming code rechecks and exact-pins them.
 
-ADR-0005 establishes a Nomos-owned adapter boundary:
+## Generated source-map composition
 
-- `EmbeddedScript` and `EmbeddedExpression` own exact `.nomos` spans/raw text and isolate the current TypeScript programmatic parser behind opaque adapter handles.
-- `EmbeddedStylesheet` owns exact style-section spans/raw text and isolates Lightning CSS typed visitor/transform structures behind the same kind of boundary.
-- Nomos source spans are authoritative; third-party location objects cannot overwrite them.
-- TypeScript 6 `SourceFile` / `Program` and Lightning CSS visitor structures are implementation details, not durable/public Nomos IR.
-- The verified dependency baselines are `@typescript/typescript6@6.0.2` and `lightningcss@1.33.0`, but neither is added until executable adapter code consumes it and the dependency policy is rechecked.
-- This decision does not resolve `OD-009` (TypeScript 7.1+ API adoption timing).
+ADR-0006 and `docs/phase-1/research/source-map-composition.md` resolve Wayfinder issue 3.
 
-## Source-map state
+Contract:
 
-The current primitive is an ECMA-426 `version: 3` identity line-start map with `sourcesContent`. Token/segment generated-code mapping and cross-stage composition remain open under Wayfinder issue 3.
+- every position-changing compiler stage maps output to its immediate input;
+- position-preserving stages may forward the existing map;
+- generated-only scaffolding is explicitly unmapped;
+- stage maps compose in pipeline order until mapped final segments resolve to the original `.nomos` source;
+- final maps include original source content and are validated before Vite/Rolldown handoff;
+- generated/original JavaScript and CSS columns use ADR-0004 UTF-16 semantics;
+- Phase 1 does not depend on experimental scope/range extensions.
+
+The current identity line-start map is therefore only a pass-through primitive, not completion of generated-code mapping.
 
 ## Verification history
 
-- First parser slice: 8/8 green after the nested-section regression fix.
-- Structural parser slice: RED 8/3 -> GREEN 11/0.
-- Hierarchical AST slice: regression RED via missing transform module -> GREEN 4/4 focused hierarchy/annotator tests.
+- Parser/source-map baseline: 8/8 green after nested-section regression fix.
+- Structural parser: RED 8/3 → GREEN 11/0.
+- Hierarchical AST: regression RED via missing transform → GREEN 4/4 focused hierarchy/annotator tests.
 
-The environment used for these slices has Node `v22.16.0` but no pinned `pnpm` executable; do not claim a full `pnpm check` run without fresh evidence.
+## Remaining before `Parser and source maps` can close
 
-## Deliberately not complete
+- executable TypeScript/CSS adapters behind ADR-0005;
+- broader WHATWG HTML tree-construction ownership validation;
+- decoded segment-map and stage-composition implementation behind ADR-0006;
+- exact public `NCON-*` conformance wiring before requirement promotion;
+- later Vite/HMR integration without silently resolving `OD-003`.
 
-`Parser and source maps` stays IN PROGRESS until all of the following are evidenced:
-
-- executable TypeScript and CSS adapters behind ADR-0005;
-- broader WHATWG HTML tree-construction ownership validation beyond the certified paragraph case;
-- token/segment generated source maps and composition across lowering stages;
-- exact public `NCON-*` conformance wiring before any associated requirement row is promoted from `planned` to `passing`;
-- later Vite/HMR integration when that Phase 1 slice is reached.
-
-Machine authority for the implemented/planned boundary: `spec/compiler-front-end.json` and `spec/phase-status.json`.
+Machine authority: `spec/compiler-front-end.json` and `spec/phase-status.json`. Wayfinder map: https://github.com/AahPlexX/nomos/issues/1.
