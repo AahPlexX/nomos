@@ -78,6 +78,14 @@ function analyzeRange(source, start, end, lineStarts, diagnostics) {
         'Close the <p> before this element or move the element outside the paragraph.'));
       elements.splice(pIndex);
     }
+    const impliedClose = findImpliedStartTagClose(elements, lower);
+    if (impliedClose) {
+      diagnostics.push(diagnostic(source, lineStarts, 'NOMOS-PARSE-HTML-OWNERSHIP', index, tag.end,
+        `<${tag.name}> implicitly closes the currently open <${impliedClose.name}> in the HTML parse tree.`,
+        `HTML tree construction closes <${impliedClose.name}> before inserting <${tag.name}>, so the browser tree would differ from the declared Nomos ownership tree.`,
+        `Close the <${impliedClose.name}> before this <${tag.name}>.`));
+      elements.splice(impliedClose.index);
+    }
     nodes.push({ type: 'ElementOpen', name: tag.name, category: classify(tag.name), selfClosing: tag.selfClosing, span: span(source, lineStarts, index, tag.end) });
     for (const attr of attributes(source, index + 1 + tag.name.length, tag.end - 1)) {
       if (attr.name.includes(':')) {
@@ -104,6 +112,21 @@ function analyzeRange(source, start, end, lineStarts, diagnostics) {
       `Add {/${block.kind}} after the block body.`));
   }
   return { type: 'TemplateSyntaxTree', span: span(source, lineStarts, start, end), nodes };
+}
+
+function findImpliedStartTagClose(elements, incoming) {
+  let index = -1;
+  if (incoming === 'li') {
+    index = lastIndex(elements, (name) => name.toLowerCase() === 'li');
+  } else if (incoming === 'dd' || incoming === 'dt') {
+    index = lastIndex(elements, (name) => {
+      const lower = name.toLowerCase();
+      return lower === 'dd' || lower === 'dt';
+    });
+  } else if (incoming === 'button') {
+    index = lastIndex(elements, (name) => name.toLowerCase() === 'button');
+  }
+  return index >= 0 ? { index, name: elements[index] } : null;
 }
 
 function blockOpen(source, start) {
