@@ -28,11 +28,12 @@
       "phase0-structural-parser-corpus-certification",
       "embedded-language-adapter-boundary",
       "stage-local-source-map-composition-contract",
-      "exact-decoded-segment-composer"
+      "exact-decoded-segment-composer",
+      "whatwg-implied-close-ownership-li-dd-dt-button"
     ],
     "parserRemaining": [
       "embedded-typescript-and-css-adapter-implementation",
-      "broader-html-tree-construction-validation",
+      "remaining-html-tree-construction-validation-including-table-foster-parenting",
       "token-level-generated-mapping-production"
     ],
     "conformance": {
