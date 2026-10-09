@@ -20,11 +20,12 @@ Status keys: `[x]` verified complete, `[>]` in progress, `[ ]` not complete, `[!
   - [x] ADR-0004 ECMA-426 coordinate/map baseline and identity pass-through map.
   - [x] ADR-0005 embedded-language representation boundary.
   - [x] ADR-0006 stage-local source-map composition contract.
-  - [x] Implement exact decoded mapping validation, stage composition, unmapped scaffolding preservation, and ECMA-426 encoding core.
+  - [x] Exact decoded mapping validation, stage composition, unmapped scaffolding preservation, and ECMA-426 encoding core.
+  - [x] Expand HTML ownership checks from paragraph auto-close to repeated `li`, `dt`/`dd`, and nested `button` implied-close cases.
+  - [ ] Extend HTML ownership validation into table insertion modes/foster parenting and remaining high-impact tree rewrites.
   - [ ] Produce token/segment mappings from real lowering/code-generation stages and compose them through the new core.
-  - [ ] Implement `EmbeddedScript` / `EmbeddedExpression` adapter using exact-pinned TypeScript compatibility API after fresh dependency recheck.
-  - [ ] Implement `EmbeddedStylesheet` adapter using exact-pinned Lightning CSS after fresh dependency recheck.
-  - [ ] Broaden HTML ownership checks beyond the certified paragraph auto-close case.
+  - [ ] Implement `EmbeddedScript` / `EmbeddedExpression` adapter using exact-pinned TypeScript compatibility API.
+  - [ ] Implement `EmbeddedStylesheet` adapter using exact-pinned Lightning CSS.
 - [>] Public conformance infrastructure.
   - [x] ADR-0007 public `NCON-*` identity/environment/promotion contract.
   - [x] Public `conformance/` manifest, runner, validator, machine contract, and harness-core tests.
