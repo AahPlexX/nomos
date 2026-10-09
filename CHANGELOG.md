@@ -46,7 +46,22 @@ All material repository changes are recorded here. This file tracks project stat
 - Existing paragraph auto-close behavior remained diagnosed.
 - Explicitly closed `li`, `dt`/`dd`, and `button` examples remained valid.
 
+## 2026-10-09 — Table foster-parenting ownership validation
+
+### Added
+
+- WHATWG-aligned ownership diagnostics for non-whitespace text that browser table parsing foster-parents away from `table`, `tbody`, `tfoot`, `thead`, or `tr` ownership.
+- Ownership diagnostics for ordinary non-table elements in those same table parsing contexts when the browser would foster-parent them outside the declared owner.
+- `tests/phase1-parser-table-ownership.test.mjs` covering both relocation cases plus valid ordinary content inside an explicit table cell.
+- Machine-readable ownership coverage now records six certified rewrite families.
+
+### Verified
+
+- RED: 1/3 table tests passed; the valid cell-content control passed while both relocation cases were still undiagnosed.
+- GREEN: 3/3 table tests pass under Node `v22.16.0`.
+- Combined focused ownership regression run: 11/11 pass under Node `v22.16.0`, including earlier paragraph/`li`/`dt`/`dd`/`button` cases and explicit valid controls.
+
 ### Still open
 
-- Table insertion modes/foster parenting and remaining WHATWG tree-construction rewrites.
+- Remaining table insertion-mode transitions, implied wrappers/section transitions, and formatting-element edge cases.
 - Embedded TypeScript/CSS adapters and real lowering/code-generation mapping production.
