@@ -11,6 +11,7 @@ const required = [
   'tests/phase1-parser.test.mjs',
   'tests/phase1-parser-structural.test.mjs',
   'tests/phase1-parser-ast.test.mjs',
+  'tests/phase1-source-map-composition.test.mjs',
   'tests/phase1-conformance-harness.test.mjs',
   'docs/phase-1/PARSER-AND-SOURCEMAPS.md',
   'docs/phase-1/research/embedded-language-representation.md',
@@ -37,6 +38,8 @@ assert.equal(phase.currentPhase, 1);
 assert.equal(phase.phase1.status, 'in-progress');
 assert.equal(phase.phase1.parserAndSourceMaps, 'in-progress');
 assert.equal(phase.phase1.conformanceInfrastructure, 'foundation-implemented');
+assert.ok(phase.phase1.parserImplemented.includes('exact-decoded-segment-composer'));
+assert.ok(phase.phase1.parserRemaining.includes('token-level-generated-mapping-production'));
 assert.equal(phase.phase1.conformance.seedTest, 'NCON-NREQ-0145');
 assert.equal(phase.phase1.conformance.seedTestStatus, 'wired-unverified');
 assert.equal(phase.phase1.conformance.passingRequirementCount, 0);
@@ -46,7 +49,10 @@ assert.deepEqual(phase.phase1.openWayfinderDecisions, ['https://github.com/AahPl
 const frontEnd = JSON.parse(await readFile(new URL('spec/compiler-front-end.json', root), 'utf8'));
 assert.equal(frontEnd.sourcePositionModel.offsetUnit, 'utf-16-code-unit');
 assert.equal(frontEnd.sourceMaps.standard, 'ECMA-426');
-assert.equal(frontEnd.sourceMaps.stageLocalMappings, 'contract-resolved-implementation-planned');
+assert.equal(frontEnd.sourceMaps.stageLocalMappings, 'core-composer-implemented');
+assert.equal(frontEnd.sourceMaps.compositionResolution, 'exact-mapping-points-only');
+assert.equal(frontEnd.sourceMaps.finalMapValidation, 'implemented-core');
+assert.equal(frontEnd.sourceMaps.tokenLevelGeneratedMappings, 'planned');
 assert.equal(frontEnd.templateSyntax.hierarchicalTypedAst, 'implemented-structural');
 assert.equal(frontEnd.embeddedLanguages.typescript.implementation, 'planned');
 assert.equal(frontEnd.embeddedLanguages.css.implementation, 'planned');
@@ -57,4 +63,4 @@ assert.equal(conformance.browserSubstitutionAllowed, false);
 assert.equal(conformance.seedTest.status, 'wired-unverified');
 assert.deepEqual(conformance.passingRequirements, []);
 
-console.log(`Phase 1 check passed: ${required.length} required artifacts; conformance foundation is implemented while parser adapters/composer and public green evidence remain in progress.`);
+console.log(`Phase 1 check passed: ${required.length} required artifacts; exact segment-map composition core is implemented while token mapping production, embedded adapters, browser ownership coverage, and public green evidence remain in progress.`);

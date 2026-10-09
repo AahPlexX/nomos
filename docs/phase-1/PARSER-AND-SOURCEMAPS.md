@@ -1,14 +1,14 @@
 # Phase 1 parser and source-map implementation
 
 **Status:** IN PROGRESS  
-**Last updated:** 2026-10-08
+**Last updated:** 2026-10-09
 
 ## Implemented compiler-front-end layers
 
 1. `parser.mjs` — lossless top-level section partitioning and exact source positions.
 2. `template-syntax.mjs` — flat structural syntax stream for diagnostics and source ownership.
 3. `template-ast.mjs` — hierarchical ownership transform for lowering/semantic analysis while preserving the flat stream.
-4. `source-map.mjs` — current ECMA-426 identity line-start primitive for genuinely 1:1 pass-through code.
+4. `source-map.mjs` — ECMA-426 identity pass-through support plus decoded mapping validation, exact stage composition, unmapped generated scaffolding preservation, and version-3 encoding with `sourcesContent`.
 
 The executable parser structurally certifies all seven valid and four invalid Phase 0 fixtures and provides the stable parser diagnostics recorded under `docs/diagnostics/`.
 
@@ -20,30 +20,31 @@ ADR-0005 and `docs/phase-1/research/embedded-language-representation.md` resolve
 
 ADR-0006 and `docs/phase-1/research/source-map-composition.md` resolve Wayfinder issue 3.
 
-Contract:
+Implemented core:
 
-- every position-changing compiler stage maps output to its immediate input;
-- position-preserving stages may forward the existing map;
-- generated-only scaffolding is explicitly unmapped;
-- stage maps compose in pipeline order until mapped final segments resolve to the original `.nomos` source;
-- final maps include original source content and are validated before Vite/Rolldown handoff;
-- generated/original JavaScript and CSS columns use ADR-0004 UTF-16 semantics;
-- Phase 1 does not depend on experimental scope/range extensions.
+- decoded mapping positions are zero-based UTF-16 line/column pairs;
+- decoded mappings are strictly ordered and validated;
+- exact downstream mapping points compose through an intermediate stage to the original source;
+- compiler-generated scaffolding remains explicitly unmapped;
+- unresolved intermediate positions fail instead of receiving fabricated provenance;
+- optional names survive composition when meaningful;
+- validated decoded mappings encode to ECMA-426 version-3 `mappings`, `sources`, `sourcesContent`, and `names`.
 
-The current identity line-start map is therefore only a pass-through primitive, not completion of generated-code mapping.
+The current composer intentionally requires exact intermediate mapping points. It does not infer or interpolate provenance between mapping segments. Real lowering/code-generation stages must therefore emit sufficient token/segment mapping points for every downstream position they reference.
 
 ## Verification history
 
 - Parser/source-map baseline: 8/8 green after nested-section regression fix.
 - Structural parser: RED 8/3 → GREEN 11/0.
 - Hierarchical AST: regression RED via missing transform → GREEN 4/4 focused hierarchy/annotator tests.
+- Source-map composition: RED because the new exports were absent → GREEN 4/4 focused composition/validation/encoding tests under Node `v22.16.0`.
 
 ## Remaining before `Parser and source maps` can close
 
 - executable TypeScript/CSS adapters behind ADR-0005;
 - broader WHATWG HTML tree-construction ownership validation;
-- decoded segment-map and stage-composition implementation behind ADR-0006;
-- exact public `NCON-*` conformance wiring before requirement promotion;
+- token/segment mapping production in actual lowering and generated-code stages, composed through the implemented ADR-0006 core;
+- public `NCON-*` coverage and green evidence for applicable requirements;
 - later Vite/HMR integration without silently resolving `OD-003`.
 
 Machine authority: `spec/compiler-front-end.json` and `spec/phase-status.json`. Wayfinder map: https://github.com/AahPlexX/nomos/issues/1.

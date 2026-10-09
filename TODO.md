@@ -1,6 +1,6 @@
 # Nomos execution queue
 
-**Last updated:** 2026-10-08  
+**Last updated:** 2026-10-09  
 **Binding scope:** `PRD.md` plus effective amendments  
 **Current phase:** Phase 1 — Vertical Slice
 
@@ -20,9 +20,10 @@ Status keys: `[x]` verified complete, `[>]` in progress, `[ ]` not complete, `[!
   - [x] ADR-0004 ECMA-426 coordinate/map baseline and identity pass-through map.
   - [x] ADR-0005 embedded-language representation boundary.
   - [x] ADR-0006 stage-local source-map composition contract.
+  - [x] Implement exact decoded mapping validation, stage composition, unmapped scaffolding preservation, and ECMA-426 encoding core.
+  - [ ] Produce token/segment mappings from real lowering/code-generation stages and compose them through the new core.
   - [ ] Implement `EmbeddedScript` / `EmbeddedExpression` adapter using exact-pinned TypeScript compatibility API after fresh dependency recheck.
   - [ ] Implement `EmbeddedStylesheet` adapter using exact-pinned Lightning CSS after fresh dependency recheck.
-  - [ ] Implement decoded segment maps + stage composition + final validation per ADR-0006.
   - [ ] Broaden HTML ownership checks beyond the certified paragraph auto-close case.
 - [>] Public conformance infrastructure.
   - [x] ADR-0007 public `NCON-*` identity/environment/promotion contract.

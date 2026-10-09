@@ -24,14 +24,15 @@
     "versionField": 3,
     "columnUnitForJavaScriptAndCss": "utf-16-code-unit",
     "sourcesContent": true,
-    "currentPrimitive": "identity-line-start",
+    "currentPrimitive": "decoded-exact-segment-composer",
     "compositionContract": "docs/adr/0006-stage-local-source-map-composition.md",
     "compositionResearch": "docs/phase-1/research/source-map-composition.md",
     "compositionWayfinderDecision": "https://github.com/AahPlexX/nomos/issues/3",
-    "stageLocalMappings": "contract-resolved-implementation-planned",
+    "stageLocalMappings": "core-composer-implemented",
+    "compositionResolution": "exact-mapping-points-only",
     "generatedScaffolding": "unmapped",
     "finalMapTarget": "original-.nomos-source",
-    "finalMapValidation": "required",
+    "finalMapValidation": "implemented-core",
     "tokenLevelGeneratedMappings": "planned"
   },
   "phase0ParserCorpus": {

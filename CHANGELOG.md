@@ -40,3 +40,23 @@ All material repository changes are recorded here. This file tracks project stat
 
 - `NREQ-0145` remains `planned`. Its public test is wired but has not been executed against a complete authenticated checkout in this environment, so no green public evidence is claimed.
 - Real-browser environment profiles remain future work; unit-only DOM substitution is explicitly forbidden for browser-required obligations.
+
+## 2026-10-09 — Source-map composition core
+
+### Added
+
+- `validateDecodedMappings` for strict ordered zero-based decoded mapping validation.
+- `composeDecodedMappings` for exact stage-to-stage provenance composition.
+- `createSourceMapFromDecodedMappings` for ECMA-426 version-3 encoding with source/name tables and `sourcesContent`.
+- `tests/phase1-source-map-composition.test.mjs` covering composition, unmapped generated scaffolding, invalid/unresolved mapping rejection, and final encoding.
+
+### Verified
+
+- TDD RED: source-map composition test failed because the new exports did not exist.
+- GREEN: 4/4 source-map composition tests pass under Node `v22.16.0`.
+
+### Boundary retained
+
+- Composition intentionally resolves exact intermediate mapping points only; it does not infer provenance between segments.
+- Real lowering/code-generation stages still need to emit sufficient token/segment mappings before `Parser and source maps` can be marked complete.
+- Embedded TypeScript/CSS adapters and broader WHATWG HTML ownership validation remain open.

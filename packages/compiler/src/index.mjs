@@ -9,4 +9,9 @@ export function parseComponent(source, options) {
 }
 
 export { buildTemplateAst } from './template-ast.mjs';
-export { createIdentitySourceMap } from './source-map.mjs';
+export {
+  composeDecodedMappings,
+  createIdentitySourceMap,
+  createSourceMapFromDecodedMappings,
+  validateDecodedMappings,
+} from './source-map.mjs';
