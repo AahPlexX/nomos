@@ -55,7 +55,18 @@ function analyzeRange(source, start, end, lineStarts, diagnostics) {
       nodes.push({ type: 'Interpolation', span: span(source, lineStarts, index, close) });
       index = close; continue;
     }
-    if (source[index] !== '<') { index += 1; continue; }
+    if (source[index] !== '<') {
+      const textEnd = nextMarkupBoundary(source, index, end);
+      const tableContext = currentTableContext(elements);
+      if (tableContext && source.slice(index, textEnd).trim() !== '') {
+        diagnostics.push(diagnostic(source, lineStarts, 'NOMOS-PARSE-HTML-OWNERSHIP', index, textEnd,
+          `Text cannot remain owned by <${tableContext}> in the HTML table parse tree.`,
+          'HTML tree construction foster-parents non-whitespace text out of this table context, so the browser tree would differ from the declared Nomos ownership tree.',
+          'Move the text into a table cell such as <td> or <th>, or outside the table.'));
+      }
+      index = textEnd;
+      continue;
+    }
     if (source.startsWith('</', index)) {
       const tag = readTag(source, index, true);
       if (!tag || tag.end > end) { index += 1; continue; }
@@ -70,6 +81,13 @@ function analyzeRange(source, start, end, lineStarts, diagnostics) {
     const tag = readTag(source, index, false);
     if (!tag || tag.end > end) { index += 1; continue; }
     const lower = tag.name.toLowerCase();
+    const fosterContext = tableFosterParentContext(elements, lower);
+    if (fosterContext) {
+      diagnostics.push(diagnostic(source, lineStarts, 'NOMOS-PARSE-HTML-OWNERSHIP', index, tag.end,
+        `<${tag.name}> cannot remain owned by <${fosterContext}> in the HTML table parse tree.`,
+        `HTML tree construction foster-parents <${tag.name}> out of <${fosterContext}>, so the browser tree would differ from the declared Nomos ownership tree.`,
+        `Move <${tag.name}> into a valid table cell or outside the table.`));
+    }
     const pIndex = lastIndex(elements, (name) => name.toLowerCase() === 'p');
     if (pIndex >= 0 && P_BREAKERS.has(lower)) {
       diagnostics.push(diagnostic(source, lineStarts, 'NOMOS-PARSE-HTML-OWNERSHIP', index, tag.end,
@@ -112,6 +130,28 @@ function analyzeRange(source, start, end, lineStarts, diagnostics) {
       `Add {/${block.kind}} after the block body.`));
   }
   return { type: 'TemplateSyntaxTree', span: span(source, lineStarts, start, end), nodes };
+}
+
+function currentTableContext(elements) {
+  const current = elements.at(-1)?.toLowerCase();
+  return current && ['table','tbody','tfoot','thead','tr'].includes(current) ? current : null;
+}
+
+function tableFosterParentContext(elements, incoming) {
+  const current = currentTableContext(elements);
+  if (!current) return null;
+  const allowed = current === 'table'
+    ? new Set(['caption','colgroup','tbody','tfoot','thead','tr','style','script','template'])
+    : current === 'tr'
+      ? new Set(['td','th','style','script','template'])
+      : new Set(['tr','style','script','template']);
+  return allowed.has(incoming) ? null : current;
+}
+
+function nextMarkupBoundary(source, start, end) {
+  let index = start + 1;
+  while (index < end && source[index] !== '<' && source[index] !== '{') index += 1;
+  return index;
 }
 
 function findImpliedStartTagClose(elements, incoming) {
