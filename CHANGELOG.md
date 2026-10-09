@@ -17,46 +17,36 @@ All material repository changes are recorded here. This file tracks project stat
 - Added lossless component section parsing, exact UTF-16 positions, structural diagnostics, ECMA-426 identity mapping, full Phase 0 structural parser-corpus certification, and hierarchical template ownership AST.
 - Parser development evidence reached 11/11 structural tests plus 4/4 focused hierarchy/annotator tests under Node `v22.16.0`.
 - ADR-0004 established source positions/maps; ADR-0005 established embedded-language adapter boundaries; ADR-0006 established stage-local source-map composition.
-- Embedded TypeScript/CSS adapters, broader HTML tree construction, and the segment-map composer remain unimplemented.
 
 ## 2026-10-08 — Public conformance foundation
 
-### Added
-
-- ADR-0007 defining stable public `NCON-*` identities, manifest-declared environments, and evidence-gated requirement promotion.
-- `docs/phase-1/research/public-conformance-promotion.md` with Node/GitHub Actions/PRD evidence.
-- `conformance/manifest.json` and `conformance/README.md` as the public suite index/contract.
-- `tools/conformance-core.mjs`, `tools/run-conformance.mjs`, and `tools/validate-conformance.mjs`.
-- `spec/conformance.json` as machine-readable conformance state.
-- `tests/phase1-conformance-harness.test.mjs` with four harness-contract cases.
-- First public compiler conformance file: `conformance/compiler/NCON-NREQ-0145.test.mjs`.
-
-### Verified
-
-- Conformance harness core: 4/4 tests green under Node `v22.16.0`.
-- Public seed test file, runner, and validator pass syntax checks.
-
-### Not promoted
-
-- `NREQ-0145` remains `planned`. Its public test is wired but has not been executed against a complete authenticated checkout in this environment, so no green public evidence is claimed.
-- Real-browser environment profiles remain future work; unit-only DOM substitution is explicitly forbidden for browser-required obligations.
+- Added ADR-0007, public `conformance/` manifest/runner/validator, machine state, four harness-core tests, and the first wired compiler test `NCON-NREQ-0145`.
+- `NREQ-0145` remains `planned` until that exact public test executes green against a complete checkout/evidence set.
 
 ## 2026-10-09 — Source-map composition core
 
+- Added strict decoded mapping validation, exact stage-to-stage composition, explicit unmapped scaffolding preservation, and ECMA-426 version-3 encoding with `sourcesContent`.
+- TDD RED: composer exports absent. GREEN: 4/4 focused source-map tests under Node `v22.16.0`.
+- Real lowering/code-generation stages still need to emit sufficient token/segment mappings.
+
+## 2026-10-09 — Expanded HTML ownership validation
+
 ### Added
 
-- `validateDecodedMappings` for strict ordered zero-based decoded mapping validation.
-- `composeDecodedMappings` for exact stage-to-stage provenance composition.
-- `createSourceMapFromDecodedMappings` for ECMA-426 version-3 encoding with source/name tables and `sourcesContent`.
-- `tests/phase1-source-map-composition.test.mjs` covering composition, unmapped generated scaffolding, invalid/unresolved mapping rejection, and final encoding.
+- WHATWG-aligned ownership diagnostics when a new `li` implicitly closes an open `li`.
+- Ownership diagnostics when a new `dt`/`dd` implicitly closes an open `dt`/`dd`.
+- Ownership diagnostics when a nested `button` causes the browser parser to close the outer button.
+- `tests/phase1-parser-html-ownership.test.mjs` with three focused regression cases.
+- Updated diagnostic documentation and machine-readable ownership coverage.
 
 ### Verified
 
-- TDD RED: source-map composition test failed because the new exports did not exist.
-- GREEN: 4/4 source-map composition tests pass under Node `v22.16.0`.
+- RED: 0/3 new ownership tests passed because no diagnostics were emitted.
+- GREEN: 3/3 pass under Node `v22.16.0`.
+- Existing paragraph auto-close behavior remained diagnosed.
+- Explicitly closed `li`, `dt`/`dd`, and `button` examples remained valid.
 
-### Boundary retained
+### Still open
 
-- Composition intentionally resolves exact intermediate mapping points only; it does not infer provenance between segments.
-- Real lowering/code-generation stages still need to emit sufficient token/segment mappings before `Parser and source maps` can be marked complete.
-- Embedded TypeScript/CSS adapters and broader WHATWG HTML ownership validation remain open.
+- Table insertion modes/foster parenting and remaining WHATWG tree-construction rewrites.
+- Embedded TypeScript/CSS adapters and real lowering/code-generation mapping production.
