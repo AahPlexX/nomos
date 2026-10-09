@@ -19,6 +19,19 @@
     "NOMOS-PARSE-UNTERMINATED-BLOCK",
     "NOMOS-PARSE-UNKNOWN-DIRECTIVE"
   ],
+  "htmlOwnership": {
+    "status": "partial-whatwg-tree-construction-validation",
+    "certifiedRewrites": [
+      "paragraph-auto-close-before-block-like-start-tags",
+      "li-start-tag-closes-open-li",
+      "dd-or-dt-start-tag-closes-open-dd-or-dt",
+      "button-start-tag-closes-open-button"
+    ],
+    "remaining": [
+      "table-insertion-modes-and-foster-parenting",
+      "remaining-special-element-and-insertion-mode-rewrites"
+    ]
+  },
   "sourceMaps": {
     "standard": "ECMA-426",
     "versionField": 3,
