@@ -29,11 +29,12 @@
       "embedded-language-adapter-boundary",
       "stage-local-source-map-composition-contract",
       "exact-decoded-segment-composer",
-      "whatwg-implied-close-ownership-li-dd-dt-button"
+      "whatwg-implied-close-ownership-li-dd-dt-button",
+      "whatwg-table-foster-parenting-text-and-elements"
     ],
     "parserRemaining": [
       "embedded-typescript-and-css-adapter-implementation",
-      "remaining-html-tree-construction-validation-including-table-foster-parenting",
+      "remaining-table-and-formatting-tree-construction-validation",
       "token-level-generated-mapping-production"
     ],
     "conformance": {
