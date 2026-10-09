@@ -21,15 +21,18 @@
   ],
   "htmlOwnership": {
     "status": "partial-whatwg-tree-construction-validation",
+    "certifiedRewriteCount": 6,
     "certifiedRewrites": [
       "paragraph-auto-close-before-block-like-start-tags",
       "li-start-tag-closes-open-li",
       "dd-or-dt-start-tag-closes-open-dd-or-dt",
-      "button-start-tag-closes-open-button"
+      "button-start-tag-closes-open-button",
+      "table-context-non-whitespace-text-foster-parented",
+      "table-context-ordinary-element-foster-parented"
     ],
     "remaining": [
-      "table-insertion-modes-and-foster-parenting",
-      "remaining-special-element-and-insertion-mode-rewrites"
+      "remaining-table-insertion-mode-and-implied-wrapper-rewrites",
+      "remaining-special-element-and-formatting-insertion-mode-rewrites"
     ]
   },
   "sourceMaps": {
