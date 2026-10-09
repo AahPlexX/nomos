@@ -20,9 +20,9 @@ Resolved Wayfinder research decisions:
 
 The ADR-0006 composition core is executable: decoded mappings are validated, exact stage mapping points compose through an intermediate source, generated-only scaffolding remains unmapped, unresolved provenance fails loudly, and final decoded mappings encode to ECMA-426 version-3 maps with `sourcesContent`.
 
-HTML ownership validation now rejects four certified browser-rewrite families: paragraph auto-close before block-like starts, repeated `li`, `dt`/`dd` replacement, and nested `button`. Table foster-parenting/insertion modes and other remaining WHATWG rewrites are still open.
+HTML ownership validation now certifies six browser-rewrite families: paragraph auto-close before block-like starts, repeated `li`, `dt`/`dd` replacement, nested `button`, foster-parented non-whitespace text in table parsing contexts, and foster-parented ordinary elements in `table`/table-section/`tr` contexts. Valid ordinary content inside `td`/`th` remains accepted. Remaining table insertion-mode transitions and other WHATWG rewrites are still open.
 
-`Parser and source maps` remains **IN PROGRESS** because real lowering/code-generation stages do not yet emit full token/segment mappings, embedded TypeScript/CSS adapters are not implemented, and full WHATWG HTML ownership validation is not complete.
+`Parser and source maps` remains **IN PROGRESS** because real lowering/code-generation stages do not yet emit full token/segment mappings, embedded TypeScript/CSS adapters are not implemented, and complete WHATWG HTML tree-construction ownership validation is not finished.
 
 ## Public conformance state
 
@@ -36,9 +36,11 @@ Hierarchical AST GREEN: 4 passed / 0 failed under Node v22.16.0.
 Conformance harness core GREEN: 4 passed / 0 failed under Node v22.16.0.
 Source-map composition RED: missing exported composer API.
 Source-map composition GREEN: 4 passed / 0 failed under Node v22.16.0.
-Expanded HTML ownership RED: 0 passed / 3 failed because no diagnostics were emitted.
-Expanded HTML ownership GREEN: 3 passed / 0 failed under Node v22.16.0.
-Existing paragraph auto-close remained diagnosed; explicitly closed li/dt/dd/button cases remained valid.
+Expanded implied-close ownership RED: 0 passed / 3 failed because no diagnostics were emitted.
+Expanded implied-close ownership GREEN: 3 passed / 0 failed under Node v22.16.0.
+Table foster-parenting RED: 1 passed / 2 failed because text/element relocation was not diagnosed.
+Table foster-parenting GREEN: 3 passed / 0 failed under Node v22.16.0.
+Combined focused HTML ownership regression run: 11 passed / 0 failed under Node v22.16.0.
 ```
 
 The current environment does not provide the repository-pinned `pnpm` executable. Do not claim a full `pnpm check` or a green public `NCON-NREQ-0145` run until one actually occurs against the complete repository.
@@ -61,6 +63,6 @@ Portable Handoff: `/tmp/nomos-phase1-handoff.md`. Canonical facts remain in this
 
 1. Resolve runtime ownership/scheduling (Wayfinder issue 4) before starting the reactive runtime slice.
 2. Implement ADR-0005 TypeScript/CSS adapters test-first using the freshly reverified exact dependency baselines.
-3. Extend HTML ownership validation into table insertion modes/foster parenting and remaining high-impact tree rewrites.
+3. Finish remaining high-impact table insertion-mode rewrites beyond the newly covered foster-parenting cases.
 4. Produce real token/segment mappings in lowering/code-generation and compose them through the ADR-0006 core.
 5. Execute `NCON-NREQ-0145` in a complete checkout/CI evidence set; only then consider promoting `NREQ-0145`.
