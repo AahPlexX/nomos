@@ -16,8 +16,11 @@ const required = [
   'tests/phase1-parser-html-ownership.test.mjs',
   'tests/phase1-parser-table-ownership.test.mjs',
   'tests/phase1-parser-table-integration.test.mjs',
+  'tests/phase1-parser-table-transitions.test.mjs',
   'tests/phase1-table-ownership-rules.test.mjs',
   'tests/phase1-table-structure-validation.test.mjs',
+  'tests/phase1-table-section-transitions.test.mjs',
+  'tests/phase1-table-stack-repair.test.mjs',
   'tests/phase1-source-map-composition.test.mjs',
   'tests/phase1-conformance-harness.test.mjs',
   'docs/diagnostics/NOMOS-PARSE-HTML-OWNERSHIP.md',
@@ -50,7 +53,8 @@ assert.ok(phase.phase1.parserImplemented.includes('exact-decoded-segment-compose
 assert.ok(phase.phase1.parserImplemented.includes('whatwg-implied-close-ownership-li-dd-dt-button'));
 assert.ok(phase.phase1.parserImplemented.includes('whatwg-table-foster-parenting-text-and-elements'));
 assert.ok(phase.phase1.parserImplemented.includes('whatwg-table-implied-wrappers-and-row-cell-autoclose'));
-assert.ok(phase.phase1.parserRemaining.includes('remaining-table-section-transition-and-formatting-tree-construction-validation'));
+assert.ok(phase.phase1.parserImplemented.includes('whatwg-table-section-transitions-colgroup-caption-and-close-chains'));
+assert.ok(phase.phase1.parserRemaining.includes('remaining-formatting-and-special-insertion-mode-tree-construction-validation'));
 assert.ok(phase.phase1.parserRemaining.includes('token-level-generated-mapping-production'));
 assert.equal(phase.phase1.conformance.seedTest, 'NCON-NREQ-0145');
 assert.equal(phase.phase1.conformance.seedTestStatus, 'wired-unverified');
@@ -65,15 +69,15 @@ assert.equal(frontEnd.sourceMaps.compositionResolution, 'exact-mapping-points-on
 assert.equal(frontEnd.sourceMaps.finalMapValidation, 'implemented-core');
 assert.equal(frontEnd.sourceMaps.tokenLevelGeneratedMappings, 'planned');
 assert.equal(frontEnd.htmlOwnership.status, 'partial-whatwg-tree-construction-validation');
-assert.equal(frontEnd.htmlOwnership.certifiedRewriteCount, 11);
-assert.ok(frontEnd.htmlOwnership.certifiedRewrites.includes('table-context-non-whitespace-text-foster-parented'));
-assert.ok(frontEnd.htmlOwnership.certifiedRewrites.includes('table-context-ordinary-element-foster-parented'));
-assert.ok(frontEnd.htmlOwnership.certifiedRewrites.includes('tr-directly-under-table-implies-tbody'));
-assert.ok(frontEnd.htmlOwnership.certifiedRewrites.includes('td-or-th-directly-under-table-implies-tbody-and-tr'));
-assert.ok(frontEnd.htmlOwnership.certifiedRewrites.includes('td-or-th-directly-under-table-section-implies-tr'));
-assert.ok(frontEnd.htmlOwnership.certifiedRewrites.includes('td-or-th-start-tag-closes-open-table-cell'));
-assert.ok(frontEnd.htmlOwnership.certifiedRewrites.includes('tr-start-tag-closes-open-tr'));
-assert.ok(frontEnd.htmlOwnership.remaining.includes('remaining-table-section-transition-rewrites'));
+assert.equal(frontEnd.htmlOwnership.certifiedRewriteCount, 18);
+assert.ok(frontEnd.htmlOwnership.certifiedRewrites.includes('col-directly-under-table-implies-colgroup'));
+assert.ok(frontEnd.htmlOwnership.certifiedRewrites.includes('caption-start-closes-open-table-section'));
+assert.ok(frontEnd.htmlOwnership.certifiedRewrites.includes('table-section-start-closes-open-table-section'));
+assert.ok(frontEnd.htmlOwnership.certifiedRewrites.includes('colgroup-start-closes-open-table-section'));
+assert.ok(frontEnd.htmlOwnership.certifiedRewrites.includes('table-section-start-closes-open-row-and-section'));
+assert.ok(frontEnd.htmlOwnership.certifiedRewrites.includes('caption-start-closes-open-cell-row-and-section'));
+assert.ok(frontEnd.htmlOwnership.certifiedRewrites.includes('caption-start-closes-open-caption'));
+assert.ok(frontEnd.htmlOwnership.remaining.includes('remaining-special-element-and-formatting-insertion-mode-rewrites'));
 assert.equal(frontEnd.templateSyntax.hierarchicalTypedAst, 'implemented-structural');
 assert.equal(frontEnd.embeddedLanguages.typescript.implementation, 'planned');
 assert.equal(frontEnd.embeddedLanguages.css.implementation, 'planned');
@@ -84,4 +88,4 @@ assert.equal(conformance.browserSubstitutionAllowed, false);
 assert.equal(conformance.seedTest.status, 'wired-unverified');
 assert.deepEqual(conformance.passingRequirements, []);
 
-console.log(`Phase 1 check passed: ${required.length} required artifacts; eleven HTML ownership rewrite families plus source-map composition core are implemented while remaining HTML transitions, embedded adapters, token mapping production, and public green evidence remain in progress.`);
+console.log(`Phase 1 check passed: ${required.length} required artifacts; eighteen HTML ownership scenarios plus source-map composition core are implemented while formatting/special insertion modes, embedded adapters, token mapping production, and public green evidence remain in progress.`);
