@@ -1,14 +1,14 @@
 # Phase 1 parser and source-map implementation
 
 **Status:** IN PROGRESS  
-**Last updated:** 2026-10-09
+**Last updated:** 2026-10-10
 
 ## Implemented compiler-front-end layers
 
 1. `parser.mjs` — lossless top-level section partitioning and exact source positions.
 2. `template-syntax.mjs` — flat structural syntax stream for diagnostics and source ownership.
 3. `html-table-ownership.mjs` — pure WHATWG table start-tag ownership/rewrite rules.
-4. `table-structure-validation.mjs` — table ownership diagnostics over the flat syntax stream, including stack repair after browser-implied closes.
+4. `table-structure-validation.mjs` — table ownership diagnostics over the flat syntax stream, including full-stack repair after browser-implied closes.
 5. `template-ast.mjs` — hierarchical ownership transform for lowering/semantic analysis while preserving the flat stream.
 6. `source-map.mjs` — ECMA-426 identity pass-through support plus decoded mapping validation, exact stage composition, unmapped generated scaffolding preservation, and version-3 encoding with `sourcesContent`.
 
@@ -16,23 +16,25 @@ The executable parser structurally certifies all seven valid and four invalid Ph
 
 ## HTML ownership validation
 
-`NOMOS-PARSE-HTML-OWNERSHIP` now covers **11 certified WHATWG tree-construction rewrite families**:
+`NOMOS-PARSE-HTML-OWNERSHIP` now records **18 certified WHATWG tree-construction rewrite scenarios**.
+
+Covered families include:
 
 - block-like start tags implicitly closing an open paragraph;
-- a new `li` start tag implicitly closing an open `li`;
-- a new `dt` or `dd` start tag implicitly closing an open `dt`/`dd`;
-- a nested `button` start tag implicitly closing the open `button`;
-- non-whitespace text in `table`, `tbody`, `tfoot`, `thead`, or `tr` parsing context being foster-parented away from the declared owner;
-- ordinary non-table elements in those table parsing contexts being foster-parented away from the declared owner;
-- a `tr` directly under `table` causing the browser to insert `tbody`;
-- a `td`/`th` directly under `table` causing the browser to insert `tbody` and `tr`;
-- a `td`/`th` directly under `tbody`/`thead`/`tfoot` causing the browser to insert `tr`;
-- a new `td`/`th` closing an already-open table cell;
-- a new `tr` closing an already-open row.
+- repeated `li`, `dt`/`dd`, and nested `button` implied closes;
+- table foster-parenting of non-whitespace text and ordinary elements;
+- browser-inserted `tbody`, `tr`, and `colgroup` wrappers;
+- table cell and row auto-close behavior;
+- caption, `thead`/`tbody`/`tfoot`, and `colgroup` transitions that close an active table section;
+- section transitions while a row is open;
+- caption transitions while a cell is open, which close the cell → row → section chain;
+- caption replacement while another caption remains open.
 
-Ordinary content inside an explicit `td` or `th`, and explicitly declared `tbody`/`tr`/cell boundaries, remain accepted. These cases are rejected only where the browser-owned DOM tree would differ from the ownership declared by the Nomos template.
+The table diagnostic validator repairs the entire browser-closed chain after one diagnostic. This prevents a single invalid table transition from leaving stale synthetic ownership on the validation stack and producing misleading secondary diagnostics.
 
-Coverage remains partial. Remaining work is narrowed to table-section transition rewrites plus high-impact formatting/adoption-agency and other insertion-mode interactions.
+Explicit table wrappers, explicit section/row/cell boundaries, explicit `colgroup`, and ordinary content inside valid cells remain accepted.
+
+Coverage remains partial. Remaining work is narrowed to formatting/adoption-agency behavior plus lower-frequency special/table/template insertion-mode interactions.
 
 ## Embedded TypeScript/CSS boundary
 
@@ -62,14 +64,14 @@ The current composer intentionally requires exact intermediate mapping points. I
 - Source-map composition: RED because the new exports were absent → GREEN 4/4 focused composition/validation/encoding tests under Node `v22.16.0`.
 - Expanded implied-close ownership: RED 0/3 → GREEN 3/3 under Node `v22.16.0`.
 - Table foster-parenting ownership: RED 1/3 → GREEN 3/3 under Node `v22.16.0`.
-- Combined focused ownership regression run after foster-parenting: 11/11 green under Node `v22.16.0`.
-- Table wrapper/row/cell rules: RED because the new helper/integration modules were absent → GREEN 10/10 focused tests under Node `v22.16.0`.
-- `tests/phase1-parser-table-integration.test.mjs` now exercises the public `parseComponent` entrypoint; a fresh full-repository `pnpm` run is not claimed in this environment.
+- Table wrapper/row/cell rules: RED because helper/integration modules were absent → GREEN 10/10 focused tests under Node `v22.16.0`.
+- Table section transitions: RED 1/7 because six transition rewrites were absent → GREEN 8/8 after implementation; combined with the multi-level stack-repair regression the focused run is GREEN 9/9 under Node `v22.16.0`.
+- `tests/phase1-parser-table-transitions.test.mjs` wires the same cases through the public `parseComponent` entrypoint; a fresh full-repository `pnpm` run is not claimed in this environment.
 
 ## Remaining before `Parser and source maps` can close
 
 - executable TypeScript/CSS adapters behind ADR-0005;
-- remaining WHATWG table-section transition and formatting/insertion-mode ownership validation;
+- remaining WHATWG formatting/adoption-agency and lower-frequency special/table/template insertion-mode ownership validation;
 - token/segment mapping production in actual lowering and generated-code stages, composed through the implemented ADR-0006 core;
 - public `NCON-*` coverage and green evidence for applicable requirements;
 - later Vite/HMR integration without silently resolving `OD-003`.
