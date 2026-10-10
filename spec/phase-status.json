@@ -30,11 +30,12 @@
       "stage-local-source-map-composition-contract",
       "exact-decoded-segment-composer",
       "whatwg-implied-close-ownership-li-dd-dt-button",
-      "whatwg-table-foster-parenting-text-and-elements"
+      "whatwg-table-foster-parenting-text-and-elements",
+      "whatwg-table-implied-wrappers-and-row-cell-autoclose"
     ],
     "parserRemaining": [
       "embedded-typescript-and-css-adapter-implementation",
-      "remaining-table-and-formatting-tree-construction-validation",
+      "remaining-table-section-transition-and-formatting-tree-construction-validation",
       "token-level-generated-mapping-production"
     ],
     "conformance": {
