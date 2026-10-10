@@ -21,17 +21,22 @@
   ],
   "htmlOwnership": {
     "status": "partial-whatwg-tree-construction-validation",
-    "certifiedRewriteCount": 6,
+    "certifiedRewriteCount": 11,
     "certifiedRewrites": [
       "paragraph-auto-close-before-block-like-start-tags",
       "li-start-tag-closes-open-li",
       "dd-or-dt-start-tag-closes-open-dd-or-dt",
       "button-start-tag-closes-open-button",
       "table-context-non-whitespace-text-foster-parented",
-      "table-context-ordinary-element-foster-parented"
+      "table-context-ordinary-element-foster-parented",
+      "tr-directly-under-table-implies-tbody",
+      "td-or-th-directly-under-table-implies-tbody-and-tr",
+      "td-or-th-directly-under-table-section-implies-tr",
+      "td-or-th-start-tag-closes-open-table-cell",
+      "tr-start-tag-closes-open-tr"
     ],
     "remaining": [
-      "remaining-table-insertion-mode-and-implied-wrapper-rewrites",
+      "remaining-table-section-transition-rewrites",
       "remaining-special-element-and-formatting-insertion-mode-rewrites"
     ]
   },
