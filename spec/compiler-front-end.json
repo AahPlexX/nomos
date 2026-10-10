@@ -21,7 +21,7 @@
   ],
   "htmlOwnership": {
     "status": "partial-whatwg-tree-construction-validation",
-    "certifiedRewriteCount": 11,
+    "certifiedRewriteCount": 18,
     "certifiedRewrites": [
       "paragraph-auto-close-before-block-like-start-tags",
       "li-start-tag-closes-open-li",
@@ -33,11 +33,18 @@
       "td-or-th-directly-under-table-implies-tbody-and-tr",
       "td-or-th-directly-under-table-section-implies-tr",
       "td-or-th-start-tag-closes-open-table-cell",
-      "tr-start-tag-closes-open-tr"
+      "tr-start-tag-closes-open-tr",
+      "col-directly-under-table-implies-colgroup",
+      "caption-start-closes-open-table-section",
+      "table-section-start-closes-open-table-section",
+      "colgroup-start-closes-open-table-section",
+      "table-section-start-closes-open-row-and-section",
+      "caption-start-closes-open-cell-row-and-section",
+      "caption-start-closes-open-caption"
     ],
     "remaining": [
-      "remaining-table-section-transition-rewrites",
-      "remaining-special-element-and-formatting-insertion-mode-rewrites"
+      "remaining-special-element-and-formatting-insertion-mode-rewrites",
+      "remaining-low-frequency-table-and-template-insertion-mode-rewrites"
     ]
   },
   "sourceMaps": {
