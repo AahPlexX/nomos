@@ -20,9 +20,9 @@ Resolved Wayfinder research decisions:
 
 The ADR-0006 composition core is executable: decoded mappings are validated, exact stage mapping points compose through an intermediate source, generated-only scaffolding remains unmapped, unresolved provenance fails loudly, and final decoded mappings encode to ECMA-426 version-3 maps with `sourcesContent`.
 
-HTML ownership validation now certifies six browser-rewrite families: paragraph auto-close before block-like starts, repeated `li`, `dt`/`dd` replacement, nested `button`, foster-parented non-whitespace text in table parsing contexts, and foster-parented ordinary elements in `table`/table-section/`tr` contexts. Valid ordinary content inside `td`/`th` remains accepted. Remaining table insertion-mode transitions and other WHATWG rewrites are still open.
+HTML ownership validation now certifies **11 browser-rewrite families**: paragraph auto-close before block-like starts; repeated `li`; `dt`/`dd` replacement; nested `button`; foster-parented non-whitespace table text; foster-parented ordinary elements in table parsing contexts; implied `tbody` before a direct `tr`; implied `tbody` + `tr` before a direct cell; implied `tr` before a direct cell in a table section; cell auto-close when another `td`/`th` begins; and row auto-close when another `tr` begins. Explicit table wrappers, rows, and cell boundaries remain accepted.
 
-`Parser and source maps` remains **IN PROGRESS** because real lowering/code-generation stages do not yet emit full token/segment mappings, embedded TypeScript/CSS adapters are not implemented, and complete WHATWG HTML tree-construction ownership validation is not finished.
+`Parser and source maps` remains **IN PROGRESS** because real lowering/code-generation stages do not yet emit full token/segment mappings, embedded TypeScript/CSS adapters are not implemented, and remaining table-section/formatting insertion-mode rewrites are not yet certified.
 
 ## Public conformance state
 
@@ -41,6 +41,9 @@ Expanded implied-close ownership GREEN: 3 passed / 0 failed under Node v22.16.0.
 Table foster-parenting RED: 1 passed / 2 failed because text/element relocation was not diagnosed.
 Table foster-parenting GREEN: 3 passed / 0 failed under Node v22.16.0.
 Combined focused HTML ownership regression run: 11 passed / 0 failed under Node v22.16.0.
+Table wrapper/row/cell rules RED: helper/integration modules absent.
+Table wrapper/row/cell rules GREEN: 10 passed / 0 failed under Node v22.16.0.
+Public `parseComponent` table integration regression file is wired on `main`; a fresh full-repository test run is still not claimed because this execution environment has no complete checkout/pnpm toolchain.
 ```
 
 The current environment does not provide the repository-pinned `pnpm` executable. Do not claim a full `pnpm check` or a green public `NCON-NREQ-0145` run until one actually occurs against the complete repository.
@@ -63,6 +66,6 @@ Portable Handoff: `/tmp/nomos-phase1-handoff.md`. Canonical facts remain in this
 
 1. Resolve runtime ownership/scheduling (Wayfinder issue 4) before starting the reactive runtime slice.
 2. Implement ADR-0005 TypeScript/CSS adapters test-first using the freshly reverified exact dependency baselines.
-3. Finish remaining high-impact table insertion-mode rewrites beyond the newly covered foster-parenting cases.
+3. Finish the narrowed HTML ownership remainder: table-section transitions and high-impact formatting/insertion-mode rewrites.
 4. Produce real token/segment mappings in lowering/code-generation and compose them through the ADR-0006 core.
 5. Execute `NCON-NREQ-0145` in a complete checkout/CI evidence set; only then consider promoting `NREQ-0145`.
