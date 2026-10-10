@@ -57,9 +57,15 @@ function toDiagnostic(node, rewrite) {
 
 function repairStack(stack, rewrite) {
   if (rewrite.kind !== 'implicit-close' || rewrite.closes.length === 0) return;
-  const first = rewrite.closes[0].toLowerCase();
-  const found = lastIndex(stack, (name) => name.toLowerCase() === first);
-  if (found >= 0) stack.splice(found);
+  const closed = new Set(rewrite.closes.map((name) => name.toLowerCase()));
+  let earliest = -1;
+  for (let index = 0; index < stack.length; index += 1) {
+    if (closed.has(stack[index].toLowerCase())) {
+      earliest = index;
+      break;
+    }
+  }
+  if (earliest >= 0) stack.splice(earliest);
 }
 
 function cloneSpan(span) { return { start: { ...span.start }, end: { ...span.end } }; }
