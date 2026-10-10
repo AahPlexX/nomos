@@ -1,6 +1,6 @@
 # Nomos execution queue
 
-**Last updated:** 2026-10-09  
+**Last updated:** 2026-10-10  
 **Binding scope:** `PRD.md` plus effective amendments  
 **Current phase:** Phase 1 — Vertical Slice
 
@@ -21,8 +21,9 @@ Status keys: `[x]` verified complete, `[>]` in progress, `[ ]` not complete, `[!
   - [x] ADR-0005 embedded-language representation boundary.
   - [x] ADR-0006 stage-local source-map composition contract.
   - [x] Exact decoded mapping validation, stage composition, unmapped scaffolding preservation, and ECMA-426 encoding core.
-  - [x] HTML ownership: paragraph, `li`, `dt`/`dd`, nested `button`, table foster-parented text/elements, implied `tbody`/`tr`, and row/cell auto-close families.
-  - [ ] Finish remaining high-impact table-section transitions and formatting/insertion-mode rewrites.
+  - [x] HTML ownership: 18 certified WHATWG rewrite scenarios including paragraph/list/button rewrites, foster parenting, implied table wrappers, row/cell auto-close, bare `col` → `colgroup`, section/caption transitions, and multi-level cell/row/section close chains.
+  - [x] Repair the table validation stack across the whole browser-closed chain so one invalid construct does not create false follow-on diagnostics.
+  - [ ] Finish remaining formatting/adoption-agency and lower-frequency special/table/template insertion-mode ownership rewrites.
   - [ ] Produce token/segment mappings from real lowering/code-generation stages and compose them through the new core.
   - [ ] Implement `EmbeddedScript` / `EmbeddedExpression` adapter using exact-pinned TypeScript compatibility API.
   - [ ] Implement `EmbeddedStylesheet` adapter using exact-pinned Lightning CSS.
