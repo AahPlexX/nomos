@@ -21,9 +21,8 @@ Status keys: `[x]` verified complete, `[>]` in progress, `[ ]` not complete, `[!
   - [x] ADR-0005 embedded-language representation boundary.
   - [x] ADR-0006 stage-local source-map composition contract.
   - [x] Exact decoded mapping validation, stage composition, unmapped scaffolding preservation, and ECMA-426 encoding core.
-  - [x] Expand HTML ownership checks from paragraph auto-close to repeated `li`, `dt`/`dd`, and nested `button` implied-close cases.
-  - [x] Detect table foster-parenting of non-whitespace text and ordinary elements in `table`/table-section/`tr` parsing contexts while preserving valid `td`/`th` content.
-  - [ ] Finish remaining high-impact table insertion-mode rewrites, including implied table wrappers/section transitions and formatting-element edge cases.
+  - [x] HTML ownership: paragraph, `li`, `dt`/`dd`, nested `button`, table foster-parented text/elements, implied `tbody`/`tr`, and row/cell auto-close families.
+  - [ ] Finish remaining high-impact table-section transitions and formatting/insertion-mode rewrites.
   - [ ] Produce token/segment mappings from real lowering/code-generation stages and compose them through the new core.
   - [ ] Implement `EmbeddedScript` / `EmbeddedExpression` adapter using exact-pinned TypeScript compatibility API.
   - [ ] Implement `EmbeddedStylesheet` adapter using exact-pinned Lightning CSS.
