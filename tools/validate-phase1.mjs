@@ -10,6 +10,8 @@ const required = [
   'packages/compiler/src/source-map.mjs',
   'packages/compiler/src/html-table-ownership.mjs',
   'packages/compiler/src/table-structure-validation.mjs',
+  'packages/compiler/src/html-formatting-ownership.mjs',
+  'packages/compiler/src/formatting-structure-validation.mjs',
   'tests/phase1-parser.test.mjs',
   'tests/phase1-parser-structural.test.mjs',
   'tests/phase1-parser-ast.test.mjs',
@@ -21,6 +23,9 @@ const required = [
   'tests/phase1-table-structure-validation.test.mjs',
   'tests/phase1-table-section-transitions.test.mjs',
   'tests/phase1-table-stack-repair.test.mjs',
+  'tests/phase1-formatting-ownership-rules.test.mjs',
+  'tests/phase1-formatting-structure-validation.test.mjs',
+  'tests/phase1-parser-formatting-integration.test.mjs',
   'tests/phase1-source-map-composition.test.mjs',
   'tests/phase1-conformance-harness.test.mjs',
   'docs/diagnostics/NOMOS-PARSE-HTML-OWNERSHIP.md',
@@ -28,6 +33,7 @@ const required = [
   'docs/phase-1/research/embedded-language-representation.md',
   'docs/phase-1/research/source-map-composition.md',
   'docs/phase-1/research/public-conformance-promotion.md',
+  'docs/phase-1/research/html-formatting-ownership.md',
   'docs/adr/0004-source-position-and-map-baseline.md',
   'docs/adr/0005-embedded-language-adapter-boundary.md',
   'docs/adr/0006-stage-local-source-map-composition.md',
@@ -50,11 +56,9 @@ assert.equal(phase.phase1.status, 'in-progress');
 assert.equal(phase.phase1.parserAndSourceMaps, 'in-progress');
 assert.equal(phase.phase1.conformanceInfrastructure, 'foundation-implemented');
 assert.ok(phase.phase1.parserImplemented.includes('exact-decoded-segment-composer'));
-assert.ok(phase.phase1.parserImplemented.includes('whatwg-implied-close-ownership-li-dd-dt-button'));
-assert.ok(phase.phase1.parserImplemented.includes('whatwg-table-foster-parenting-text-and-elements'));
-assert.ok(phase.phase1.parserImplemented.includes('whatwg-table-implied-wrappers-and-row-cell-autoclose'));
 assert.ok(phase.phase1.parserImplemented.includes('whatwg-table-section-transitions-colgroup-caption-and-close-chains'));
-assert.ok(phase.phase1.parserRemaining.includes('remaining-formatting-and-special-insertion-mode-tree-construction-validation'));
+assert.ok(phase.phase1.parserImplemented.includes('whatwg-high-impact-formatting-adoption-agency-ownership'));
+assert.ok(phase.phase1.parserRemaining.includes('remaining-active-formatting-reconstruction-and-low-frequency-special-insertion-mode-validation'));
 assert.ok(phase.phase1.parserRemaining.includes('token-level-generated-mapping-production'));
 assert.equal(phase.phase1.conformance.seedTest, 'NCON-NREQ-0145');
 assert.equal(phase.phase1.conformance.seedTestStatus, 'wired-unverified');
@@ -69,15 +73,12 @@ assert.equal(frontEnd.sourceMaps.compositionResolution, 'exact-mapping-points-on
 assert.equal(frontEnd.sourceMaps.finalMapValidation, 'implemented-core');
 assert.equal(frontEnd.sourceMaps.tokenLevelGeneratedMappings, 'planned');
 assert.equal(frontEnd.htmlOwnership.status, 'partial-whatwg-tree-construction-validation');
-assert.equal(frontEnd.htmlOwnership.certifiedRewriteCount, 18);
-assert.ok(frontEnd.htmlOwnership.certifiedRewrites.includes('col-directly-under-table-implies-colgroup'));
-assert.ok(frontEnd.htmlOwnership.certifiedRewrites.includes('caption-start-closes-open-table-section'));
-assert.ok(frontEnd.htmlOwnership.certifiedRewrites.includes('table-section-start-closes-open-table-section'));
-assert.ok(frontEnd.htmlOwnership.certifiedRewrites.includes('colgroup-start-closes-open-table-section'));
-assert.ok(frontEnd.htmlOwnership.certifiedRewrites.includes('table-section-start-closes-open-row-and-section'));
-assert.ok(frontEnd.htmlOwnership.certifiedRewrites.includes('caption-start-closes-open-cell-row-and-section'));
-assert.ok(frontEnd.htmlOwnership.certifiedRewrites.includes('caption-start-closes-open-caption'));
-assert.ok(frontEnd.htmlOwnership.remaining.includes('remaining-special-element-and-formatting-insertion-mode-rewrites'));
+assert.equal(frontEnd.htmlOwnership.certifiedRewriteCount, 21);
+assert.ok(frontEnd.htmlOwnership.certifiedRewrites.includes('nested-anchor-start-closes-open-anchor'));
+assert.ok(frontEnd.htmlOwnership.certifiedRewrites.includes('nested-nobr-start-runs-formatting-recovery'));
+assert.ok(frontEnd.htmlOwnership.certifiedRewrites.includes('misnested-formatting-end-tag-triggers-adoption-agency'));
+assert.equal(frontEnd.htmlOwnership.formattingResearch, 'docs/phase-1/research/html-formatting-ownership.md');
+assert.ok(frontEnd.htmlOwnership.remaining.includes('remaining-active-formatting-reconstruction-and-adoption-agency-edge-cases'));
 assert.equal(frontEnd.templateSyntax.hierarchicalTypedAst, 'implemented-structural');
 assert.equal(frontEnd.embeddedLanguages.typescript.implementation, 'planned');
 assert.equal(frontEnd.embeddedLanguages.css.implementation, 'planned');
@@ -88,4 +89,4 @@ assert.equal(conformance.browserSubstitutionAllowed, false);
 assert.equal(conformance.seedTest.status, 'wired-unverified');
 assert.deepEqual(conformance.passingRequirements, []);
 
-console.log(`Phase 1 check passed: ${required.length} required artifacts; eighteen HTML ownership scenarios plus source-map composition core are implemented while formatting/special insertion modes, embedded adapters, token mapping production, and public green evidence remain in progress.`);
+console.log(`Phase 1 check passed: ${required.length} required artifacts; twenty-one HTML ownership scenarios plus source-map composition core are implemented while active-formatting reconstruction, embedded adapters, token mapping production, and public green evidence remain in progress.`);

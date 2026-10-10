@@ -4,29 +4,25 @@
 **Disableable:** no  
 **Learning level:** 0+
 
-The declared template ownership would not survive HTML tree construction. Nomos currently diagnoses 18 certified browser-rewrite scenarios across paragraph/list/button behavior and HTML table insertion modes.
+The declared template ownership would not survive HTML tree construction. Nomos currently diagnoses **21 certified browser-rewrite scenarios** across paragraph/list/button behavior, major table insertion modes, and high-impact active-formatting recovery.
 
-Covered table cases include:
+Covered formatting cases include:
 
-- non-whitespace text or ordinary elements foster-parented away from table ownership;
-- `tr` directly under `table` causing an implied `tbody`;
-- `td`/`th` directly under `table` causing implied `tbody` + `tr`;
-- `td`/`th` directly under `tbody`/`thead`/`tfoot` causing an implied `tr`;
-- a new table cell closing the currently open cell;
-- a new row closing the currently open row;
-- bare `col` directly under `table` causing an implied `colgroup`;
-- caption, table-section, and `colgroup` starts closing an active table section before reprocessing;
-- a new table section closing an open row and its active section;
-- caption starts inside a cell closing the cell → row → section chain;
-- a new caption closing an already-open caption.
+- a nested `<a>` start tag while another anchor remains active;
+- a nested `<nobr>` start tag while another `nobr` remains active;
+- a misnested end tag for an active formatting element such as `a`, `b`, `em`, `i`, `strong`, or related WHATWG formatting elements while another element is still current.
 
-In each case, browser tree construction changes ownership relative to the literal source structure. Nomos reports the offending source span instead of compiling against an ownership tree that the browser would reconstruct differently.
+In those cases the HTML parser runs active-formatting recovery or the adoption agency algorithm, which can close, recreate, or reparent formatting elements. The resulting browser DOM can therefore differ from literal source nesting.
+
+Covered table cases include foster-parenting, implied `tbody`/`tr`/`colgroup` wrappers, row/cell auto-close, caption/section/column-group transitions, and multi-level cell → row → section close chains.
 
 ## Repair
 
+For formatting cases, make formatting tags properly nested and explicitly close the existing `a` or `nobr` before starting another one.
+
 For implied-close cases, explicitly close the element HTML would otherwise close before the offending start tag.
 
-For table foster-parenting cases, move ordinary content into a valid table cell (`td` or `th`) or outside the table structure. Whitespace-only table text and ordinary content inside an explicit cell are not rejected by this rule.
+For table foster-parenting cases, move ordinary content into a valid table cell (`td` or `th`) or outside the table structure.
 
 For browser-inserted table wrappers, write the required `tbody`, `tr`, or `colgroup` explicitly so Nomos and the browser own the same DOM hierarchy.
 
@@ -36,4 +32,4 @@ This diagnostic is intentionally structural and non-disableable because Nomos ca
 
 ## Coverage boundary
 
-This diagnostic does not yet claim complete HTML tree-construction parity. Remaining Phase 1 work is narrowed to formatting/adoption-agency behavior and lower-frequency special/table/template insertion-mode interactions.
+This diagnostic does not yet claim complete HTML tree-construction parity or a complete implementation of the adoption agency algorithm. Remaining Phase 1 work is narrowed to active-formatting reconstruction edge cases plus lower-frequency special/table/template insertion-mode interactions.

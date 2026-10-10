@@ -20,9 +20,9 @@ Resolved Wayfinder research decisions:
 
 The ADR-0006 composition core is executable: decoded mappings are validated, exact stage mapping points compose through an intermediate source, generated-only scaffolding remains unmapped, unresolved provenance fails loudly, and final decoded mappings encode to ECMA-426 version-3 maps with `sourcesContent`.
 
-HTML ownership validation now records **18 certified browser-rewrite scenarios**. Coverage includes paragraph/list/button rewrites; table foster-parenting; implied `tbody`/`tr` wrappers; row/cell auto-close; bare `col` implying `colgroup`; caption, section, and column-group transitions; multi-level cell → row → section closes; and caption replacement. The table diagnostic stack now repairs the full browser-closed chain so one invalid construct does not cause false secondary diagnostics.
+HTML ownership validation now records **21 certified browser-rewrite scenarios**. The prior 18 paragraph/list/button/table scenarios remain, and this pass adds nested anchors, nested `nobr`, and misnested formatting end tags whose WHATWG recovery invokes the adoption-agency machinery. Formatting rules live in `html-formatting-ownership.mjs`; diagnostic integration and stack repair live in `formatting-structure-validation.mjs`. Research is cached in `docs/phase-1/research/html-formatting-ownership.md`.
 
-`Parser and source maps` remains **IN PROGRESS** because real lowering/code-generation stages do not yet emit full token/segment mappings, embedded TypeScript/CSS adapters are not implemented, and formatting/adoption-agency plus lower-frequency special/table/template insertion-mode ownership rewrites remain uncertified.
+`Parser and source maps` remains **IN PROGRESS** because real lowering/code-generation stages do not yet emit full token/segment mappings, embedded TypeScript/CSS adapters are not implemented, and full active-formatting reconstruction plus lower-frequency special/table/template insertion-mode ownership cases remain uncertified.
 
 ## Public conformance state
 
@@ -44,7 +44,11 @@ Table wrapper/row/cell rules RED: helper/integration modules absent.
 Table wrapper/row/cell rules GREEN: 10 passed / 0 failed under Node v22.16.0.
 Table section transitions RED: 1 passed / 6 failed because transition rewrites were not implemented.
 Table section transitions + stack-repair GREEN: 9 passed / 0 failed under Node v22.16.0.
-Public `parseComponent` table transition regression file is wired on `main`; a fresh full-repository test run is not claimed because this environment has no complete checkout/pnpm toolchain.
+Formatting rule layer RED: module absent.
+Formatting rule layer GREEN: 5 passed / 0 failed under Node v22.16.0.
+Formatting diagnostic layer RED: module absent.
+Formatting rule + diagnostic GREEN: 9 passed / 0 failed under Node v22.16.0.
+Public `parseComponent` formatting integration regression file is wired; a fresh full-repository test run is not claimed because this environment has no complete checkout/pnpm toolchain.
 ```
 
 The current environment does not provide the repository-pinned `pnpm` executable. Do not claim a full `pnpm check` or a green public `NCON-NREQ-0145` run until one actually occurs against the complete repository.
@@ -67,6 +71,6 @@ Portable Handoff: `/tmp/nomos-phase1-handoff.md`. Canonical facts remain in this
 
 1. Resolve runtime ownership/scheduling (Wayfinder issue 4) before starting the reactive runtime slice.
 2. Implement ADR-0005 TypeScript/CSS adapters test-first using exact-pinned dependency baselines.
-3. Finish the narrowed HTML ownership remainder: formatting/adoption-agency and lower-frequency special/table/template insertion-mode rewrites.
+3. Finish the narrowed HTML ownership remainder: active-formatting reconstruction edge cases plus low-frequency special/table/template insertion modes.
 4. Produce real token/segment mappings in lowering/code-generation and compose them through the ADR-0006 core.
 5. Execute `NCON-NREQ-0145` in a complete checkout/CI evidence set; only then consider promoting `NREQ-0145`.

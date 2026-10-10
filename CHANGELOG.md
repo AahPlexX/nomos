@@ -37,27 +37,35 @@ All material repository changes are recorded here. This file tracks project stat
 
 ## 2026-10-10 — Table section transitions and close-chain repair
 
+- Added bare `col` → `colgroup`, caption/table-section/column-group transitions, row/section and cell/row/section close chains, caption replacement, and full synthetic-stack repair.
+- Added focused section-transition, stack-repair, and public parser integration regression files.
+- Machine-readable HTML ownership coverage increased from 11 to 18 certified scenarios.
+- Focused transition + repair verification reached 9/9 under Node `v22.16.0`.
+
+## 2026-10-10 — High-impact formatting/adoption-agency ownership validation
+
 ### Added
 
-- Bare `col` directly under `table` now reports the browser-implied `colgroup` wrapper.
-- Caption, table-section, and `colgroup` starts now report when browser table parsing closes an active table section before reprocessing.
-- Table-section starts now report row + section close chains when a row is still open.
-- Caption starts inside a table cell now report the browser-closing cell → row → section chain.
-- A new caption now reports the implicit close of an already-open caption.
-- Table validation stack repair now removes the complete browser-closed chain rather than only its first element, preventing false secondary diagnostics.
-- Added `tests/phase1-table-section-transitions.test.mjs`, `tests/phase1-table-stack-repair.test.mjs`, and `tests/phase1-parser-table-transitions.test.mjs`.
-- Machine-readable HTML ownership coverage increased from 11 to **18 certified scenarios**.
+- `html-formatting-ownership.mjs` as a pure rule layer for nested anchors, nested `nobr`, and misnested formatting end tags.
+- `formatting-structure-validation.mjs` as the diagnostic/stack-repair layer over the existing flat syntax stream.
+- Compiler entrypoint integration before hierarchical AST construction.
+- `tests/phase1-formatting-ownership-rules.test.mjs` and `tests/phase1-formatting-structure-validation.test.mjs`.
+- `tests/phase1-parser-formatting-integration.test.mjs` for public `parseComponent` coverage.
+- `docs/phase-1/research/html-formatting-ownership.md` caching the current WHATWG rationale and deliberate scope boundary.
+- Parser gate expanded to include focused `phase1-formatting-*` suites.
+- Machine-readable HTML ownership coverage increased from 18 to **21 certified scenarios**.
 
 ### Verified
 
-- Section-transition RED: 1/7 tests passed; six transition rewrites were not yet implemented.
-- Section-transition GREEN: 8/8 tests passed after implementation.
-- Stack-repair RED: one multi-level transition produced two diagnostics instead of one.
-- Combined section-transition + stack-repair GREEN: 9/9 tests passed under Node `v22.16.0`.
-- The public `parseComponent` transition regression file is wired on `main`; a fresh whole-repository `pnpm` run is not claimed in this environment.
+- Formatting rule RED: module absent.
+- Formatting rule GREEN: 5/5 under Node `v22.16.0`.
+- Formatting diagnostic RED: module absent.
+- Combined formatting rule + diagnostic GREEN: 9/9 under Node `v22.16.0`.
+- New and modified JavaScript files pass syntax checks; JSON state files parse successfully.
+- A fresh whole-repository `pnpm` run and public parser integration execution are not claimed in this environment.
 
 ### Still open
 
-- Formatting/adoption-agency and lower-frequency special/table/template insertion-mode ownership rewrites.
+- Active-formatting reconstruction edge cases and lower-frequency special/table/template insertion-mode ownership rewrites.
 - Embedded TypeScript/CSS adapters and real lowering/code-generation mapping production.
 - Public conformance green evidence and later Vite/HMR integration.

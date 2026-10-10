@@ -21,9 +21,10 @@ Status keys: `[x]` verified complete, `[>]` in progress, `[ ]` not complete, `[!
   - [x] ADR-0005 embedded-language representation boundary.
   - [x] ADR-0006 stage-local source-map composition contract.
   - [x] Exact decoded mapping validation, stage composition, unmapped scaffolding preservation, and ECMA-426 encoding core.
-  - [x] HTML ownership: 18 certified WHATWG rewrite scenarios including paragraph/list/button rewrites, foster parenting, implied table wrappers, row/cell auto-close, bare `col` → `colgroup`, section/caption transitions, and multi-level cell/row/section close chains.
-  - [x] Repair the table validation stack across the whole browser-closed chain so one invalid construct does not create false follow-on diagnostics.
-  - [ ] Finish remaining formatting/adoption-agency and lower-frequency special/table/template insertion-mode ownership rewrites.
+  - [x] HTML ownership: 18 certified WHATWG scenarios covering paragraph/list/button rewrites and major table insertion-mode ownership changes.
+  - [x] High-impact formatting ownership: nested `a`, nested `nobr`, and misnested formatting end tags that invoke adoption-agency recovery.
+  - [x] Repair validation stacks after browser-implied table/formatting closes so one invalid construct does not create false follow-on diagnostics.
+  - [ ] Finish active-formatting reconstruction edge cases and lower-frequency special/table/template insertion-mode ownership rewrites.
   - [ ] Produce token/segment mappings from real lowering/code-generation stages and compose them through the new core.
   - [ ] Implement `EmbeddedScript` / `EmbeddedExpression` adapter using exact-pinned TypeScript compatibility API.
   - [ ] Implement `EmbeddedStylesheet` adapter using exact-pinned Lightning CSS.
