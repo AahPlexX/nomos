@@ -31,56 +31,33 @@ All material repository changes are recorded here. This file tracks project stat
 
 ## 2026-10-09 — Expanded HTML ownership validation
 
-### Added
+- Added WHATWG-aligned paragraph/list/definition-list/button ownership diagnostics and table foster-parenting checks.
+- Added pure table rewrite rules plus compiler integration for implied `tbody`/`tr` wrappers and row/cell auto-close behavior.
+- Machine-readable ownership coverage reached 11 certified rewrite scenarios.
 
-- WHATWG-aligned ownership diagnostics when a new `li` implicitly closes an open `li`.
-- Ownership diagnostics when a new `dt`/`dd` implicitly closes an open `dt`/`dd`.
-- Ownership diagnostics when a nested `button` causes the browser parser to close the outer button.
-- `tests/phase1-parser-html-ownership.test.mjs` with three focused regression cases.
-- Updated diagnostic documentation and machine-readable ownership coverage.
-
-### Verified
-
-- RED: 0/3 new ownership tests passed because no diagnostics were emitted.
-- GREEN: 3/3 pass under Node `v22.16.0`.
-- Existing paragraph auto-close behavior remained diagnosed.
-- Explicitly closed `li`, `dt`/`dd`, and `button` examples remained valid.
-
-## 2026-10-09 — Table foster-parenting ownership validation
+## 2026-10-10 — Table section transitions and close-chain repair
 
 ### Added
 
-- WHATWG-aligned ownership diagnostics for non-whitespace text that browser table parsing foster-parents away from `table`, `tbody`, `tfoot`, `thead`, or `tr` ownership.
-- Ownership diagnostics for ordinary non-table elements in those same table parsing contexts when the browser would foster-parent them outside the declared owner.
-- `tests/phase1-parser-table-ownership.test.mjs` covering both relocation cases plus valid ordinary content inside an explicit table cell.
-- Machine-readable ownership coverage now records six certified rewrite families.
+- Bare `col` directly under `table` now reports the browser-implied `colgroup` wrapper.
+- Caption, table-section, and `colgroup` starts now report when browser table parsing closes an active table section before reprocessing.
+- Table-section starts now report row + section close chains when a row is still open.
+- Caption starts inside a table cell now report the browser-closing cell → row → section chain.
+- A new caption now reports the implicit close of an already-open caption.
+- Table validation stack repair now removes the complete browser-closed chain rather than only its first element, preventing false secondary diagnostics.
+- Added `tests/phase1-table-section-transitions.test.mjs`, `tests/phase1-table-stack-repair.test.mjs`, and `tests/phase1-parser-table-transitions.test.mjs`.
+- Machine-readable HTML ownership coverage increased from 11 to **18 certified scenarios**.
 
 ### Verified
 
-- RED: 1/3 table tests passed; the valid cell-content control passed while both relocation cases were still undiagnosed.
-- GREEN: 3/3 table tests pass under Node `v22.16.0`.
-- Combined focused ownership regression run: 11/11 pass under Node `v22.16.0`, including earlier paragraph/`li`/`dt`/`dd`/`button` cases and explicit valid controls.
-
-## 2026-10-09 — Table wrapper and row/cell ownership validation
-
-### Added
-
-- `html-table-ownership.mjs` as a pure rule layer for browser-implied `tbody`/`tr` insertion and row/cell auto-close behavior.
-- `table-structure-validation.mjs` as the compiler diagnostic layer over the existing flat template syntax stream.
-- Ownership diagnostics when `tr` directly under `table` requires an implied `tbody`.
-- Ownership diagnostics when `td`/`th` directly under `table` requires implied `tbody` + `tr`, or directly under a table section requires an implied `tr`.
-- Ownership diagnostics when a new table cell closes an open cell or a new row closes an open row.
-- `tests/phase1-table-ownership-rules.test.mjs`, `tests/phase1-table-structure-validation.test.mjs`, and `tests/phase1-parser-table-integration.test.mjs`.
-- Parser gate updated to include `phase1-table-*` suites.
-- Machine-readable ownership coverage increased from 6 to **11 certified rewrite families**.
-
-### Verified
-
-- Pure rule layer RED: helper module absent. GREEN: 6/6 focused rule tests under Node `v22.16.0`.
-- Integration layer RED: validator module absent. GREEN: combined rule + integration run 10/10 under Node `v22.16.0`.
-- Public `parseComponent` integration regression file is wired on `main`; a complete repository `pnpm` run is not claimed in this environment.
+- Section-transition RED: 1/7 tests passed; six transition rewrites were not yet implemented.
+- Section-transition GREEN: 8/8 tests passed after implementation.
+- Stack-repair RED: one multi-level transition produced two diagnostics instead of one.
+- Combined section-transition + stack-repair GREEN: 9/9 tests passed under Node `v22.16.0`.
+- The public `parseComponent` transition regression file is wired on `main`; a fresh whole-repository `pnpm` run is not claimed in this environment.
 
 ### Still open
 
-- Remaining table-section transition rewrites and high-impact formatting/adoption-agency insertion-mode behavior.
+- Formatting/adoption-agency and lower-frequency special/table/template insertion-mode ownership rewrites.
 - Embedded TypeScript/CSS adapters and real lowering/code-generation mapping production.
+- Public conformance green evidence and later Vite/HMR integration.
