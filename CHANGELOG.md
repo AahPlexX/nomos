@@ -61,7 +61,26 @@ All material repository changes are recorded here. This file tracks project stat
 - GREEN: 3/3 table tests pass under Node `v22.16.0`.
 - Combined focused ownership regression run: 11/11 pass under Node `v22.16.0`, including earlier paragraph/`li`/`dt`/`dd`/`button` cases and explicit valid controls.
 
+## 2026-10-09 — Table wrapper and row/cell ownership validation
+
+### Added
+
+- `html-table-ownership.mjs` as a pure rule layer for browser-implied `tbody`/`tr` insertion and row/cell auto-close behavior.
+- `table-structure-validation.mjs` as the compiler diagnostic layer over the existing flat template syntax stream.
+- Ownership diagnostics when `tr` directly under `table` requires an implied `tbody`.
+- Ownership diagnostics when `td`/`th` directly under `table` requires implied `tbody` + `tr`, or directly under a table section requires an implied `tr`.
+- Ownership diagnostics when a new table cell closes an open cell or a new row closes an open row.
+- `tests/phase1-table-ownership-rules.test.mjs`, `tests/phase1-table-structure-validation.test.mjs`, and `tests/phase1-parser-table-integration.test.mjs`.
+- Parser gate updated to include `phase1-table-*` suites.
+- Machine-readable ownership coverage increased from 6 to **11 certified rewrite families**.
+
+### Verified
+
+- Pure rule layer RED: helper module absent. GREEN: 6/6 focused rule tests under Node `v22.16.0`.
+- Integration layer RED: validator module absent. GREEN: combined rule + integration run 10/10 under Node `v22.16.0`.
+- Public `parseComponent` integration regression file is wired on `main`; a complete repository `pnpm` run is not claimed in this environment.
+
 ### Still open
 
-- Remaining table insertion-mode transitions, implied wrappers/section transitions, and formatting-element edge cases.
+- Remaining table-section transition rewrites and high-impact formatting/adoption-agency insertion-mode behavior.
 - Embedded TypeScript/CSS adapters and real lowering/code-generation mapping production.
