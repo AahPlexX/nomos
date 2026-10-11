@@ -1,7 +1,11 @@
 import { spawnSync } from 'node:child_process';
 
 const checks = [
-  ['unit', [process.execPath, '--test', 'tests/phase1-template-dom-materialization.test.mjs']],
+  ['unit', [process.execPath, '--test',
+    'tests/phase1-template-dom-materialization.test.mjs',
+    'tests/phase1-template-attribute-lowering.test.mjs',
+    'tests/phase1-runtime-attribute-binding.test.mjs',
+  ]],
   ['browser', [process.execPath, 'tools/verify-browser-dom.mjs']],
 ];
 
