@@ -59,9 +59,19 @@
       "hostCspMustAllowPolicyName": true
     },
     "browserVerification": {
-      "run": 38168894701,
+      "run": 38169465234,
       "chrome": "154.0.8037.97",
-      "trustedTypesEnforced": true
+      "trustedTypesEnforced": true,
+      "verifiedBehaviors": [
+        "html-character-reference-decoding",
+        "svg-namespace-preservation",
+        "dynamic-text-interpolation",
+        "dynamic-ordinary-attribute-assignment",
+        "mixed-attribute-assignment",
+        "boolean-attribute-presence-absence",
+        "temporary-element-marker-removal",
+        "owned-root-disposal"
+      ]
     },
     "guarded": [
       "spread-attribute-merge-precedence",
