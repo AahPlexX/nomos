@@ -87,3 +87,25 @@ test('does not flag state writes inside a nested function merely returned by der
   const result = lowerScript(`import { state, derive } from 'nomos'; let count=state(0); const fn=derive(()=>()=>{ count += 1; return count; });`);
   assert.equal(result.diagnostics.length, 0);
 });
+
+test('lowers a reactive root used as a for-of assignment target', () => {
+  const result = lowerScript(`import { state } from 'nomos'; let item = state(0); const seen = []; for (item of [2, 3]) { seen.push(item); }`);
+  assert.equal(result.diagnostics.length, 0);
+  assert.doesNotMatch(result.code, /for\s*\(\s*__n_read\(item\)\s+of/);
+  assert.match(result.code, /for\s*\([^)]*\s+of\s+\[2, 3\]\)/);
+  assert.match(result.code, /__n_write\(item,/);
+  assert.match(result.code, /seen\.push\(__n_read\(item\)\)/);
+});
+
+test('lowers a reactive root used as a for-in assignment target without changing shadowed loop declarations', () => {
+  const reactive = lowerScript(`import { state } from 'nomos'; let key = state(''); const seen = []; for (key in { a: 1 }) { seen.push(key); }`);
+  assert.equal(reactive.diagnostics.length, 0);
+  assert.doesNotMatch(reactive.code, /for\s*\(\s*__n_read\(key\)\s+in/);
+  assert.match(reactive.code, /__n_write\(key,/);
+  assert.match(reactive.code, /seen\.push\(__n_read\(key\)\)/);
+
+  const shadowed = lowerScript(`import { state } from 'nomos'; let key = state('outer'); for (let key in { a: 1 }) { console.log(key); }`);
+  assert.equal(shadowed.diagnostics.length, 0);
+  assert.match(shadowed.code, /for \(let key in \{ a: 1 \}\)/);
+  assert.match(shadowed.code, /console\.log\(key\)/);
+});
