@@ -44,28 +44,32 @@ All material repository changes are recorded here. This file tracks project stat
 
 ## 2026-10-10 — High-impact formatting/adoption-agency ownership validation
 
+- Added pure formatting ownership rules and diagnostic integration for nested anchors, nested `nobr`, and misnested formatting end tags.
+- Cached current WHATWG rationale in `docs/phase-1/research/html-formatting-ownership.md` and expanded the parser gate.
+- Machine-readable HTML ownership coverage increased from 18 to 21 certified scenarios.
+- Focused formatting rule + diagnostic verification reached 9/9 under Node `v22.16.0`.
+
+## 2026-10-10 — Runtime ownership, scheduler, and reactive core
+
 ### Added
 
-- `html-formatting-ownership.mjs` as a pure rule layer for nested anchors, nested `nobr`, and misnested formatting end tags.
-- `formatting-structure-validation.mjs` as the diagnostic/stack-repair layer over the existing flat syntax stream.
-- Compiler entrypoint integration before hierarchical AST construction.
-- `tests/phase1-formatting-ownership-rules.test.mjs` and `tests/phase1-formatting-structure-validation.test.mjs`.
-- `tests/phase1-parser-formatting-integration.test.mjs` for public `parseComponent` coverage.
-- `docs/phase-1/research/html-formatting-ownership.md` caching the current WHATWG rationale and deliberate scope boundary.
-- Parser gate expanded to include focused `phase1-formatting-*` suites.
-- Machine-readable HTML ownership coverage increased from 18 to **21 certified scenarios**.
+- ADR-0008 resolves Wayfinder issue #4 with one versioned fine-grained graph, one owner tree, lazy derives, and an ordered DOM-before-sync microtask scheduler.
+- `packages/runtime/src/reactivity.mjs` implements the first executable Phase 1 runtime core using platform `Map`, `Set`, and `queueMicrotask()` primitives rather than a third-party reactivity engine.
+- Versioned scalar state cells, lazy memoized derives, dynamic dependency capture/removal, development derive-write guards, `untrack()`, mount-gated DOM/sync observers, sync cleanup, deterministic owner disposal, and named reactive-cycle errors.
+- `spec/runtime-core.json` records the implemented core and explicitly separates deep state, `state.raw`, snapshot semantics, compiler lowering, request cancellation, and generated DOM binding work.
+- `docs/phase-1/research/runtime-ownership-and-scheduling.md` caches the architecture research and dependency decision.
+- `tests/phase1-runtime-core.test.mjs` provides a lean 10-test contract suite; `check:phase1:runtime` runs it directly.
 
 ### Verified
 
-- Formatting rule RED: module absent.
-- Formatting rule GREEN: 5/5 under Node `v22.16.0`.
-- Formatting diagnostic RED: module absent.
-- Combined formatting rule + diagnostic GREEN: 9/9 under Node `v22.16.0`.
-- New and modified JavaScript files pass syntax checks; JSON state files parse successfully.
-- A fresh whole-repository `pnpm` run and public parser integration execution are not claimed in this environment.
+- Proper RED was re-established against a deliberately reverted skeletal runtime: the suite exited non-zero with behavioral assertion failures for memoization, dynamic dependencies, derive-write protection, scheduler ordering, async tracking, cycle detection, automatic microtask delivery, and sync cleanup.
+- GREEN: 10/10 runtime contract tests pass under Node `v22.16.0`.
+- Runtime source passes `node --check`; runtime machine state parses as valid JSON.
+- No normative requirement row is promoted from development tests alone; ADR-0007 public conformance evidence remains required.
 
 ### Still open
 
-- Active-formatting reconstruction edge cases and lower-frequency special/table/template insertion-mode ownership rewrites.
-- Embedded TypeScript/CSS adapters and real lowering/code-generation mapping production.
-- Public conformance green evidence and later Vite/HMR integration.
+- Deep reactive tracking for plain objects, arrays, `Map`, and `Set`; `state.raw`; and compiler lowering to the internal cell ABI.
+- `state.snapshot` behavior specification and implementation; `OD-004` remains open and is not silently resolved.
+- Request ownership/cancellation and generated DOM binding integration.
+- Embedded TypeScript/CSS adapters, real code-generation source mappings, remaining narrow HTML ownership cases, and public conformance evidence.
