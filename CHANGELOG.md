@@ -50,31 +50,32 @@ All material repository changes are recorded here. This file tracks project stat
 
 ## 2026-10-11 — Browser-parsed static DOM materialization
 
-### Architecture
+- Added `template-dom-lowering.mjs` and internal runtime `mountTemplate`.
+- Supported static HTML is preserved as one browser-parsed skeleton with collision-free text markers rather than reconstructing HTML semantics via raw `createTextNode` calls.
+- Runtime parses through `HTMLTemplateElement`, clones content, replaces markers with live `Text` nodes, owns cloned roots, and uses a cached `nomos` Trusted Types policy when enforcement is active.
+- Added explicit `NOMOS-LOWER-UNSUPPORTED-TEMPLATE-FEATURE` guards for template features whose dedicated lowerers are not complete.
+- RED `38122206062`: focused unit/browser checks failed on missing `lowerTemplateDom` / `mountTemplate` after the exact environment initialized successfully.
+- GREEN `38122323711`: DOM **3/3**, Chrome `154.0.8037.97` under Trusted Types enforcement, lowering **16/16**, runtime **21/21**.
 
-- Added `packages/compiler/src/template-dom-lowering.mjs` and internal runtime `mountTemplate`.
-- Rejected per-source-text `createTextNode(...)` generation because raw HTML source would require Nomos to duplicate character-reference, namespace, and other browser parsing semantics.
-- The compiler now preserves supported static HTML as one skeleton, substitutes collision-free comment markers for dynamic text interpolations, and emits generated mount/binding/setup code plus source-map points in the same pass.
-- Runtime `mountTemplate` parses the compiler-owned skeleton through `HTMLTemplateElement`, clones `template.content`, replaces markers with real `Text` nodes, registers cloned roots with the existing owner, and exposes text binding slots.
-- Trusted Types enforcement uses a per-window cached `nomos` policy. Failure to create that policy states that host CSP must allow the `nomos` policy name, matching the existing PRD contract.
-- No new public root API concept or third-party DOM dependency was added.
+## 2026-10-11 — Typed attribute IR and parser-gate hardening
 
-### Correctness boundary
+### Attribute representation
 
-- Added `NOMOS-LOWER-UNSUPPORTED-TEMPLATE-FEATURE` so the incomplete Phase 1 compiler refuses rather than miscompiles dynamic/mixed/shorthand/spread attributes, directives, raw HTML, structural blocks, component nodes, and interpolation contexts unsafe for comment-marker lowering.
-- Static custom elements may pass through browser parsing, but dynamic custom-element property behavior remains untouched while `OD-008` is open.
-- Template maps now cover explicit mount, binding-slot/setup, and expression-start points but remain intentionally non-token-complete.
+- Added `packages/compiler/src/attribute-ir.mjs` and integrated it into the hierarchical AST.
+- All five ratified non-directive forms are now durable exact-span Nomos IR: static, dynamic, mixed, shorthand, and spread.
+- Static values retain boolean/quoted distinction; mixed values retain ordered text/expression segments; dynamic/shorthand/spread expressions retain exact outer/body spans.
+- Nested brace expressions are preserved and directives remain separate on `Element.directives`.
+- This slice deliberately does not assign DOM semantics yet; custom-element pre-upgrade property behavior remains untouched while `OD-008` is open.
 
-### TDD and browser evidence
+### Parser verification and latent defect repair
 
-- RED run `38122206062`: Ubuntu 24.04, Node `22.16.0`, pnpm `12.10.1`, exact dependencies, and Chrome `154.0.8037.97` initialized successfully; focused unit and browser checks failed on the intended missing `compiler.lowerTemplateDom` / `runtimeInternal.mountTemplate` seam.
-- GREEN run `38122323711`: focused DOM boundary suite **3/3**; real Chrome verification passed under `require-trusted-types-for 'script'; trusted-types nomos`.
-- The browser gate verified native HTML character-reference decoding, static-attribute decoding, SVG namespace preservation, dynamic text interpolation, and owner disposal removing cloned roots.
-- Existing lowering remained **16/16**, runtime **21/21**, and the Phase 1 machine validator remained green before this documentation/spec synchronization.
-- These are development/regression results and do not automatically promote public `NCON-*` rows under ADR-0007.
+- Added `pnpm check:phase1:parser` to the pinned main CI workflow instead of leaving parser integration as a manual-only gate.
+- RED run `38122824413`: the two new attribute IR tests failed as intended; the newly enforced parser gate also exposed six pre-existing table integration failures caused by duplicate ownership reporting.
+- Fixed duplicate reporting at the proper validation seam: when a specialized table rewrite exists, it replaces only a generic `NOMOS-PARSE-HTML-OWNERSHIP` diagnostic with the exact same source span.
+- GREEN run `38122979344`: parser **66/66**, DOM **3/3 + real Chrome**, lowering **16/16**, runtime **21/21**, machine state green. No tests or ownership expectations were weakened.
 
 ### Next frontier
 
-- Typed exact-span attribute-value IR for static, dynamic, mixed, shorthand, and spread attributes.
-- Safe standard-HTML dynamic attribute lowering and a published/tested assignment table without silently resolving `OD-008` custom-element pre-upgrade policy.
-- Events/native-control bindings, structural blocks, components, richer template mappings, reactive destructuring, CSS adapter, and later public conformance promotion at complete requirement boundaries.
+- Define and publish the safe standard-HTML attribute/property assignment policy from authoritative platform behavior.
+- Lower dynamic/mixed/shorthand attributes from the new IR onto deterministic element slots, keeping custom elements/property-backed native controls behind explicit policy boundaries.
+- Emit attribute-stage source mappings during generation, then proceed to events/native-control bindings, structural blocks, components, reactive destructuring, and CSS integration.

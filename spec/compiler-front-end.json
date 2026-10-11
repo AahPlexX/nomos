@@ -24,6 +24,7 @@
   "htmlOwnership": {
     "status": "partial-whatwg-tree-construction-validation",
     "certifiedRewriteCount": 21,
+    "duplicateDiagnosticPolicy": "specialized-table-rewrite-replaces-same-span-generic-foster-diagnostic",
     "certifiedRewrites": [
       "paragraph-auto-close-before-block-like-start-tags",
       "li-start-tag-closes-open-li",
@@ -77,11 +78,19 @@
     "allInvalidFixtures": "certified"
   },
   "templateSyntax": {
-    "status": "hierarchical-structural-ast",
+    "status": "hierarchical-structural-ast-with-typed-attribute-ir",
     "flatTreeType": "TemplateSyntaxTree",
     "hierarchicalTreeType": "Template",
     "hierarchicalTypedAst": "implemented-structural",
-    "typedEmbeddedExpressions": "implemented-text-interpolation-slice"
+    "typedEmbeddedExpressions": "implemented-text-interpolation-slice",
+    "attributeIr": {
+      "status": "implemented-exact-span-five-ratified-forms",
+      "implementationFile": "packages/compiler/src/attribute-ir.mjs",
+      "forms": ["static", "dynamic", "mixed", "shorthand", "spread"],
+      "directivesRemainSeparate": true,
+      "nestedBraceExpressions": "preserved",
+      "sourceOwnership": "original-.nomos-spans"
+    }
   },
   "embeddedLanguages": {
     "decision": "docs/adr/0005-embedded-language-adapter-boundary.md",
@@ -120,7 +129,7 @@
       "hostMustAllowPolicyName": true
     },
     "browserVerification": {
-      "run": 38122323711,
+      "run": 38122979344,
       "chrome": "154.0.8037.97",
       "trustedTypesEnforced": true,
       "verifiedBehaviors": [
@@ -170,11 +179,12 @@
       "pnpm": "12.10.1",
       "typescript": "6.0.2",
       "chrome": "154.0.8037.97",
+      "parserTests": 66,
       "loweringAndAbiTests": 16,
       "runtimeTests": 21,
       "domSliceUnitTests": 3,
-      "browserDomRun": 38122323711,
-      "lastVerifiedRun": 38122323711
+      "browserDomRun": 38122979344,
+      "lastVerifiedRun": 38122979344
     },
     "remaining": [
       "destructuring-assignment-target-edge-cases",

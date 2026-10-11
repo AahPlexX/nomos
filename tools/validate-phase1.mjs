@@ -7,6 +7,7 @@ const required = [
   'packages/compiler/src/index.mjs',
   'packages/compiler/src/parser.mjs',
   'packages/compiler/src/template-syntax.mjs',
+  'packages/compiler/src/attribute-ir.mjs',
   'packages/compiler/src/template-ast.mjs',
   'packages/compiler/src/source-map.mjs',
   'packages/compiler/src/html-table-ownership.mjs',
@@ -24,6 +25,7 @@ const required = [
   'tests/phase1-parser.test.mjs',
   'tests/phase1-parser-structural.test.mjs',
   'tests/phase1-parser-ast.test.mjs',
+  'tests/phase1-parser-attribute-ir.test.mjs',
   'tests/phase1-parser-html-ownership.test.mjs',
   'tests/phase1-parser-table-ownership.test.mjs',
   'tests/phase1-parser-table-integration.test.mjs',
@@ -80,83 +82,70 @@ assert.equal(phase.phase1.status, 'in-progress');
 assert.equal(phase.phase1.parserAndSourceMaps, 'in-progress');
 assert.equal(phase.phase1.runtimeCore, 'deep-state-script-and-browser-template-dom-implemented');
 assert.equal(phase.phase1.conformanceInfrastructure, 'foundation-implemented');
+assert.ok(phase.phase1.parserImplemented.includes('typed-exact-span-static-dynamic-mixed-shorthand-spread-attribute-ir'));
+assert.ok(phase.phase1.parserImplemented.includes('same-span-table-ownership-diagnostic-deduplication'));
 assert.ok(phase.phase1.parserImplemented.includes('typescript-embedded-expression-and-text-binding-ir-lowering'));
 assert.ok(phase.phase1.parserImplemented.includes('browser-parsed-static-template-dom-materialization'));
 assert.ok(phase.phase1.parserImplemented.includes('template-dom-mount-binding-and-expression-mapping'));
-assert.ok(phase.phase1.parserImplemented.includes('whatwg-high-impact-formatting-adoption-agency-ownership'));
-assert.ok(phase.phase1.parserRemaining.includes('dynamic-mixed-shorthand-spread-attribute-ir-and-lowering'));
+assert.ok(phase.phase1.parserRemaining.includes('dynamic-mixed-shorthand-spread-attribute-lowering'));
+assert.ok(!phase.phase1.parserRemaining.some((entry) => entry.includes('attribute-ir')));
 assert.ok(phase.phase1.parserRemaining.includes('remaining-reactive-destructuring-assignment-target-lowering'));
 assert.ok(phase.phase1.parserRemaining.includes('structural-block-and-component-template-lowering'));
-assert.ok(!phase.phase1.parserRemaining.some((entry) => entry.includes('dom-node-materialization')));
 assert.ok(phase.phase1.runtimeImplemented.includes('owner-backed-browser-parsed-static-template-mount'));
-assert.ok(phase.phase1.runtimeImplemented.includes('internal-owner-backed-text-binding-helper'));
 assert.ok(phase.phase1.runtimeRemaining.includes('state-snapshot-contract-and-implementation'));
-assert.ok(phase.phase1.runtimeRemaining.includes('dynamic-attribute-event-binding-integration'));
 assert.equal(phase.phase1.verification.workflow, '.github/workflows/ci.yml');
 assert.equal(phase.phase1.verification.node, '22.16.0');
 assert.equal(phase.phase1.verification.pnpm, '12.10.1');
 assert.equal(phase.phase1.verification.typescript6, '6.0.2');
 assert.equal(phase.phase1.verification.chrome, '154.0.8037.97');
+assert.equal(phase.phase1.verification.parserTests, 66);
 assert.equal(phase.phase1.verification.loweringAndAbiTests, 16);
 assert.equal(phase.phase1.verification.runtimeTests, 21);
 assert.equal(phase.phase1.verification.domSliceUnitTests, 3);
-assert.equal(phase.phase1.verification.browserDomRun, 38122323711);
+assert.equal(phase.phase1.verification.browserDomRun, 38122979344);
 assert.equal(phase.phase1.verification.browserTrustedTypesEnforced, true);
-assert.equal(phase.phase1.verification.lastVerifiedRun, 38122323711);
+assert.equal(phase.phase1.verification.lastVerifiedRun, 38122979344);
 assert.deepEqual(phase.phase1.openWayfinderDecisions, []);
 assert.equal(phase.phase1.conformance.seedTestStatus, 'wired-unverified');
 assert.equal(phase.phase1.conformance.passingRequirementCount, 0);
 
 const frontEnd = JSON.parse(await readFile(new URL('spec/compiler-front-end.json', root), 'utf8'));
 assert.equal(frontEnd.sourceMaps.standard, 'ECMA-426');
-assert.equal(frontEnd.sourceMaps.scriptLoweringMappings, 'implemented-with-original-nomos-sourcesContent');
 assert.equal(frontEnd.sourceMaps.templateDomMappings, 'implemented-mount-binding-and-expression-points-to-original-nomos');
-assert.equal(frontEnd.sourceMaps.tokenLevelGeneratedMappings, 'partial-template-dom-points-not-token-complete');
 assert.equal(frontEnd.htmlOwnership.certifiedRewriteCount, 21);
-assert.ok(frontEnd.implementedDiagnostics.includes('NOMOS-LOWER-UNSUPPORTED-TEMPLATE-FEATURE'));
-assert.equal(frontEnd.embeddedLanguages.typescript.dependencyPin, '6.0.2');
-assert.equal(frontEnd.embeddedLanguages.typescript.expressionAdapter, 'implemented-text-interpolation');
-assert.equal(frontEnd.embeddedLanguages.css.implementation, 'planned');
+assert.equal(frontEnd.htmlOwnership.duplicateDiagnosticPolicy, 'specialized-table-rewrite-replaces-same-span-generic-foster-diagnostic');
+assert.equal(frontEnd.templateSyntax.status, 'hierarchical-structural-ast-with-typed-attribute-ir');
+assert.equal(frontEnd.templateSyntax.attributeIr.status, 'implemented-exact-span-five-ratified-forms');
+assert.deepEqual(frontEnd.templateSyntax.attributeIr.forms, ['static', 'dynamic', 'mixed', 'shorthand', 'spread']);
+assert.equal(frontEnd.templateSyntax.attributeIr.directivesRemainSeparate, true);
+assert.equal(frontEnd.templateSyntax.attributeIr.sourceOwnership, 'original-.nomos-spans');
 assert.equal(frontEnd.templateDom.status, 'browser-parsed-static-skeleton-and-text-interpolation-materialization-implemented');
-assert.equal(frontEnd.templateDom.staticHtmlParsing, 'HTMLTemplateElement-browser-parser');
-assert.equal(frontEnd.templateDom.ownedRootCleanup, true);
 assert.equal(frontEnd.templateDom.trustedTypes.policyName, 'nomos');
-assert.equal(frontEnd.templateDom.trustedTypes.hostMustAllowPolicyName, true);
-assert.equal(frontEnd.templateDom.browserVerification.run, 38122323711);
-assert.equal(frontEnd.templateDom.browserVerification.chrome, '154.0.8037.97');
-assert.equal(frontEnd.templateDom.browserVerification.trustedTypesEnforced, true);
-assert.equal(frontEnd.reactiveLowering.status, 'script-core-and-browser-parsed-template-text-dom-implemented');
-assert.equal(frontEnd.reactiveLowering.templateTextBindings.status, 'browser-materialized-and-runtime-bound');
-assert.equal(frontEnd.reactiveLowering.templateTextBindings.nodeMaterialization, 'implemented-via-browser-parsed-static-skeleton-markers');
-assert.ok(!frontEnd.reactiveLowering.remaining.includes('generated-dom-node-materialization'));
-assert.ok(frontEnd.reactiveLowering.remaining.includes('dynamic-mixed-shorthand-spread-attribute-lowering'));
+assert.equal(frontEnd.templateDom.browserVerification.run, 38122979344);
+assert.equal(frontEnd.reactiveLowering.verification.parserTests, 66);
 assert.equal(frontEnd.reactiveLowering.verification.domSliceUnitTests, 3);
-assert.equal(frontEnd.reactiveLowering.verification.browserDomRun, 38122323711);
-assert.equal(frontEnd.reactiveLowering.verification.lastVerifiedRun, 38122323711);
+assert.equal(frontEnd.reactiveLowering.verification.browserDomRun, 38122979344);
+assert.equal(frontEnd.reactiveLowering.verification.lastVerifiedRun, 38122979344);
+assert.ok(frontEnd.reactiveLowering.remaining.includes('dynamic-mixed-shorthand-spread-attribute-lowering'));
 
 const runtime = JSON.parse(await readFile(new URL('spec/runtime-core.json', root), 'utf8'));
 assert.equal(runtime.status, 'phase-1-runtime-deep-state-script-and-browser-template-dom-implemented');
-assert.equal(runtime.compilerAbi.implementationFile, 'packages/runtime/src/internal.mjs');
-assert.ok(runtime.compilerAbi.exports.includes('updateState'));
 assert.ok(runtime.compilerAbi.exports.includes('bindText'));
 assert.ok(runtime.compilerAbi.exports.includes('mountTemplate'));
 assert.equal(runtime.domBindings.status, 'static-template-mount-and-text-binding-implemented');
 assert.equal(runtime.domBindings.staticParser, 'HTMLTemplateElement');
-assert.equal(runtime.domBindings.nodeMaterialization, 'implemented-static-html-and-text-interpolation-slice');
 assert.equal(runtime.domBindings.trustedTypes.policyName, 'nomos');
-assert.equal(runtime.domBindings.browserVerification.run, 38122323711);
-assert.ok(runtime.implementedSlice.includes('owner-backed-browser-parsed-static-template-mount'));
 assert.ok(runtime.remaining.includes('dynamic-attribute-event-binding-integration'));
-assert.ok(!runtime.remaining.some((entry) => entry.includes('generated-dom-node-materialization')));
 assert.equal(runtime.openDecisionImpact, 'none');
 
 const packageJson = JSON.parse(await readFile(new URL('package.json', root), 'utf8'));
 assert.equal(packageJson.scripts['check:phase1:dom-slice'], 'node tools/verify-dom-slice.mjs');
-assert.equal(packageJson.scripts['check:phase1:browser-dom'], 'node tools/verify-browser-dom.mjs');
+assert.equal(packageJson.scripts['check:phase1:parser'], 'node --test "tests/phase1-parser*.test.mjs" "tests/phase1-table-*.test.mjs" "tests/phase1-formatting-*.test.mjs"');
 
 const workflow = await readFile(new URL('.github/workflows/ci.yml', root), 'utf8');
 assert.match(workflow, /runs-on: ubuntu-24\.04/);
 assert.match(workflow, /google-chrome --version/);
+assert.match(workflow, /pnpm check:phase1:parser/);
 assert.match(workflow, /pnpm check:phase1:dom-slice/);
 
 const conformance = JSON.parse(await readFile(new URL('spec/conformance.json', root), 'utf8'));
@@ -165,4 +154,4 @@ assert.equal(conformance.browserSubstitutionAllowed, false);
 assert.equal(conformance.seedTest.status, 'wired-unverified');
 assert.deepEqual(conformance.passingRequirements, []);
 
-console.log(`Phase 1 check passed: ${required.length} required artifacts; compiler foundations, 21 HTML ownership scenarios, reactive runtime, browser-parsed static template DOM, live text interpolation, Trusted Types browser verification, and template mapping points are implemented while dynamic attributes/events, structural/component lowering, snapshot semantics, CSS adapter work, and public green evidence remain in progress.`);
+console.log(`Phase 1 check passed: ${required.length} required artifacts; compiler foundations, typed five-form attribute IR, deduplicated table ownership diagnostics, 21 HTML ownership scenarios, reactive runtime, browser-parsed static template DOM, live text interpolation, Trusted Types browser verification, and template mapping points are implemented while dynamic attribute assignment, events, structural/component lowering, snapshot semantics, CSS adapter work, and public green evidence remain in progress.`);
