@@ -70,7 +70,7 @@
     "finalMapValidation": "implemented-core",
     "scriptLoweringMappings": "implemented-with-original-nomos-sourcesContent",
     "templateTextBindingMappings": "implemented-expression-start-to-original-nomos",
-    "templateDomMappings": "implemented-mount-binding-and-expression-points-to-original-nomos",
+    "templateDomMappings": "implemented-mount-text-attribute-binding-and-expression-points-to-original-nomos",
     "tokenLevelGeneratedMappings": "partial-template-dom-points-not-token-complete"
   },
   "phase0ParserCorpus": {
@@ -82,7 +82,7 @@
     "flatTreeType": "TemplateSyntaxTree",
     "hierarchicalTreeType": "Template",
     "hierarchicalTypedAst": "implemented-structural",
-    "typedEmbeddedExpressions": "implemented-text-interpolation-slice",
+    "typedEmbeddedExpressions": "implemented-text-and-attribute-expression-slices",
     "attributeIr": {
       "status": "implemented-exact-span-five-ratified-forms",
       "implementationFile": "packages/compiler/src/attribute-ir.mjs",
@@ -105,8 +105,8 @@
       "dependencyPin": "6.0.2",
       "scriptWrapper": "implemented",
       "scriptLowering": "implemented-state-derive-state-raw",
-      "expressionAdapter": "implemented-text-interpolation",
-      "implementation": "embedded-script-and-text-expression-lowering-implemented"
+      "expressionAdapter": "implemented-text-and-attribute-expressions",
+      "implementation": "embedded-script-template-text-and-attribute-expression-lowering-implemented"
     },
     "css": {
       "wrapperKind": "EmbeddedStylesheet",
@@ -117,11 +117,24 @@
     "dependencyInstallation": "typescript6-pinned-and-ci-verified-lightningcss-deferred"
   },
   "templateDom": {
-    "status": "browser-parsed-static-skeleton-and-text-interpolation-materialization-implemented",
+    "status": "browser-parsed-static-skeleton-text-and-standard-html-attributes-implemented",
     "compiler": "packages/compiler/src/template-dom-lowering.mjs",
     "runtime": "packages/runtime/src/dom-bindings.mjs",
     "staticHtmlParsing": "HTMLTemplateElement-browser-parser",
     "dynamicTextSlots": "collision-free-comment-markers-replaced-with-Text-nodes",
+    "dynamicElementSlots": "collision-free-temporary-attributes-removed-after-browser-clone-discovery",
+    "attributeBinding": {
+      "research": "docs/phase-1/research/html-attribute-assignment.md",
+      "requiredDynamicForms": 4,
+      "implementedForms": ["dynamic", "mixed", "shorthand"],
+      "remainingForms": ["spread"],
+      "implementedCount": 3,
+      "ordinaryContentAttributeSemantics": "nullish-remove-otherwise-String-setAttribute",
+      "booleanContentAttributeSemantics": "truthy-presence-empty-string-falsy-absence",
+      "customElementDynamicAssignment": "guarded-od-008",
+      "dynamicUrlAttributes": "guarded-until-protocol-validator",
+      "inlineEventAttributes": "rejected-use-on-directive"
+    },
     "ownedRootCleanup": true,
     "trustedTypes": {
       "supported": true,
@@ -129,7 +142,7 @@
       "hostMustAllowPolicyName": true
     },
     "browserVerification": {
-      "run": 38122979344,
+      "run": 38168894701,
       "chrome": "154.0.8037.97",
       "trustedTypesEnforced": true,
       "verifiedBehaviors": [
@@ -140,7 +153,10 @@
       ]
     },
     "explicitlyRejectedUntilDedicatedLowering": [
-      "dynamic-mixed-shorthand-spread-attributes",
+      "spread-attributes",
+      "dynamic-custom-element-attributes",
+      "dynamic-url-attributes-before-validator",
+      "inline-event-attributes",
       "directives",
       "raw-html",
       "if-each-await-blocks",
@@ -149,7 +165,7 @@
     ]
   },
   "reactiveLowering": {
-    "status": "script-core-and-browser-parsed-template-text-dom-implemented",
+    "status": "script-core-browser-template-text-and-three-standard-html-attribute-forms-implemented",
     "bindingRecognition": "typescript-symbol-resolution",
     "supportedDeclarations": ["state", "state.raw", "derive"],
     "supportedRootWrites": [
@@ -181,14 +197,16 @@
       "chrome": "154.0.8037.97",
       "parserTests": 66,
       "loweringAndAbiTests": 16,
-      "runtimeTests": 21,
-      "domSliceUnitTests": 3,
-      "browserDomRun": 38122979344,
-      "lastVerifiedRun": 38122979344
+      "runtimeTests": 23,
+      "domSliceUnitTests": 7,
+      "browserDomRun": 38168894701,
+      "lastVerifiedRun": 38168894701
     },
     "remaining": [
       "destructuring-assignment-target-edge-cases",
-      "dynamic-mixed-shorthand-spread-attribute-lowering",
+      "spread-attribute-merge-precedence",
+      "dynamic-url-attribute-safety",
+      "event-and-native-control-lowering",
       "structural-block-lowering",
       "component-lowering",
       "complete-template-semantic-type-checking"
