@@ -17,7 +17,8 @@
     "NOMOS-PARSE-UNCLOSED-SECTION",
     "NOMOS-PARSE-HTML-OWNERSHIP",
     "NOMOS-PARSE-UNTERMINATED-BLOCK",
-    "NOMOS-PARSE-UNKNOWN-DIRECTIVE"
+    "NOMOS-PARSE-UNKNOWN-DIRECTIVE",
+    "NOMOS-REACTIVE-DERIVE-WRITE"
   ],
   "htmlOwnership": {
     "status": "partial-whatwg-tree-construction-validation",
@@ -60,12 +61,13 @@
     "compositionContract": "docs/adr/0006-stage-local-source-map-composition.md",
     "compositionResearch": "docs/phase-1/research/source-map-composition.md",
     "compositionWayfinderDecision": "https://github.com/AahPlexX/nomos/issues/3",
-    "stageLocalMappings": "core-composer-implemented",
+    "stageLocalMappings": "core-composer-plus-typescript-script-emitter-implemented",
     "compositionResolution": "exact-mapping-points-only",
     "generatedScaffolding": "unmapped",
     "finalMapTarget": "original-.nomos-source",
     "finalMapValidation": "implemented-core",
-    "tokenLevelGeneratedMappings": "planned"
+    "scriptLoweringMappings": "implemented-with-original-nomos-sourcesContent",
+    "tokenLevelGeneratedMappings": "template-and-dom-lowering-planned"
   },
   "phase0ParserCorpus": {
     "allValidFixtures": "certified-structural",
@@ -88,7 +90,11 @@
       "wrapperKinds": ["EmbeddedScript", "EmbeddedExpression"],
       "programmaticAdapter": "@typescript/typescript6",
       "verifiedVersionBaseline": "6.0.2",
-      "implementation": "planned"
+      "dependencyPin": "6.0.2",
+      "scriptWrapper": "implemented",
+      "scriptLowering": "implemented-state-derive-state-raw",
+      "expressionAdapter": "planned",
+      "implementation": "embedded-script-and-reactive-lowering-implemented"
     },
     "css": {
       "wrapperKind": "EmbeddedStylesheet",
@@ -96,7 +102,23 @@
       "verifiedVersionBaseline": "1.33.0",
       "implementation": "planned"
     },
-    "dependencyInstallation": "deferred-until-executable-adapter-slice"
+    "dependencyInstallation": "typescript6-pinned-lightningcss-deferred"
+  },
+  "reactiveLowering": {
+    "status": "script-core-implemented",
+    "bindingRecognition": "typescript-symbol-resolution",
+    "supportedDeclarations": ["state", "state.raw", "derive"],
+    "supportedRootWrites": ["assignment", "compound-assignment", "prefix-increment-decrement", "postfix-increment-decrement"],
+    "deepPropertyWrites": "runtime-proxy-path",
+    "helperCollisionAvoidance": "implemented",
+    "internalRuntimeModule": "nomos/internal/runtime",
+    "internalRuntimeFile": "packages/runtime/src/internal.mjs",
+    "staticDeriveWriteDiagnostic": "NOMOS-REACTIVE-DERIVE-WRITE",
+    "remaining": [
+      "destructuring-and-loop-assignment-edge-cases",
+      "template-expression-lowering",
+      "generated-dom-binding-lowering"
+    ]
   },
   "conformance": {
     "decision": "docs/adr/0007-public-conformance-promotion.md",
@@ -111,10 +133,9 @@
     "resolvedDecisionTickets": [
       "https://github.com/AahPlexX/nomos/issues/2",
       "https://github.com/AahPlexX/nomos/issues/3",
+      "https://github.com/AahPlexX/nomos/issues/4",
       "https://github.com/AahPlexX/nomos/issues/5"
     ],
-    "openDecisionTickets": [
-      "https://github.com/AahPlexX/nomos/issues/4"
-    ]
+    "openDecisionTickets": []
   }
 }
