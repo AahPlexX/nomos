@@ -31,6 +31,7 @@ export {
   lowerEmbeddedExpression,
 } from './expression-lowering.mjs';
 export { lowerTemplateTextBindings } from './template-lowering.mjs';
+export { lowerTemplateDom } from './template-dom-lowering.mjs';
 export {
   composeDecodedMappings,
   createIdentitySourceMap,
