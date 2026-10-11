@@ -102,20 +102,36 @@
       "verifiedVersionBaseline": "1.33.0",
       "implementation": "planned"
     },
-    "dependencyInstallation": "typescript6-pinned-lightningcss-deferred"
+    "dependencyInstallation": "typescript6-pinned-and-ci-verified-lightningcss-deferred"
   },
   "reactiveLowering": {
     "status": "script-core-implemented",
     "bindingRecognition": "typescript-symbol-resolution",
     "supportedDeclarations": ["state", "state.raw", "derive"],
-    "supportedRootWrites": ["assignment", "compound-assignment", "prefix-increment-decrement", "postfix-increment-decrement"],
+    "supportedRootWrites": [
+      "assignment",
+      "compound-assignment",
+      "prefix-increment-decrement",
+      "postfix-increment-decrement",
+      "for-of-assignment-target",
+      "for-in-assignment-target"
+    ],
     "deepPropertyWrites": "runtime-proxy-path",
-    "helperCollisionAvoidance": "implemented",
+    "helperCollisionAvoidance": "implemented-including-loop-temporaries",
     "internalRuntimeModule": "nomos/internal/runtime",
     "internalRuntimeFile": "packages/runtime/src/internal.mjs",
     "staticDeriveWriteDiagnostic": "NOMOS-REACTIVE-DERIVE-WRITE",
+    "verification": {
+      "workflow": ".github/workflows/ci.yml",
+      "node": "22.16.0",
+      "pnpm": "12.10.1",
+      "typescript": "6.0.2",
+      "loweringAndAbiTests": 14,
+      "runtimeTests": 20,
+      "lastVerifiedRun": 38102821673
+    },
     "remaining": [
-      "destructuring-and-loop-assignment-edge-cases",
+      "destructuring-assignment-target-edge-cases",
       "template-expression-lowering",
       "generated-dom-binding-lowering"
     ]
