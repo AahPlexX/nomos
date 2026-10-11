@@ -40,6 +40,9 @@ jobs:
       - name: Install exact dependencies
         run: pnpm install --no-frozen-lockfile
 
+      - name: Verify parser
+        run: pnpm check:phase1:parser
+
       - name: Verify template DOM slice
         run: pnpm check:phase1:dom-slice
 
