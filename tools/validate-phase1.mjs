@@ -107,9 +107,9 @@ assert.equal(phase.phase1.verification.parserTests, 66);
 assert.equal(phase.phase1.verification.loweringAndAbiTests, 16);
 assert.equal(phase.phase1.verification.runtimeTests, 23);
 assert.equal(phase.phase1.verification.domSliceUnitTests, 7);
-assert.equal(phase.phase1.verification.browserDomRun, 38168894701);
+assert.equal(phase.phase1.verification.browserDomRun, 38169465234);
 assert.equal(phase.phase1.verification.browserTrustedTypesEnforced, true);
-assert.equal(phase.phase1.verification.lastVerifiedRun, 38168894701);
+assert.equal(phase.phase1.verification.lastVerifiedRun, 38169465234);
 assert.deepEqual(phase.phase1.openWayfinderDecisions, []);
 assert.equal(phase.phase1.conformance.passingRequirementCount, 0);
 
@@ -127,11 +127,14 @@ assert.deepEqual(frontEnd.templateDom.attributeBinding.remainingForms, ['spread'
 assert.equal(frontEnd.templateDom.attributeBinding.customElementDynamicAssignment, 'guarded-od-008');
 assert.equal(frontEnd.templateDom.attributeBinding.dynamicUrlAttributes, 'guarded-until-protocol-validator');
 assert.equal(frontEnd.templateDom.trustedTypes.policyName, 'nomos');
-assert.equal(frontEnd.templateDom.browserVerification.run, 38168894701);
+assert.equal(frontEnd.templateDom.browserVerification.run, 38169465234);
+assert.ok(frontEnd.templateDom.browserVerification.verifiedBehaviors.includes('dynamic-ordinary-attribute-assignment'));
+assert.ok(frontEnd.templateDom.browserVerification.verifiedBehaviors.includes('mixed-attribute-assignment'));
+assert.ok(frontEnd.templateDom.browserVerification.verifiedBehaviors.includes('boolean-attribute-presence-absence'));
 assert.equal(frontEnd.reactiveLowering.verification.parserTests, 66);
 assert.equal(frontEnd.reactiveLowering.verification.domSliceUnitTests, 7);
 assert.equal(frontEnd.reactiveLowering.verification.runtimeTests, 23);
-assert.equal(frontEnd.reactiveLowering.verification.lastVerifiedRun, 38168894701);
+assert.equal(frontEnd.reactiveLowering.verification.lastVerifiedRun, 38169465234);
 assert.ok(frontEnd.reactiveLowering.remaining.includes('spread-attribute-merge-precedence'));
 
 const runtime = JSON.parse(await readFile(new URL('spec/runtime-core.json', root), 'utf8'));
@@ -146,6 +149,10 @@ assert.deepEqual(runtime.domBindings.attributeForms.remaining, ['spread']);
 assert.equal(runtime.domBindings.ordinaryAttributeSemantics, 'nullish-removes-otherwise-String-and-setAttribute');
 assert.equal(runtime.domBindings.booleanAttributeSemantics, 'truthy-presence-empty-string-falsy-absence');
 assert.equal(runtime.domBindings.trustedTypes.policyName, 'nomos');
+assert.equal(runtime.domBindings.browserVerification.run, 38169465234);
+assert.ok(runtime.domBindings.browserVerification.verifiedBehaviors.includes('dynamic-ordinary-attribute-assignment'));
+assert.ok(runtime.domBindings.browserVerification.verifiedBehaviors.includes('mixed-attribute-assignment'));
+assert.ok(runtime.domBindings.browserVerification.verifiedBehaviors.includes('boolean-attribute-presence-absence'));
 assert.ok(runtime.remaining.includes('spread-attribute-merge-precedence'));
 assert.equal(runtime.openDecisionImpact, 'none');
 
