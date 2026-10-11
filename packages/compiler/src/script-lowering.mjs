@@ -194,6 +194,7 @@ function createHelperNames(sourceFile) {
     read: unique('__n_read'),
     write: unique('__n_write'),
     update: unique('__n_update'),
+    loop: unique('__n_loop'),
   };
 }
 
@@ -210,6 +211,10 @@ function collectDeriveWriteDiagnostics(argument, checker, bindings, diagnostics)
       && (node.operator === ts.SyntaxKind.PlusPlusToken || node.operator === ts.SyntaxKind.MinusMinusToken)) {
       const binding = bindings.get(checker.getSymbolAtLocation(node.operand));
       if (binding?.kind === 'state') diagnostics.push(makeCompilerDiagnostic(node.operand, `Cannot write reactive state ${binding.name} while a derive is evaluating.`));
+    }
+    if ((ts.isForOfStatement(node) || ts.isForInStatement(node)) && ts.isIdentifier(node.initializer)) {
+      const binding = bindings.get(checker.getSymbolAtLocation(node.initializer));
+      if (binding?.kind === 'state') diagnostics.push(makeCompilerDiagnostic(node.initializer, `Cannot write reactive state ${binding.name} while a derive is evaluating.`));
     }
     ts.forEachChild(node, visit);
   };
@@ -257,6 +262,12 @@ function createReactiveTransformer(checker, analysis, diagnostics) {
           );
           return factory.updateVariableDeclaration(node, node.name, node.exclamationToken, node.type, initializer);
         }
+      }
+
+      if ((ts.isForOfStatement(node) || ts.isForInStatement(node)) && ts.isIdentifier(node.initializer)) {
+        const symbol = checker.getSymbolAtLocation(node.initializer);
+        const binding = analysis.bindings.get(symbol);
+        if (binding) return lowerReactiveLoop(node, binding, visit, diagnostics, analysis.helpers);
       }
 
       if (ts.isBinaryExpression(node) && ts.isIdentifier(node.left)) {
@@ -339,6 +350,33 @@ function importAlias(factory, imported, local) {
   return factory.createImportSpecifier(false, factory.createIdentifier(imported), factory.createIdentifier(local));
 }
 
+function lowerReactiveLoop(node, binding, visit, diagnostics, helpers) {
+  const factory = ts.factory;
+  if (binding.kind === 'derive') {
+    diagnostics.push(makeCompilerDiagnostic(node.initializer, `Cannot write to derived value ${binding.name}.`));
+    return node;
+  }
+
+  const temporary = factory.createIdentifier(helpers.loop);
+  const declaration = factory.createVariableDeclarationList([
+    factory.createVariableDeclaration(temporary),
+  ], ts.NodeFlags.Const);
+  const expression = ts.visitNode(node.expression, visit);
+  const visitedBody = ts.visitNode(node.statement, visit);
+  const assignment = factory.createExpressionStatement(factory.createCallExpression(
+    factory.createIdentifier(helpers.write),
+    undefined,
+    [factory.createIdentifier(binding.name), temporary],
+  ));
+  const body = ts.isBlock(visitedBody)
+    ? factory.updateBlock(visitedBody, [assignment, ...visitedBody.statements])
+    : factory.createBlock([assignment, visitedBody], true);
+
+  return ts.isForOfStatement(node)
+    ? factory.updateForOfStatement(node, node.awaitModifier, declaration, expression, body)
+    : factory.updateForInStatement(node, declaration, expression, body);
+}
+
 function lowerRootAssignment(node, binding, visit, diagnostics, helpers) {
   const factory = ts.factory;
   if (binding.kind === 'derive') {
@@ -395,6 +433,7 @@ function shouldLowerIdentifierRead(node) {
   if (ts.isBinaryExpression(parent) && parent.left === node && isAssignmentOperator(parent.operatorToken.kind)) return false;
   if ((ts.isPrefixUnaryExpression(parent) || ts.isPostfixUnaryExpression(parent)) && parent.operand === node) return false;
   if (ts.isShorthandPropertyAssignment(parent)) return false;
+  if ((ts.isForOfStatement(parent) || ts.isForInStatement(parent)) && parent.initializer === node) return false;
   return true;
 }
 
