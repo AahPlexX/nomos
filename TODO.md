@@ -23,23 +23,25 @@ Status keys: `[x]` verified complete, `[>]` in progress, `[ ]` not complete, `[!
   - [x] Exact decoded mapping validation, stage composition, unmapped scaffolding preservation, and ECMA-426 encoding core.
   - [x] HTML ownership: 21 certified WHATWG scenarios spanning paragraph/list/button, major table insertion modes, and high-impact formatting/adoption-agency recovery.
   - [ ] Finish only remaining material active-formatting/special insertion-mode gaps; do not build a duplicate browser parser.
-  - [ ] Produce token/segment mappings from real lowering/code-generation stages and compose them through the source-map core.
-  - [ ] Implement `EmbeddedScript` / `EmbeddedExpression` adapter using exact-pinned TypeScript compatibility API.
+  - [x] Implement `EmbeddedScript` plus symbol-aware `state` / `derive` / `state.raw` script lowering with exact-pinned TypeScript compatibility API.
+  - [x] Emit real TypeScript script source maps rebased to original `.nomos` coordinates and full `sourcesContent`.
+  - [ ] Implement `EmbeddedExpression` template-expression lowering and template/DOM mapping production.
   - [ ] Implement `EmbeddedStylesheet` adapter using exact-pinned Lightning CSS.
 - [>] State, derivation, synchronization, and ownership.
   - [x] ADR-0008 resolves the owner graph and scheduler architecture without adding root concepts.
   - [x] Versioned scalar state cells and `Object.is` notification suppression.
   - [x] Deep reactive tracking for plain objects, arrays, `Map`, and `Set` using the same dependency graph.
   - [x] Property/index/membership/size/iteration dependency precision with stable cycle-safe proxy identity.
-  - [x] Runtime raw-state semantics using the same cell model; source-level `state.raw` still requires compiler lowering.
+  - [x] Runtime raw-state semantics plus source-level `state.raw` TypeScript script lowering on the same cell model.
   - [x] Lazy, memoized, dynamic-dependency derived nodes with development derive-write guard.
   - [x] One microtask scheduler with DOM phase before sync phase and DOM reentry before remaining sync work.
   - [x] `sync()` mount gating, synchronous-read tracking, cleanup before rerun/disposal, and post-`await` tracking cutoff.
   - [x] Single owner tree with children-first disposal, reverse local cleanup, then owned DOM.
   - [x] `untrack()` and named non-terminating cycle diagnostics.
   - [!] `state.snapshot` conformance semantics/implementation remain blocked on the still-required behavior contract and must not silently resolve `OD-004`.
-  - [ ] Compiler lowering for transparent source-level `state`, `derive`, and `state.raw` reads/writes.
-  - [ ] Generated DOM binding integration with the DOM observer phase.
+  - [x] Compiler script lowering for transparent source-level `state`, `derive`, and `state.raw` reads/writes, including root assignment/compound assignment and prefix/postfix updates.
+  - [ ] Extend reactive lowering to destructuring/loop-assignment edge cases when conformance fixtures require them.
+  - [ ] Generated text/attribute DOM binding integration with the DOM observer phase, producing mappings in the same pass.
   - [ ] Owner-backed exclusive/shared request cancellation in the query slice.
 - [>] Public conformance infrastructure.
   - [x] ADR-0007 public `NCON-*` identity/environment/promotion contract.
