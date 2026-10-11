@@ -29,6 +29,7 @@
       "phase0-structural-parser-corpus-certification",
       "embedded-language-adapter-boundary",
       "typescript-embedded-script-wrapper-and-reactive-lowering",
+      "typescript-reactive-loop-assignment-target-lowering",
       "stage-local-source-map-composition-contract",
       "exact-decoded-segment-composer",
       "typescript-script-emitter-source-maps-to-original-nomos",
@@ -40,6 +41,7 @@
     ],
     "parserRemaining": [
       "embedded-typescript-expression-and-css-adapter-implementation",
+      "remaining-reactive-destructuring-assignment-target-lowering",
       "remaining-active-formatting-reconstruction-and-low-frequency-special-insertion-mode-validation",
       "template-and-dom-generated-mapping-production"
     ],
@@ -59,7 +61,8 @@
       "post-await-tracking-cutoff",
       "named-reactive-cycle-diagnostics",
       "compiler-internal-update-state-helper",
-      "compiler-state-derive-and-state-raw-script-lowering"
+      "compiler-state-derive-and-state-raw-script-lowering",
+      "compiler-reactive-for-of-and-for-in-target-lowering"
     ],
     "runtimeRemaining": [
       "state-snapshot-contract-and-implementation",
@@ -67,6 +70,15 @@
       "generated-dom-binding-integration"
     ],
     "runtimeMachineSpec": "spec/runtime-core.json",
+    "verification": {
+      "workflow": ".github/workflows/ci.yml",
+      "lastVerifiedRun": 38102821673,
+      "node": "22.16.0",
+      "pnpm": "12.10.1",
+      "typescript6": "6.0.2",
+      "loweringAndAbiTests": 14,
+      "runtimeTests": 20
+    },
     "conformance": {
       "contract": "docs/adr/0007-public-conformance-promotion.md",
       "machineSpec": "spec/conformance.json",
