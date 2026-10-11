@@ -1,0 +1,55 @@
+{
+  "schemaVersion": 1,
+  "status": "phase-1-runtime-core-implemented",
+  "decision": "docs/adr/0008-runtime-ownership-and-scheduler.md",
+  "research": "docs/phase-1/research/runtime-ownership-and-scheduling.md",
+  "wayfinderDecision": "https://github.com/AahPlexX/nomos/issues/4",
+  "dependencyPolicy": "platform-primitives-no-third-party-reactivity-core",
+  "graph": {
+    "sources": ["state-cell", "derived-node"],
+    "observers": ["dom-observer", "sync-observer"],
+    "dependencyCapture": "dynamic-synchronous-read-tracking",
+    "versionedSources": true,
+    "derivedEvaluation": "lazy-memoized-on-demand",
+    "deriveWriteGuard": "development-runtime-implemented"
+  },
+  "scheduler": {
+    "primitive": "queueMicrotask",
+    "writeTiming": "synchronous",
+    "flushPhases": ["dom", "sync"],
+    "syncYieldsToNewDomWork": true,
+    "manualFlushSurface": "testing-and-interoperability-only",
+    "asyncTracking": "ends-when-callback-returns-before-await-continuation"
+  },
+  "ownership": {
+    "model": "single-parent-child-owner-tree",
+    "mountActivatesObservers": true,
+    "disposalOrder": ["child-owners", "local-cleanup-reverse-creation", "owned-dom"],
+    "syncCleanupOnRerun": true,
+    "syncCleanupOnDisposal": true
+  },
+  "cycleDetection": {
+    "status": "development-runtime-implemented",
+    "identifies": ["participating-state-names", "synchronization-owner-labels"]
+  },
+  "implementedSlice": [
+    "scalar-state-cells",
+    "lazy-derived-nodes",
+    "dynamic-dependency-tracking",
+    "dom-before-sync-microtask-scheduling",
+    "owner-mount-and-disposal",
+    "sync-cleanup",
+    "untrack",
+    "async-tracking-cutoff",
+    "named-cycle-diagnostics"
+  ],
+  "remaining": [
+    "deep-tracking-plain-object-array-map-set",
+    "state-raw",
+    "state-snapshot-contract-and-implementation",
+    "compiler-state-and-derive-lowering",
+    "request-ownership-and-cancellation",
+    "generated-dom-binding-integration"
+  ],
+  "openDecisionImpact": "none"
+}
