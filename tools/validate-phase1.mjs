@@ -13,6 +13,7 @@ const required = [
   'packages/compiler/src/html-formatting-ownership.mjs',
   'packages/compiler/src/formatting-structure-validation.mjs',
   'packages/runtime/src/reactivity.mjs',
+  'packages/runtime/src/deep-state.mjs',
   'tests/phase1-parser.test.mjs',
   'tests/phase1-parser-structural.test.mjs',
   'tests/phase1-parser-ast.test.mjs',
@@ -28,6 +29,7 @@ const required = [
   'tests/phase1-formatting-structure-validation.test.mjs',
   'tests/phase1-parser-formatting-integration.test.mjs',
   'tests/phase1-runtime-core.test.mjs',
+  'tests/phase1-runtime-deep-state.test.mjs',
   'tests/phase1-source-map-composition.test.mjs',
   'tests/phase1-conformance-harness.test.mjs',
   'docs/diagnostics/NOMOS-PARSE-HTML-OWNERSHIP.md',
@@ -59,14 +61,19 @@ const phase = JSON.parse(await readFile(new URL('spec/phase-status.json', root),
 assert.equal(phase.currentPhase, 1);
 assert.equal(phase.phase1.status, 'in-progress');
 assert.equal(phase.phase1.parserAndSourceMaps, 'in-progress');
-assert.equal(phase.phase1.runtimeCore, 'foundation-implemented');
+assert.equal(phase.phase1.runtimeCore, 'deep-state-implemented');
 assert.equal(phase.phase1.conformanceInfrastructure, 'foundation-implemented');
 assert.ok(phase.phase1.parserImplemented.includes('whatwg-high-impact-formatting-adoption-agency-ownership'));
 assert.ok(phase.phase1.runtimeImplemented.includes('adr-0008-owner-and-scheduler-architecture'));
+assert.ok(phase.phase1.runtimeImplemented.includes('deep-tracking-plain-object-array-map-set'));
+assert.ok(phase.phase1.runtimeImplemented.includes('raw-state-cell-runtime-semantics'));
+assert.ok(phase.phase1.runtimeImplemented.includes('stable-cycle-safe-deep-proxy-identity'));
 assert.ok(phase.phase1.runtimeImplemented.includes('dom-before-sync-microtask-flush'));
 assert.ok(phase.phase1.runtimeImplemented.includes('named-reactive-cycle-diagnostics'));
-assert.ok(phase.phase1.runtimeRemaining.includes('deep-tracking-plain-object-array-map-set'));
-assert.ok(phase.phase1.runtimeRemaining.includes('compiler-state-and-derive-lowering'));
+assert.ok(!phase.phase1.runtimeRemaining.includes('deep-tracking-plain-object-array-map-set'));
+assert.ok(!phase.phase1.runtimeRemaining.includes('state-raw'));
+assert.ok(phase.phase1.runtimeRemaining.includes('compiler-state-derive-and-state-raw-lowering'));
+assert.ok(phase.phase1.runtimeRemaining.includes('state-snapshot-contract-and-implementation'));
 assert.equal(phase.phase1.runtimeMachineSpec, 'spec/runtime-core.json');
 assert.deepEqual(phase.phase1.openWayfinderDecisions, []);
 assert.ok(phase.phase1.resolvedWayfinderDecisions.includes('https://github.com/AahPlexX/nomos/issues/4'));
@@ -83,8 +90,15 @@ assert.equal(frontEnd.embeddedLanguages.typescript.implementation, 'planned');
 assert.equal(frontEnd.embeddedLanguages.css.implementation, 'planned');
 
 const runtime = JSON.parse(await readFile(new URL('spec/runtime-core.json', root), 'utf8'));
-assert.equal(runtime.status, 'phase-1-runtime-core-implemented');
+assert.equal(runtime.status, 'phase-1-runtime-deep-state-implemented');
 assert.equal(runtime.decision, 'docs/adr/0008-runtime-ownership-and-scheduler.md');
+assert.ok(runtime.graph.sources.includes('deep-property-source'));
+assert.equal(runtime.deepState.status, 'runtime-implemented');
+assert.deepEqual(runtime.deepState.containers, ['plain-object', 'array', 'Map', 'Set']);
+assert.ok(runtime.deepState.granularity.includes('membership'));
+assert.equal(runtime.deepState.proxyIdentity, 'stable-per-state-and-cycle-safe');
+assert.equal(runtime.deepState.rawOptOut, 'implemented-as-state-cell-raw-option');
+assert.equal(runtime.deepState.publicStateRawSurface, 'pending-compiler-lowering');
 assert.equal(runtime.scheduler.primitive, 'queueMicrotask');
 assert.deepEqual(runtime.scheduler.flushPhases, ['dom', 'sync']);
 assert.equal(runtime.scheduler.syncYieldsToNewDomWork, true);
@@ -92,8 +106,10 @@ assert.equal(runtime.graph.derivedEvaluation, 'lazy-memoized-on-demand');
 assert.equal(runtime.graph.deriveWriteGuard, 'development-runtime-implemented');
 assert.deepEqual(runtime.ownership.disposalOrder, ['child-owners', 'local-cleanup-reverse-creation', 'owned-dom']);
 assert.equal(runtime.cycleDetection.status, 'development-runtime-implemented');
-assert.ok(runtime.remaining.includes('deep-tracking-plain-object-array-map-set'));
+assert.ok(runtime.implementedSlice.includes('deep-tracked-plain-object-array-map-set'));
+assert.ok(runtime.implementedSlice.includes('raw-state-cell-runtime-semantics'));
 assert.ok(runtime.remaining.includes('state-snapshot-contract-and-implementation'));
+assert.ok(runtime.remaining.includes('compiler-state-derive-and-state-raw-lowering'));
 assert.equal(runtime.openDecisionImpact, 'none');
 
 const conformance = JSON.parse(await readFile(new URL('spec/conformance.json', root), 'utf8'));
@@ -102,4 +118,4 @@ assert.equal(conformance.browserSubstitutionAllowed, false);
 assert.equal(conformance.seedTest.status, 'wired-unverified');
 assert.deepEqual(conformance.passingRequirements, []);
 
-console.log(`Phase 1 check passed: ${required.length} required artifacts; compiler front-end foundations, 21 HTML ownership scenarios, and ADR-0008 runtime core are implemented while deep state/lowering, embedded adapters, generated mappings, and public green evidence remain in progress.`);
+console.log(`Phase 1 check passed: ${required.length} required artifacts; compiler front-end foundations, 21 HTML ownership scenarios, ADR-0008 runtime core, and deep tracked state/raw runtime semantics are implemented while compiler lowering, snapshot semantics, embedded adapters, generated mappings, and public green evidence remain in progress.`);
