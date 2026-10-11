@@ -142,13 +142,17 @@
       "hostMustAllowPolicyName": true
     },
     "browserVerification": {
-      "run": 38168894701,
+      "run": 38169465234,
       "chrome": "154.0.8037.97",
       "trustedTypesEnforced": true,
       "verifiedBehaviors": [
         "html-character-reference-decoding",
         "svg-namespace-preservation",
         "dynamic-text-interpolation",
+        "dynamic-ordinary-attribute-assignment",
+        "mixed-attribute-assignment",
+        "boolean-attribute-presence-absence",
+        "temporary-element-marker-removal",
         "owned-root-disposal"
       ]
     },
@@ -199,8 +203,8 @@
       "loweringAndAbiTests": 16,
       "runtimeTests": 23,
       "domSliceUnitTests": 7,
-      "browserDomRun": 38168894701,
-      "lastVerifiedRun": 38168894701
+      "browserDomRun": 38169465234,
+      "lastVerifiedRun": 38169465234
     },
     "remaining": [
       "destructuring-assignment-target-edge-cases",
