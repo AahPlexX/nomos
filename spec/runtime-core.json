@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "status": "phase-1-runtime-deep-state-implemented",
+  "status": "phase-1-runtime-deep-state-and-script-lowering-implemented",
   "decision": "docs/adr/0008-runtime-ownership-and-scheduler.md",
   "research": "docs/phase-1/research/runtime-ownership-and-scheduling.md",
   "wayfinderDecision": "https://github.com/AahPlexX/nomos/issues/4",
@@ -24,7 +24,14 @@
     "setMutation": ["add", "delete", "clear"],
     "referenceHeld": ["class-instance", "Date", "DOM-node", "typed-array", "Promise", "Error", "Function", "WeakMap", "WeakSet", "frozen-object"],
     "rawOptOut": "implemented-as-state-cell-raw-option",
-    "publicStateRawSurface": "pending-compiler-lowering"
+    "publicStateRawSurface": "implemented-by-typescript-script-lowering"
+  },
+  "compilerAbi": {
+    "moduleSpecifier": "nomos/internal/runtime",
+    "implementationFile": "packages/runtime/src/internal.mjs",
+    "exports": ["createStateCell", "createDerived", "read", "write", "updateState"],
+    "updateStatePrefixPostfixSemantics": "implemented-number-and-bigint",
+    "publicRootBudgetImpact": "none-internal-only"
   },
   "scheduler": {
     "primitive": "queueMicrotask",
@@ -57,11 +64,12 @@
     "sync-cleanup",
     "untrack",
     "async-tracking-cutoff",
-    "named-cycle-diagnostics"
+    "named-cycle-diagnostics",
+    "internal-prefix-postfix-update-helper",
+    "typescript-symbol-aware-state-derive-state-raw-lowering"
   ],
   "remaining": [
     "state-snapshot-contract-and-implementation",
-    "compiler-state-derive-and-state-raw-lowering",
     "request-ownership-and-cancellation",
     "generated-dom-binding-integration"
   ],
