@@ -12,9 +12,10 @@ import * as runtimeInternal from '../packages/runtime/src/internal.mjs';
 const missing = [];
 if (typeof compiler.lowerTemplateDom !== 'function') missing.push('compiler.lowerTemplateDom');
 if (typeof runtimeInternal.mountTemplate !== 'function') missing.push('runtimeInternal.mountTemplate');
+if (typeof runtimeInternal.bindAttribute !== 'function') missing.push('runtimeInternal.bindAttribute');
 assert.deepEqual(missing, [], `template DOM materialization seam is incomplete: ${missing.join(', ')}`);
 
-const source = `<main data-label="A &amp; B">A &amp; B {1 + 2}<svg><circle></circle></svg></main>`;
+const source = `<main data-label="A &amp; B" data-count={count} class="count {count}" inert={inert}>A &amp; B {1 + 2}<svg><circle></circle></svg></main>`;
 const component = compiler.parseComponent(source, { filename: 'BrowserDom.nomos' });
 const lowered = compiler.lowerTemplateDom(source, component, {
   filename: 'BrowserDom.nomos',
@@ -22,6 +23,7 @@ const lowered = compiler.lowerTemplateDom(source, component, {
 });
 assert.equal(lowered.diagnostics.length, 0);
 assert.ok(lowered.code);
+assert.equal(lowered.attributeBindings.length, 3);
 
 const runtimeImportClause = lowered.runtimeImports
   .map(({ imported, local }) => `${imported} as ${local}`)
@@ -33,6 +35,8 @@ import { createOwner, disposeOwner, mountOwner, runWithOwner } from '/packages/r
 
 const target = document.querySelector('#app');
 const owner = createOwner(null, { name: 'browser-root' });
+const count = 4;
+const inert = true;
 
 try {
   runWithOwner(owner, () => {
@@ -44,6 +48,10 @@ ${indent(lowered.code, 4)}
   const main = target.querySelector('main');
   if (!main) throw new Error('main element was not materialized');
   if (main.getAttribute('data-label') !== 'A & B') throw new Error('static attribute entity decoding diverged from HTML parsing');
+  if (main.getAttribute('data-count') !== '4') throw new Error('dynamic ordinary attribute mismatch: ' + main.getAttribute('data-count'));
+  if (main.getAttribute('class') !== 'count 4') throw new Error('mixed attribute mismatch: ' + main.getAttribute('class'));
+  if (!main.hasAttribute('inert') || main.getAttribute('inert') !== '') throw new Error('boolean attribute presence semantics mismatch');
+  if (lowered.elementMarkerAttribute && main.hasAttribute(lowered.elementMarkerAttribute)) throw new Error('temporary Nomos element marker leaked into mounted DOM');
   if (main.textContent !== 'A & B 3') throw new Error('static/dynamic text materialization mismatch: ' + JSON.stringify(main.textContent));
   const circle = main.querySelector('circle');
   if (!circle) throw new Error('SVG child was not materialized');
@@ -106,18 +114,10 @@ try {
   const address = server.address();
   const url = `http://127.0.0.1:${address.port}/`;
   const result = await run(chrome, [
-    '--headless=new',
-    '--no-sandbox',
-    '--disable-gpu',
-    `--user-data-dir=${profile}`,
-    '--virtual-time-budget=1500',
-    '--dump-dom',
-    url,
+    '--headless=new', '--no-sandbox', '--disable-gpu', `--user-data-dir=${profile}`,
+    '--virtual-time-budget=1500', '--dump-dom', url,
   ]);
-
-  if (result.code !== 0) {
-    throw new Error(`Chrome exited ${result.code}:\n${result.stderr}`);
-  }
+  if (result.code !== 0) throw new Error(`Chrome exited ${result.code}:\n${result.stderr}`);
   assert.match(result.stdout, /data-nomos-result="pass"/, `browser DOM verification did not pass:\n${result.stdout}\n${result.stderr}`);
   console.log(`Browser DOM verification passed with ${await chromeVersion(chrome)} under Trusted Types enforcement.`);
 } finally {
@@ -131,18 +131,9 @@ function indent(text, spaces) {
 }
 
 async function findChrome() {
-  const candidates = [
-    process.env.CHROME_PATH,
-    '/usr/bin/google-chrome',
-    '/usr/bin/google-chrome-stable',
-    '/usr/bin/chromium',
-    '/usr/bin/chromium-browser',
-  ].filter(Boolean);
+  const candidates = [process.env.CHROME_PATH, '/usr/bin/google-chrome', '/usr/bin/google-chrome-stable', '/usr/bin/chromium', '/usr/bin/chromium-browser'].filter(Boolean);
   for (const candidate of candidates) {
-    try {
-      await access(candidate, fsConstants.X_OK);
-      return candidate;
-    } catch {}
+    try { await access(candidate, fsConstants.X_OK); return candidate; } catch {}
   }
   throw new Error('Chrome/Chromium is required for the Phase 1 browser DOM verification gate.');
 }
@@ -150,10 +141,8 @@ async function findChrome() {
 function run(command, args) {
   return new Promise((resolveRun, rejectRun) => {
     const child = spawn(command, args, { stdio: ['ignore', 'pipe', 'pipe'] });
-    let stdout = '';
-    let stderr = '';
-    child.stdout.setEncoding('utf8');
-    child.stderr.setEncoding('utf8');
+    let stdout = ''; let stderr = '';
+    child.stdout.setEncoding('utf8'); child.stderr.setEncoding('utf8');
     child.stdout.on('data', (chunk) => { stdout += chunk; });
     child.stderr.on('data', (chunk) => { stderr += chunk; });
     child.once('error', rejectRun);
