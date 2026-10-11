@@ -20,16 +20,20 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
 
+      - name: Setup pinned pnpm
+        uses: pnpm/action-setup@v6.1.0
+        with:
+          version: 12.10.1
+
       - name: Setup Node
         uses: actions/setup-node@v7
         with:
           node-version: 22.16.0
           package-manager-cache: false
 
-      - name: Activate pinned pnpm
+      - name: Verify toolchain
         run: |
-          corepack enable
-          corepack prepare pnpm@12.10.1 --activate
+          node --version
           pnpm --version
 
       - name: Install exact dependencies
