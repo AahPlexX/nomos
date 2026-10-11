@@ -16,9 +16,9 @@
     "name": "Vertical Slice",
     "status": "in-progress",
     "allowed": true,
-    "activeSlice": "compiler-runtime-and-conformance",
+    "activeSlice": "compiler-runtime-browser-dom-and-conformance",
     "parserAndSourceMaps": "in-progress",
-    "runtimeCore": "deep-state-script-and-text-binding-seam-implemented",
+    "runtimeCore": "deep-state-script-and-browser-template-dom-implemented",
     "conformanceInfrastructure": "foundation-implemented",
     "parserImplemented": [
       "top-level-section-partitioning",
@@ -31,10 +31,12 @@
       "typescript-embedded-script-wrapper-and-reactive-lowering",
       "typescript-reactive-loop-assignment-target-lowering",
       "typescript-embedded-expression-and-text-binding-ir-lowering",
+      "browser-parsed-static-template-dom-materialization",
       "stage-local-source-map-composition-contract",
       "exact-decoded-segment-composer",
       "typescript-script-emitter-source-maps-to-original-nomos",
       "template-text-binding-original-source-mapping",
+      "template-dom-mount-binding-and-expression-mapping",
       "whatwg-implied-close-ownership-li-dd-dt-button",
       "whatwg-table-foster-parenting-text-and-elements",
       "whatwg-table-implied-wrappers-and-row-cell-autoclose",
@@ -45,7 +47,10 @@
       "embedded-css-adapter-implementation",
       "remaining-reactive-destructuring-assignment-target-lowering",
       "remaining-active-formatting-reconstruction-and-low-frequency-special-insertion-mode-validation",
-      "dom-node-materialization-and-attribute-binding-mapping-production"
+      "dynamic-mixed-shorthand-spread-attribute-ir-and-lowering",
+      "structural-block-and-component-template-lowering",
+      "complete-template-semantic-type-checking",
+      "richer-token-level-template-generated-mapping-production"
     ],
     "runtimeImplemented": [
       "adr-0008-owner-and-scheduler-architecture",
@@ -65,22 +70,28 @@
       "compiler-internal-update-state-helper",
       "compiler-state-derive-and-state-raw-script-lowering",
       "compiler-reactive-for-of-and-for-in-target-lowering",
-      "internal-owner-backed-text-binding-helper"
+      "internal-owner-backed-text-binding-helper",
+      "owner-backed-browser-parsed-static-template-mount"
     ],
     "runtimeRemaining": [
       "state-snapshot-contract-and-implementation",
       "request-ownership-and-cancellation",
-      "generated-dom-node-materialization-and-attribute-binding-integration"
+      "dynamic-attribute-event-binding-integration",
+      "structural-block-and-component-dom-ownership"
     ],
     "runtimeMachineSpec": "spec/runtime-core.json",
     "verification": {
       "workflow": ".github/workflows/ci.yml",
-      "lastVerifiedRun": 38120937878,
+      "lastVerifiedRun": 38122323711,
       "node": "22.16.0",
       "pnpm": "12.10.1",
       "typescript6": "6.0.2",
+      "chrome": "154.0.8037.97",
       "loweringAndAbiTests": 16,
-      "runtimeTests": 21
+      "runtimeTests": 21,
+      "domSliceUnitTests": 3,
+      "browserDomRun": 38122323711,
+      "browserTrustedTypesEnforced": true
     },
     "conformance": {
       "contract": "docs/adr/0007-public-conformance-promotion.md",

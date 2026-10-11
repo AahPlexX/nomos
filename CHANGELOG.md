@@ -4,140 +4,77 @@ All material repository changes are recorded here. This file tracks project stat
 
 ## 2026-10-08 — Phase 0 thesis slice
 
-- Preserved the authoritative PRD byte-for-byte, established governance, grammar/reactive/learning contracts, 10 representative components, parser corpus, whitespace semantics, capability/learnability protocols, and 239-requirement traceability.
-- Phase 0 contract, traceability, and semantics TDD reached green; preserved PRD SHA is `b07950df46be388b10497063c5aabc01a20402a13dcebea0c8ec847869147690`.
+- Preserved the authoritative PRD byte-for-byte, established governance, grammar/reactive/learning contracts, representative components, parser corpus, whitespace semantics, capability/learnability protocols, and 239-requirement traceability.
+- Phase 0 contract, traceability, and semantics gates reached green; preserved PRD SHA is `b07950df46be388b10497063c5aabc01a20402a13dcebea0c8ec847869147690`.
 
 ## 2026-10-08 — Product-owner Phase 0 gate amendment
 
 - PRD Amendment 0001 removed the unavailable five-external-reviewer prerequisite while retaining contradiction-free semantics and immutable source provenance.
 - Phase 0 closed and Phase 1 opened with synchronized machine/handoff state.
 
-## 2026-10-08 — Phase 1 parser/source-map foundations
+## 2026-10-08 — Phase 1 parser/source-map and conformance foundations
 
-- Added lossless component section parsing, exact UTF-16 positions, structural diagnostics, ECMA-426 identity mapping, full Phase 0 structural parser-corpus certification, and hierarchical template ownership AST.
-- Parser development evidence reached 11/11 structural tests plus 4/4 focused hierarchy/annotator tests under Node `v22.16.0`.
-- ADR-0004 established source positions/maps; ADR-0005 established embedded-language adapter boundaries; ADR-0006 established stage-local source-map composition.
+- Added lossless component section parsing, exact UTF-16 positions, structural diagnostics, ECMA-426 mapping foundations, structural parser-corpus certification, and hierarchical template ownership AST.
+- ADR-0004/0005/0006 established source position/map, embedded-language, and stage-local source-map composition boundaries.
+- ADR-0007 established public `NCON-*` identity/environment/promotion rules and the first wired compiler conformance seed; no row was promoted without required evidence.
 
-## 2026-10-08 — Public conformance foundation
+## 2026-10-09 to 2026-10-10 — HTML ownership and source-map core
 
-- Added ADR-0007, public `conformance/` manifest/runner/validator, machine state, four harness-core tests, and the first wired compiler test `NCON-NREQ-0145`.
-- `NREQ-0145` remains `planned` until that exact public test executes green against a complete checkout/evidence set.
+- Added decoded mapping validation/composition, explicit unmapped scaffolding, and ECMA-426 version-3 encoding with `sourcesContent`.
+- Expanded WHATWG ownership validation across paragraph/list/button, table foster parenting, implied wrappers, table-section transitions, close-chain repair, nested anchors/`nobr`, and high-impact adoption-agency recovery.
+- Machine-readable ownership coverage reached 21 certified rewrite scenarios while intentionally avoiding a duplicate browser parser.
 
-## 2026-10-09 — Source-map composition core
+## 2026-10-10 — Runtime ownership, deep state, and scheduler
 
-- Added strict decoded mapping validation, exact stage-to-stage composition, explicit unmapped scaffolding preservation, and ECMA-426 version-3 encoding with `sourcesContent`.
-- TDD RED: composer exports absent. GREEN: 4/4 focused source-map tests under Node `v22.16.0`.
-- Real lowering/code-generation stages still need to emit sufficient token/segment mappings.
+- ADR-0008 resolved the owner/scheduler architecture with one fine-grained graph, one owner tree, lazy derives, and DOM-before-sync microtask scheduling.
+- Implemented scalar/deep/raw state, plain object/array/Map/Set tracking, stable cycle-safe proxies, dynamic dependencies, derive-write guards, `untrack`, sync cleanup, owner disposal, and named cycle diagnostics.
+- Proper runtime behavioral RED→GREEN evidence was recorded before the runtime foundation was marked implemented.
 
-## 2026-10-09 — Expanded HTML ownership validation
+## 2026-10-10 — TypeScript reactive script lowering and pinned CI
 
-- Added WHATWG-aligned paragraph/list/definition-list/button ownership diagnostics and table foster-parenting checks.
-- Added pure table rewrite rules plus compiler integration for implied `tbody`/`tr` wrappers and row/cell auto-close behavior.
-- Machine-readable ownership coverage reached 11 certified rewrite scenarios.
-
-## 2026-10-10 — Table section transitions and close-chain repair
-
-- Added bare `col` → `colgroup`, caption/table-section/column-group transitions, row/section and cell/row/section close chains, caption replacement, and full synthetic-stack repair.
-- Added focused section-transition, stack-repair, and public parser integration regression files.
-- Machine-readable HTML ownership coverage increased from 11 to 18 certified scenarios.
-- Focused transition + repair verification reached 9/9 under Node `v22.16.0`.
-
-## 2026-10-10 — High-impact formatting/adoption-agency ownership validation
-
-- Added pure formatting ownership rules and diagnostic integration for nested anchors, nested `nobr`, and misnested formatting end tags.
-- Cached current WHATWG rationale in `docs/phase-1/research/html-formatting-ownership.md` and expanded the parser gate.
-- Machine-readable HTML ownership coverage increased from 18 to 21 certified scenarios.
-- Focused formatting rule + diagnostic verification reached 9/9 under Node `v22.16.0`.
-
-## 2026-10-10 — Runtime ownership, scheduler, and reactive core
-
-- ADR-0008 resolves Wayfinder issue #4 with one versioned fine-grained graph, one owner tree, lazy derives, and an ordered DOM-before-sync microtask scheduler.
-- Added `packages/runtime/src/reactivity.mjs`, scalar cells, derives, dynamic dependencies, derive-write guards, `untrack()`, mount-gated DOM/sync observers, sync cleanup, deterministic owner disposal, and named cycle errors.
-- Proper behavioral RED was established against a skeletal runtime; GREEN reached 10/10 focused runtime contract tests under Node `v22.16.0`.
-- `spec/runtime-core.json` and the Phase 1 validator were added; no normative requirement row was promoted from development tests alone.
-
-## 2026-10-10 — Deep reactive state and raw-state runtime semantics
-
-### Added
-
-- `packages/runtime/src/deep-state.mjs` isolates deep proxy/collection tracking from the ADR-0008 scheduler and owner core.
-- Plain objects and arrays now track property/index/iteration dependencies; array length and truncation invalidate appropriate dependents.
-- `Map` and `Set` now provide reactive membership, size, iteration, and mutation behavior for `set`/`add`, `delete`, and `clear`.
-- Proxy identity is stable per state cell and cycle-safe.
-- Class instances, dates, DOM nodes, typed arrays, promises, errors, functions, weak collections, and frozen objects remain reference-held.
-- Runtime raw-state behavior uses the same state-cell ABI via `{ raw: true }`.
-
-### Verified
-
-- RED: before implementation, the deep-state suite passed 3/8 controls and failed 5/8 required deep behaviors.
-- GREEN: deep-state suite reached 8/8.
-- Regression gate: runtime core plus deep state reached 18/18 under Node `v22.16.0` after module separation.
-
-## 2026-10-10 — TypeScript reactive script lowering bridge
-
-### Added
-
-- Exact-pinned `@typescript/typescript6@6.0.2` as the executable TypeScript compatibility adapter.
-- `packages/compiler/src/script-lowering.mjs` with durable `EmbeddedScript` extraction, TypeScript-symbol-aware primitive recognition, transparent `state` / `state.raw` / `derive` lowering, collision-free helper names, root write/update lowering, and TypeScript-emitter source maps.
-- `.nomos` script map rebasing via coordinate-preserving prefix padding, keeping original line/UTF-16 columns and full original `sourcesContent`.
-- `packages/runtime/src/internal.mjs` as the compiler-only runtime ABI and `updateState` for correct prefix/postfix Number/BigInt semantics without adding a root API concept.
-- `NOMOS-REACTIVE-DERIVE-WRITE` for writes to derived bindings and statically visible state writes during synchronous derive evaluation.
-- Focused compiler and runtime ABI regression suites plus `check:phase1:lowering`.
-
-### Earlier verification
-
-- Compiler lowering had recorded 10/10 focused tests under Node `v22.16.0` using an API-compatibility harness.
-- Runtime ABI plus existing runtime regression reached 20/20 under Node `v22.16.0`.
-
-## 2026-10-10 — Pinned CI gate and reactive loop assignment lowering
-
-### Added
-
-- `.github/workflows/ci.yml` as the reproducible dependency-backed verification surface for Phase 1 compiler/runtime work.
-- Pinned workflow runtime: Node `22.16.0`, pnpm `12.10.1`, exact repository dependencies including `@typescript/typescript6@6.0.2`.
-- Reactive direct-root `for...of` and `for...in` assignment-target lowering through a collision-safe generated loop temporary followed by the existing internal `write(...)` ABI.
-- Static derive-write detection now includes direct reactive loop assignment targets.
-- Regression controls preserve ordinary lexical-shadowed `for (let key in ...)` behavior.
-
-### CI bootstrap correction
-
-- The first workflow attempt failed before tests because Corepack could not activate pnpm 12.10.1 from its cache.
-- The workflow was corrected to use `pnpm/action-setup@v6.1.0`.
-- Because the first test-only workflow never reached the test command, the loop-target slice is not described as an observed executable RED→GREEN cycle.
-
-### Verified
-
-- GitHub Actions run `38102821673`: exact toolchain setup green.
-- `check:phase1:lowering`: **14/14 passed**.
-- `check:phase1:runtime`: **20/20 passed**.
-- `check:phase1`: green.
-- CI evidence remains development/regression evidence and does not promote public `NCON-*` requirement rows under ADR-0007.
+- Exact-pinned `@typescript/typescript6@6.0.2` as the programmatic TypeScript adapter.
+- Added `EmbeddedScript`, symbol-aware `state` / `state.raw` / `derive` lowering, transparent reads, supported root writes/updates, collision-free helpers, and original-`.nomos` TypeScript source maps.
+- Added internal `updateState` and reactive direct-root `for...of` / `for...in` assignment-target lowering.
+- Added `.github/workflows/ci.yml` with Node `22.16.0`, pnpm `12.10.1`, and exact dependency installation; corrected initial Corepack bootstrap to `pnpm/action-setup@v6.1.0`.
+- CI run `38102821673` verified lowering/ABI **14/14**, runtime **20/20**, and the Phase 1 machine validator.
 
 ## 2026-10-11 — EmbeddedExpression and text-binding runtime seam
 
-### Added
+- Added durable `EmbeddedExpression` extraction with exact original `.nomos` spans and TypeScript 6 adapter metadata.
+- Template expressions use TypeScript parsing/symbol identity rather than a second expression parser; lexical shadowing remains ordinary TypeScript.
+- Invalid interpolation syntax translates TypeScript diagnostics back to original `.nomos` spans.
+- Added `TextBinding` IR, collision-safe `bindText`/`read` helper aliases, and first template expression mapping points.
+- Added internal owner-backed `bindText` on the existing ADR-0008 DOM observer/scheduler.
+- RED `38120782593`: pinned environment reached tests; the feature suite failed on absent `template-lowering.mjs` after 14 existing lowering/ABI tests passed.
+- GREEN `38120937878`: lowering/ABI/expression **16/16**, runtime **21/21**.
 
-- `packages/compiler/src/expression-lowering.mjs` implements durable `EmbeddedExpression` extraction with exact original `.nomos` spans and TypeScript 6 adapter metadata.
-- Template expressions are parsed with the already-pinned TypeScript 6 compiler API rather than a second Nomos expression parser.
-- Reactive script bindings supplied to template lowering are resolved by TypeScript symbol identity; lexical shadowing inside a template expression remains ordinary TypeScript.
-- Invalid interpolation syntax produces TypeScript diagnostics translated to original `.nomos` offsets/spans.
-- `packages/compiler/src/template-lowering.mjs` emits `TextBinding` IR with collision-safe helper/node identifiers and owner-backed `bindText(...)` setup statements.
-- Every successful text binding emits an ECMA-426 version-3 map point from the generated expression start to the original `.nomos` expression-body start, retaining full original `sourcesContent`.
-- `packages/runtime/src/dom-bindings.mjs` adds internal `bindText`, delegating scheduling and cleanup to the existing ADR-0008 DOM observer/owner system.
-- `packages/runtime/src/internal.mjs` exposes `bindText` only through the compiler-internal ABI; public root API budget is unchanged.
+## 2026-10-11 — Browser-parsed static DOM materialization
 
-### TDD evidence
+### Architecture
 
-- RED run `38120782593`: pinned toolchain/dependencies installed successfully; 14 existing lowering/ABI tests passed, then the new feature suite failed with `ERR_MODULE_NOT_FOUND` for absent `packages/compiler/src/template-lowering.mjs`. Runtime/machine-state steps were skipped by the failed lowering gate.
-- GREEN run `38120937878`: `check:phase1:lowering` reached **16/16**, including reactive-read/shadowing/mapping and invalid-syntax expression cases.
-- The same GREEN run: `check:phase1:runtime` reached **21/21**, including owner-backed `bindText` mount/update/disposal behavior.
-- The Phase 1 validator was green on the then-current 57-artifact machine state before this documentation/validator synchronization.
+- Added `packages/compiler/src/template-dom-lowering.mjs` and internal runtime `mountTemplate`.
+- Rejected per-source-text `createTextNode(...)` generation because raw HTML source would require Nomos to duplicate character-reference, namespace, and other browser parsing semantics.
+- The compiler now preserves supported static HTML as one skeleton, substitutes collision-free comment markers for dynamic text interpolations, and emits generated mount/binding/setup code plus source-map points in the same pass.
+- Runtime `mountTemplate` parses the compiler-owned skeleton through `HTMLTemplateElement`, clones `template.content`, replaces markers with real `Text` nodes, registers cloned roots with the existing owner, and exposes text binding slots.
+- Trusted Types enforcement uses a per-window cached `nomos` policy. Failure to create that policy states that host CSP must allow the `nomos` policy name, matching the existing PRD contract.
+- No new public root API concept or third-party DOM dependency was added.
 
-### Boundary retained
+### Correctness boundary
 
-- This slice does not yet materialize actual DOM text nodes from the template AST; `TextBinding.nodeIdentifier` is code-generation IR for the next slice.
-- Dynamic/mixed/shorthand/spread attribute lowering is not implemented yet.
-- The expression adapter does not claim complete cross-component/template semantic type checking for all script/import scopes yet.
-- Reactive destructuring assignment targets remain open.
-- `state.snapshot` remains blocked on its explicit contract/`OD-004`.
-- No public `NCON-*` requirement row is promoted by these development tests.
+- Added `NOMOS-LOWER-UNSUPPORTED-TEMPLATE-FEATURE` so the incomplete Phase 1 compiler refuses rather than miscompiles dynamic/mixed/shorthand/spread attributes, directives, raw HTML, structural blocks, component nodes, and interpolation contexts unsafe for comment-marker lowering.
+- Static custom elements may pass through browser parsing, but dynamic custom-element property behavior remains untouched while `OD-008` is open.
+- Template maps now cover explicit mount, binding-slot/setup, and expression-start points but remain intentionally non-token-complete.
+
+### TDD and browser evidence
+
+- RED run `38122206062`: Ubuntu 24.04, Node `22.16.0`, pnpm `12.10.1`, exact dependencies, and Chrome `154.0.8037.97` initialized successfully; focused unit and browser checks failed on the intended missing `compiler.lowerTemplateDom` / `runtimeInternal.mountTemplate` seam.
+- GREEN run `38122323711`: focused DOM boundary suite **3/3**; real Chrome verification passed under `require-trusted-types-for 'script'; trusted-types nomos`.
+- The browser gate verified native HTML character-reference decoding, static-attribute decoding, SVG namespace preservation, dynamic text interpolation, and owner disposal removing cloned roots.
+- Existing lowering remained **16/16**, runtime **21/21**, and the Phase 1 machine validator remained green before this documentation/spec synchronization.
+- These are development/regression results and do not automatically promote public `NCON-*` rows under ADR-0007.
+
+### Next frontier
+
+- Typed exact-span attribute-value IR for static, dynamic, mixed, shorthand, and spread attributes.
+- Safe standard-HTML dynamic attribute lowering and a published/tested assignment table without silently resolving `OD-008` custom-element pre-upgrade policy.
+- Events/native-control bindings, structural blocks, components, richer template mappings, reactive destructuring, CSS adapter, and later public conformance promotion at complete requirement boundaries.

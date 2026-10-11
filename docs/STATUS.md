@@ -5,94 +5,94 @@
 **Required delivery branch:** `origin/main`  
 **Current phase:** 1 — Vertical Slice  
 **Phase state:** IN PROGRESS  
-**Active slice:** Compiler lowering, runtime reactivity, and public conformance infrastructure  
+**Active slice:** Compiler lowering, runtime reactivity/browser DOM, and public conformance infrastructure  
 **Phase 0:** COMPLETE under PRD Amendment 0001
 
 ## Current compiler state
 
-The compiler front end has lossless section partitioning, exact UTF-16 source positions, flat and hierarchical template structures, 21 certified WHATWG ownership-rewrite scenarios, ECMA-426 mapping primitives, executable TypeScript `EmbeddedScript` and first `EmbeddedExpression` adapters, reactive script lowering, and the first template text-binding IR/runtime seam.
+The front end has lossless section partitioning, exact UTF-16 positions, flat/hierarchical template structures, 21 certified WHATWG ownership-rewrite scenarios, ECMA-426 mapping primitives, executable TypeScript `EmbeddedScript`/`EmbeddedExpression` adapters, reactive script lowering, and a real browser-executed static-template/text-interpolation DOM path.
 
-Accepted architecture remains ADR-0005/0006/0007/0008. All tracked Wayfinder architecture decisions are resolved; the eleven PRD Open Decisions remain separate and unchanged.
+Accepted architecture remains ADR-0005/0006/0007/0008. All Wayfinder architecture tickets are resolved. The eleven PRD Open Decisions remain separate and unchanged.
 
-### Reactive script lowering
+### Script and expression lowering
 
-`packages/compiler/src/script-lowering.mjs`:
+- `@typescript/typescript6@6.0.2` remains exact-pinned.
+- `script-lowering.mjs` recognizes `state` / `derive` imports by TypeScript symbol identity, preserves lexical shadowing, lowers `state`, `state.raw`, `derive`, transparent reads, supported root writes/updates, and direct reactive-root `for...of` / `for...in` targets to the internal runtime ABI.
+- `expression-lowering.mjs` creates durable `EmbeddedExpression` records with exact original `.nomos` spans and translates TypeScript syntax diagnostics back to those spans.
+- `template-lowering.mjs` creates `TextBinding` IR and reuses the same internal `read`/`bindText` ABI.
+- Reactive destructuring assignment targets and complete template-visible semantic/type checking remain unfinished.
 
-- exact-pins and consumes `@typescript/typescript6@6.0.2`;
-- recognizes imported `state` / `derive` by TypeScript symbol identity, including aliases and lexical shadowing;
-- creates durable `EmbeddedScript` metadata with exact original `.nomos` body coordinates;
-- lowers `state`, `state.raw`, `derive`, transparent reads, root assignment/compound assignment, prefix/postfix updates, and direct reactive-root `for...of` / `for...in` assignment targets to the internal runtime ABI;
-- routes nested object/array/Map/Set property mutation through the existing deep-state proxy rather than a second mutation system;
-- uses collision-free generated helper and loop-temporary names;
-- emits `NOMOS-REACTIVE-DERIVE-WRITE` for writes to derives and statically visible state writes during synchronous derive evaluation, including loop assignment targets;
-- emits TypeScript version-3 source maps rebased to the original `.nomos` source.
+### Browser-parsed template DOM
 
-Reactive destructuring assignment targets remain unfinished.
+`packages/compiler/src/template-dom-lowering.mjs` and `packages/runtime/src/dom-bindings.mjs` now implement the first executable DOM slice:
 
-### EmbeddedExpression and text bindings
+- supported static template source is emitted as one HTML skeleton;
+- interpolation spans become collision-free comment markers;
+- runtime `mountTemplate` parses the skeleton through an `HTMLTemplateElement`, clones its content, replaces markers with real `Text` nodes, and returns those nodes as binding slots;
+- existing `TextBinding` expressions attach through `bindText` and the ADR-0008 DOM-observer phase;
+- cloned roots are registered with the current owner and removed on disposal;
+- Trusted Types enforcement is supported through a per-window cached `nomos` policy; host CSP must allow that policy name, matching the existing PRD requirement;
+- source-map points for template mount, binding slots/setup, and expression starts are emitted during the same lowering pass.
 
-`packages/compiler/src/expression-lowering.mjs` and `template-lowering.mjs` now implement the first template-expression slice without adding a second expression parser:
+The compiler deliberately rejects dynamic/mixed/shorthand/spread attributes, directives, raw HTML, structural blocks, component nodes, and interpolation contexts unsafe for comment markers. Those failures use `NOMOS-LOWER-UNSUPPORTED-TEMPLATE-FEATURE` rather than silently generating incorrect DOM.
 
-- every interpolation owns a durable `EmbeddedExpression` with exact outer span, body span, raw TypeScript expression text, virtual identity, and TypeScript adapter metadata;
-- TypeScript parses the expression and resolves synthetic reactive declarations by symbol identity;
-- reactive state/derive references lower to the existing internal `read(...)` ABI while lexical shadowing inside the expression remains ordinary TypeScript;
-- invalid interpolation syntax returns TypeScript diagnostics translated back to original `.nomos` offsets/spans;
-- each successful interpolation produces a `TextBinding` IR record with collision-safe node/helper identifiers and an owner-backed `bindText(...)` setup statement;
-- each text binding emits an ECMA-426 version-3 map point from the generated expression start to the original `.nomos` expression-body start with full original `sourcesContent`.
-
-This is deliberately **not** full template code generation yet. The compiler does not yet create/materialize actual DOM text nodes, lower dynamic attributes, or provide complete semantic/type checking for every template-visible script/import binding. The next slice must materialize text nodes and attach this proven binding IR to them without duplicating expression or mapping work.
+This is **not** complete template lowering. Attribute IR/lowering, events/bindings, structural blocks, components, raw HTML, full token-level mappings, SSG, and hydration remain future slices.
 
 ## Current runtime state
 
-ADR-0008's owner graph and two-phase microtask scheduler remain intact. Runtime support includes scalar state, deep property/index/membership/size/iteration tracking for plain objects/arrays/Map/Set, `state.raw`, lazy derives, sync cleanup/ownership, cycle diagnostics, and compiler-only helpers.
+ADR-0008's single owner graph and DOM-before-sync microtask scheduler remain unchanged. Runtime support includes scalar/deep state, `state.raw`, lazy derives, dynamic dependencies, sync cleanup, cycle diagnostics, `bindText`, and the new internal `mountTemplate` helper.
 
-`packages/runtime/src/dom-bindings.mjs` now provides internal `bindText(node, compute, options)`. It delegates scheduling to the existing DOM-observer phase, updates `textContent`, and stops updating after owner disposal. It introduces no second scheduler or public root API concept.
+`mountTemplate` adds no public root API concept. It uses browser HTML parsing for static source instead of duplicating entity/namespace/tree-construction behavior in Nomos.
 
-`state.snapshot` remains intentionally unimplemented while its required behavior contract and `OD-004` remain unresolved. Query/request cancellation ownership and generated DOM node/attribute integration remain open.
+`state.snapshot` remains intentionally unimplemented while its behavior contract and `OD-004` remain unresolved. Query/request cancellation ownership is also still open.
 
 ## Verification state
 
-GitHub Actions is the pinned dependency-backed Phase 1 verification surface at `.github/workflows/ci.yml`.
+GitHub Actions is the pinned Phase 1 verification surface at `.github/workflows/ci.yml`.
 
-### Text-binding TDD evidence
+### Browser DOM TDD evidence
 
-RED run `38120782593` used the exact pinned toolchain and reached the lowering command successfully. The 14 pre-existing lowering/ABI tests passed, while the new feature suite failed with `ERR_MODULE_NOT_FOUND` for the not-yet-created `template-lowering.mjs`; runtime and machine-state steps were therefore skipped.
+RED run `38122206062`:
 
-GREEN run `38120937878` used:
+- Node `22.16.0`, pnpm `12.10.1`, exact dependencies, and Chrome all initialized successfully;
+- Chrome reported `154.0.8037.97`;
+- the focused unit and browser gates failed on the intended missing behavior: `compiler.lowerTemplateDom` and `runtimeInternal.mountTemplate` did not exist.
 
-- Node `22.16.0`;
-- pnpm `12.10.1`;
-- `@typescript/typescript6@6.0.2`;
-- lowering + compiler/runtime ABI + template-expression tests: **16 passed / 0 failed**;
-- runtime wildcard suite including `bindText`: **21 passed / 0 failed**;
-- Phase 1 machine-state validator: green on the pre-synchronization 57-artifact state.
+GREEN run `38122323711`:
 
-A final post-synchronization CI run is required whenever the machine validator/docs change. Development/CI regression evidence does **not** promote normative `NCON-*` rows; ADR-0007 still governs public evidence separately.
+- focused DOM lowering boundary tests: **3/3**;
+- real Chrome execution under `require-trusted-types-for 'script'; trusted-types nomos`: green;
+- verified native character-reference decoding, SVG namespace preservation, dynamic text interpolation, and owned-root disposal;
+- existing lowering/ABI/expression suite: **16/16**;
+- runtime wildcard suite: **21/21**;
+- Phase 1 machine-state validator: green on the pre-document-sync state.
+
+Development/CI evidence does **not** automatically promote normative `NCON-*` rows; ADR-0007 governs public conformance separately.
 
 ## Public conformance state
 
-The ADR-0007 public conformance foundation remains implemented. `NCON-NREQ-0145` is wired but `NREQ-0145` remains **planned**, not passing.
+The ADR-0007 foundation remains implemented. `NCON-NREQ-0145` is wired, but `NREQ-0145` remains **planned**, not passing.
 
 ## Wayfinder / Handoff
 
 Map: https://github.com/AahPlexX/nomos/issues/1
 
 Resolved:
-- issue 2 — embedded TypeScript/CSS boundary → ADR-0005.
+- issue 2 — embedded language boundary → ADR-0005.
 - issue 3 — generated source-map composition → ADR-0006.
-- issue 4 — runtime ownership/scheduler architecture → ADR-0008.
-- issue 5 — public conformance promotion workflow → ADR-0007.
+- issue 4 — runtime ownership/scheduler → ADR-0008.
+- issue 5 — public conformance promotion → ADR-0007.
 
-No Wayfinder architecture decision ticket remains open. The eleven PRD Open Decisions remain separate and unchanged.
+No Wayfinder architecture ticket remains open. All eleven PRD Open Decisions remain open.
 
-Portable Handoff: `/tmp/nomos-phase1-handoff.md`. Canonical facts remain in this repository, machine specs, ADRs, CI, and the Wayfinder map.
+Portable Handoff: `/tmp/nomos-phase1-handoff.md`. Canonical facts are the repository machine specs, ADRs, CI, and this status record.
 
 ## Immediate next action
 
-1. Materialize static text and interpolation placeholder nodes from the hierarchical template AST and connect the existing `TextBinding` IR to those nodes under one owner.
-2. Produce code-generation mappings during that same materialization pass and compose them with the existing binding/source-map primitives rather than adding a later remap pass.
-3. Add dynamic/mixed attribute expression lowering after text-node materialization is proven.
-4. Add reactive destructuring assignment-target lowering when required by the reactive script conformance surface.
-5. Implement the Lightning CSS adapter when the scoped-CSS slice consumes it, after a fresh exact version/license/security check.
-6. Extend public runtime/compiler conformance only at complete requirement boundaries under ADR-0007.
-7. Keep `state.snapshot` blocked until its explicit contract/OD-004 is resolved rather than guessing semantics.
+1. Promote template attributes from name-only metadata into typed attribute-value IR with exact spans for static, dynamic, mixed, shorthand, and spread forms.
+2. Lower the first safe standard-HTML dynamic attribute subset onto cloned elements using deterministic element markers; do **not** resolve custom-element pre-upgrade property policy `OD-008` implicitly.
+3. Expand template generated mappings in the same attribute-generation pass.
+4. Add events/native-control bindings after the attribute/property-assignment contract is explicit.
+5. Continue structural blocks/components, reactive destructuring, and the Lightning CSS adapter as their prerequisite seams become ready.
+6. Extend public conformance only at complete requirement boundaries under ADR-0007.
+7. Keep `state.snapshot` blocked until its explicit contract/`OD-004` is resolved.

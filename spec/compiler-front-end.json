@@ -18,7 +18,8 @@
     "NOMOS-PARSE-HTML-OWNERSHIP",
     "NOMOS-PARSE-UNTERMINATED-BLOCK",
     "NOMOS-PARSE-UNKNOWN-DIRECTIVE",
-    "NOMOS-REACTIVE-DERIVE-WRITE"
+    "NOMOS-REACTIVE-DERIVE-WRITE",
+    "NOMOS-LOWER-UNSUPPORTED-TEMPLATE-FEATURE"
   ],
   "htmlOwnership": {
     "status": "partial-whatwg-tree-construction-validation",
@@ -63,12 +64,13 @@
     "compositionWayfinderDecision": "https://github.com/AahPlexX/nomos/issues/3",
     "stageLocalMappings": "core-composer-plus-typescript-script-emitter-implemented",
     "compositionResolution": "exact-mapping-points-only",
-    "generatedScaffolding": "unmapped",
+    "generatedScaffolding": "unmapped-unless-stage-emits-an-explicit-point",
     "finalMapTarget": "original-.nomos-source",
     "finalMapValidation": "implemented-core",
     "scriptLoweringMappings": "implemented-with-original-nomos-sourcesContent",
     "templateTextBindingMappings": "implemented-expression-start-to-original-nomos",
-    "tokenLevelGeneratedMappings": "partial-text-interpolation-expression-starts-only"
+    "templateDomMappings": "implemented-mount-binding-and-expression-points-to-original-nomos",
+    "tokenLevelGeneratedMappings": "partial-template-dom-points-not-token-complete"
   },
   "phase0ParserCorpus": {
     "allValidFixtures": "certified-structural",
@@ -105,8 +107,40 @@
     },
     "dependencyInstallation": "typescript6-pinned-and-ci-verified-lightningcss-deferred"
   },
+  "templateDom": {
+    "status": "browser-parsed-static-skeleton-and-text-interpolation-materialization-implemented",
+    "compiler": "packages/compiler/src/template-dom-lowering.mjs",
+    "runtime": "packages/runtime/src/dom-bindings.mjs",
+    "staticHtmlParsing": "HTMLTemplateElement-browser-parser",
+    "dynamicTextSlots": "collision-free-comment-markers-replaced-with-Text-nodes",
+    "ownedRootCleanup": true,
+    "trustedTypes": {
+      "supported": true,
+      "policyName": "nomos",
+      "hostMustAllowPolicyName": true
+    },
+    "browserVerification": {
+      "run": 38122323711,
+      "chrome": "154.0.8037.97",
+      "trustedTypesEnforced": true,
+      "verifiedBehaviors": [
+        "html-character-reference-decoding",
+        "svg-namespace-preservation",
+        "dynamic-text-interpolation",
+        "owned-root-disposal"
+      ]
+    },
+    "explicitlyRejectedUntilDedicatedLowering": [
+      "dynamic-mixed-shorthand-spread-attributes",
+      "directives",
+      "raw-html",
+      "if-each-await-blocks",
+      "component-nodes",
+      "interpolation-in-rawtext-rcdata-template-contexts"
+    ]
+  },
   "reactiveLowering": {
-    "status": "script-core-and-template-text-binding-ir-implemented",
+    "status": "script-core-and-browser-parsed-template-text-dom-implemented",
     "bindingRecognition": "typescript-symbol-resolution",
     "supportedDeclarations": ["state", "state.raw", "derive"],
     "supportedRootWrites": [
@@ -123,26 +157,31 @@
     "internalRuntimeFile": "packages/runtime/src/internal.mjs",
     "staticDeriveWriteDiagnostic": "NOMOS-REACTIVE-DERIVE-WRITE",
     "templateTextBindings": {
-      "status": "binding-ir-and-runtime-seam-implemented",
+      "status": "browser-materialized-and-runtime-bound",
       "expressionEngine": "typescript6-symbol-aware",
       "runtimeHelper": "bindText",
       "schedulerPhase": "dom",
-      "nodeMaterialization": "planned",
-      "sourceMapping": "per-binding-expression-start-to-original-nomos"
+      "nodeMaterialization": "implemented-via-browser-parsed-static-skeleton-markers",
+      "sourceMapping": "combined-template-mount-binding-and-expression-points-to-original-nomos"
     },
     "verification": {
       "workflow": ".github/workflows/ci.yml",
       "node": "22.16.0",
       "pnpm": "12.10.1",
       "typescript": "6.0.2",
+      "chrome": "154.0.8037.97",
       "loweringAndAbiTests": 16,
       "runtimeTests": 21,
-      "lastVerifiedRun": 38120937878
+      "domSliceUnitTests": 3,
+      "browserDomRun": 38122323711,
+      "lastVerifiedRun": 38122323711
     },
     "remaining": [
       "destructuring-assignment-target-edge-cases",
-      "generated-dom-node-materialization",
-      "dynamic-attribute-lowering"
+      "dynamic-mixed-shorthand-spread-attribute-lowering",
+      "structural-block-lowering",
+      "component-lowering",
+      "complete-template-semantic-type-checking"
     ]
   },
   "conformance": {

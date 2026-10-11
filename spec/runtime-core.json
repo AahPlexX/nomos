@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "status": "phase-1-runtime-deep-state-script-and-text-binding-seam-implemented",
+  "status": "phase-1-runtime-deep-state-script-and-browser-template-dom-implemented",
   "decision": "docs/adr/0008-runtime-ownership-and-scheduler.md",
   "research": "docs/phase-1/research/runtime-ownership-and-scheduling.md",
   "wayfinderDecision": "https://github.com/AahPlexX/nomos/issues/4",
@@ -29,17 +29,30 @@
   "compilerAbi": {
     "moduleSpecifier": "nomos/internal/runtime",
     "implementationFile": "packages/runtime/src/internal.mjs",
-    "exports": ["bindText", "createStateCell", "createDerived", "read", "write", "updateState"],
+    "exports": ["bindText", "mountTemplate", "createStateCell", "createDerived", "read", "write", "updateState"],
     "updateStatePrefixPostfixSemantics": "implemented-number-and-bigint",
     "publicRootBudgetImpact": "none-internal-only"
   },
   "domBindings": {
-    "status": "text-helper-implemented",
+    "status": "static-template-mount-and-text-binding-implemented",
     "implementationFile": "packages/runtime/src/dom-bindings.mjs",
     "textHelper": "bindText",
+    "templateHelper": "mountTemplate",
+    "staticParser": "HTMLTemplateElement",
+    "dynamicTextMarkers": "comment-markers-replaced-with-Text-nodes",
     "scheduling": "dom-observer",
-    "ownership": "owner-disposal-stops-updates",
-    "nodeMaterialization": "compiler-planned"
+    "ownership": "cloned-root-nodes-owned-and-removed-on-disposal",
+    "nodeMaterialization": "implemented-static-html-and-text-interpolation-slice",
+    "trustedTypes": {
+      "policyName": "nomos",
+      "policyCachedPerWindow": true,
+      "hostCspMustAllowPolicyName": true
+    },
+    "browserVerification": {
+      "run": 38122323711,
+      "chrome": "154.0.8037.97",
+      "trustedTypesEnforced": true
+    }
   },
   "scheduler": {
     "primitive": "queueMicrotask",
@@ -75,12 +88,14 @@
     "named-cycle-diagnostics",
     "internal-prefix-postfix-update-helper",
     "typescript-symbol-aware-state-derive-state-raw-lowering",
-    "owner-backed-text-binding-helper"
+    "owner-backed-text-binding-helper",
+    "owner-backed-browser-parsed-static-template-mount"
   ],
   "remaining": [
     "state-snapshot-contract-and-implementation",
     "request-ownership-and-cancellation",
-    "generated-dom-node-materialization-and-attribute-binding-integration"
+    "dynamic-attribute-event-binding-integration",
+    "structural-block-and-component-dom-ownership"
   ],
   "openDecisionImpact": "none"
 }
