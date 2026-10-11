@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "status": "phase-1-runtime-deep-state-script-and-browser-template-dom-implemented",
+  "status": "phase-1-runtime-browser-template-dom-and-standard-html-attributes-implemented",
   "decision": "docs/adr/0008-runtime-ownership-and-scheduler.md",
   "research": "docs/phase-1/research/runtime-ownership-and-scheduling.md",
   "wayfinderDecision": "https://github.com/AahPlexX/nomos/issues/4",
@@ -29,30 +29,47 @@
   "compilerAbi": {
     "moduleSpecifier": "nomos/internal/runtime",
     "implementationFile": "packages/runtime/src/internal.mjs",
-    "exports": ["bindText", "mountTemplate", "createStateCell", "createDerived", "read", "write", "updateState"],
+    "exports": ["bindAttribute", "bindText", "mountTemplate", "createStateCell", "createDerived", "read", "write", "updateState"],
     "updateStatePrefixPostfixSemantics": "implemented-number-and-bigint",
     "publicRootBudgetImpact": "none-internal-only"
   },
   "domBindings": {
-    "status": "static-template-mount-and-text-binding-implemented",
+    "status": "static-template-text-and-standard-html-attribute-binding-implemented",
     "implementationFile": "packages/runtime/src/dom-bindings.mjs",
     "textHelper": "bindText",
+    "attributeHelper": "bindAttribute",
     "templateHelper": "mountTemplate",
     "staticParser": "HTMLTemplateElement",
     "dynamicTextMarkers": "comment-markers-replaced-with-Text-nodes",
+    "dynamicElementMarkers": "temporary-collision-free-attributes-removed-after-clone-discovery",
+    "attributeForms": {
+      "requiredDynamicForms": 4,
+      "implemented": ["dynamic", "mixed", "shorthand"],
+      "remaining": ["spread"],
+      "implementedCount": 3
+    },
+    "ordinaryAttributeSemantics": "nullish-removes-otherwise-String-and-setAttribute",
+    "booleanAttributeSemantics": "truthy-presence-empty-string-falsy-absence",
     "scheduling": "dom-observer",
-    "ownership": "cloned-root-nodes-owned-and-removed-on-disposal",
-    "nodeMaterialization": "implemented-static-html-and-text-interpolation-slice",
+    "ownership": "cloned-root-nodes-owned-and-binding-observers-stop-on-disposal",
+    "nodeMaterialization": "implemented-static-html-text-and-standard-html-attribute-slice",
     "trustedTypes": {
       "policyName": "nomos",
       "policyCachedPerWindow": true,
       "hostCspMustAllowPolicyName": true
     },
     "browserVerification": {
-      "run": 38122323711,
+      "run": 38168894701,
       "chrome": "154.0.8037.97",
       "trustedTypesEnforced": true
-    }
+    },
+    "guarded": [
+      "spread-attribute-merge-precedence",
+      "dynamic-custom-element-assignment-od-008",
+      "dynamic-url-attribute-protocol-validation",
+      "inline-event-attributes",
+      "native-control-property-backed-bindings"
+    ]
   },
   "scheduler": {
     "primitive": "queueMicrotask",
@@ -89,12 +106,15 @@
     "internal-prefix-postfix-update-helper",
     "typescript-symbol-aware-state-derive-state-raw-lowering",
     "owner-backed-text-binding-helper",
-    "owner-backed-browser-parsed-static-template-mount"
+    "owner-backed-browser-parsed-static-template-mount",
+    "owner-backed-standard-html-dynamic-mixed-shorthand-attribute-binding"
   ],
   "remaining": [
     "state-snapshot-contract-and-implementation",
     "request-ownership-and-cancellation",
-    "dynamic-attribute-event-binding-integration",
+    "spread-attribute-merge-precedence",
+    "dynamic-url-attribute-safety",
+    "event-and-native-control-binding-integration",
     "structural-block-and-component-dom-ownership"
   ],
   "openDecisionImpact": "none"
