@@ -28,6 +28,7 @@ assert.equal(lowered.attributeBindings.length, 3);
 const runtimeImportClause = lowered.runtimeImports
   .map(({ imported, local }) => `${imported} as ${local}`)
   .join(', ');
+const elementMarkerAttributeLiteral = JSON.stringify(lowered.elementMarkerAttribute);
 
 const browserModule = `
 import { ${runtimeImportClause} } from '/packages/runtime/src/internal.mjs';
@@ -37,6 +38,7 @@ const target = document.querySelector('#app');
 const owner = createOwner(null, { name: 'browser-root' });
 const count = 4;
 const inert = true;
+const elementMarkerAttribute = ${elementMarkerAttributeLiteral};
 
 try {
   runWithOwner(owner, () => {
@@ -51,7 +53,7 @@ ${indent(lowered.code, 4)}
   if (main.getAttribute('data-count') !== '4') throw new Error('dynamic ordinary attribute mismatch: ' + main.getAttribute('data-count'));
   if (main.getAttribute('class') !== 'count 4') throw new Error('mixed attribute mismatch: ' + main.getAttribute('class'));
   if (!main.hasAttribute('inert') || main.getAttribute('inert') !== '') throw new Error('boolean attribute presence semantics mismatch');
-  if (lowered.elementMarkerAttribute && main.hasAttribute(lowered.elementMarkerAttribute)) throw new Error('temporary Nomos element marker leaked into mounted DOM');
+  if (elementMarkerAttribute && main.hasAttribute(elementMarkerAttribute)) throw new Error('temporary Nomos element marker leaked into mounted DOM');
   if (main.textContent !== 'A & B 3') throw new Error('static/dynamic text materialization mismatch: ' + JSON.stringify(main.textContent));
   const circle = main.querySelector('circle');
   if (!circle) throw new Error('SVG child was not materialized');
