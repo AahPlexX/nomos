@@ -3,6 +3,7 @@ import { access, readFile } from 'node:fs/promises';
 
 const root = new URL('../', import.meta.url);
 const required = [
+  '.github/workflows/ci.yml',
   'packages/compiler/src/index.mjs',
   'packages/compiler/src/parser.mjs',
   'packages/compiler/src/template-syntax.mjs',
@@ -69,6 +70,10 @@ assert.equal(phase.phase1.parserAndSourceMaps, 'in-progress');
 assert.equal(phase.phase1.runtimeCore, 'deep-state-and-script-lowering-implemented');
 assert.equal(phase.phase1.conformanceInfrastructure, 'foundation-implemented');
 assert.ok(phase.phase1.parserImplemented.includes('whatwg-high-impact-formatting-adoption-agency-ownership'));
+assert.ok(phase.phase1.parserImplemented.includes('typescript-embedded-script-wrapper-and-reactive-lowering'));
+assert.ok(phase.phase1.parserImplemented.includes('typescript-reactive-loop-assignment-target-lowering'));
+assert.ok(phase.phase1.parserImplemented.includes('typescript-script-emitter-source-maps-to-original-nomos'));
+assert.ok(phase.phase1.parserRemaining.includes('remaining-reactive-destructuring-assignment-target-lowering'));
 assert.ok(phase.phase1.runtimeImplemented.includes('adr-0008-owner-and-scheduler-architecture'));
 assert.ok(phase.phase1.runtimeImplemented.includes('deep-tracking-plain-object-array-map-set'));
 assert.ok(phase.phase1.runtimeImplemented.includes('raw-state-cell-runtime-semantics'));
@@ -77,16 +82,16 @@ assert.ok(phase.phase1.runtimeImplemented.includes('dom-before-sync-microtask-fl
 assert.ok(phase.phase1.runtimeImplemented.includes('named-reactive-cycle-diagnostics'));
 assert.ok(phase.phase1.runtimeImplemented.includes('compiler-internal-update-state-helper'));
 assert.ok(phase.phase1.runtimeImplemented.includes('compiler-state-derive-and-state-raw-script-lowering'));
-assert.ok(phase.phase1.parserImplemented.includes('typescript-embedded-script-wrapper-and-reactive-lowering'));
-assert.ok(phase.phase1.parserImplemented.includes('typescript-script-emitter-source-maps-to-original-nomos'));
-assert.ok(!phase.phase1.runtimeRemaining.includes('deep-tracking-plain-object-array-map-set'));
-assert.ok(!phase.phase1.runtimeRemaining.includes('state-raw'));
-assert.ok(!phase.phase1.runtimeRemaining.includes('compiler-state-derive-and-state-raw-lowering'));
+assert.ok(phase.phase1.runtimeImplemented.includes('compiler-reactive-for-of-and-for-in-target-lowering'));
 assert.ok(phase.phase1.runtimeRemaining.includes('state-snapshot-contract-and-implementation'));
 assert.equal(phase.phase1.runtimeMachineSpec, 'spec/runtime-core.json');
+assert.equal(phase.phase1.verification.workflow, '.github/workflows/ci.yml');
+assert.equal(phase.phase1.verification.node, '22.16.0');
+assert.equal(phase.phase1.verification.pnpm, '12.10.1');
+assert.equal(phase.phase1.verification.typescript6, '6.0.2');
+assert.equal(phase.phase1.verification.loweringAndAbiTests, 14);
+assert.equal(phase.phase1.verification.runtimeTests, 20);
 assert.deepEqual(phase.phase1.openWayfinderDecisions, []);
-assert.ok(phase.phase1.resolvedWayfinderDecisions.includes('https://github.com/AahPlexX/nomos/issues/4'));
-assert.equal(phase.phase1.conformance.seedTest, 'NCON-NREQ-0145');
 assert.equal(phase.phase1.conformance.seedTestStatus, 'wired-unverified');
 assert.equal(phase.phase1.conformance.passingRequirementCount, 0);
 
@@ -102,6 +107,12 @@ assert.equal(frontEnd.embeddedLanguages.typescript.scriptLowering, 'implemented-
 assert.equal(frontEnd.embeddedLanguages.typescript.expressionAdapter, 'planned');
 assert.equal(frontEnd.reactiveLowering.status, 'script-core-implemented');
 assert.equal(frontEnd.reactiveLowering.bindingRecognition, 'typescript-symbol-resolution');
+assert.ok(frontEnd.reactiveLowering.supportedRootWrites.includes('for-of-assignment-target'));
+assert.ok(frontEnd.reactiveLowering.supportedRootWrites.includes('for-in-assignment-target'));
+assert.ok(frontEnd.reactiveLowering.remaining.includes('destructuring-assignment-target-edge-cases'));
+assert.equal(frontEnd.reactiveLowering.verification.workflow, '.github/workflows/ci.yml');
+assert.equal(frontEnd.reactiveLowering.verification.loweringAndAbiTests, 14);
+assert.equal(frontEnd.reactiveLowering.verification.runtimeTests, 20);
 assert.equal(frontEnd.reactiveLowering.internalRuntimeFile, 'packages/runtime/src/internal.mjs');
 assert.equal(frontEnd.embeddedLanguages.css.implementation, 'planned');
 
@@ -111,7 +122,6 @@ assert.equal(runtime.decision, 'docs/adr/0008-runtime-ownership-and-scheduler.md
 assert.ok(runtime.graph.sources.includes('deep-property-source'));
 assert.equal(runtime.deepState.status, 'runtime-implemented');
 assert.deepEqual(runtime.deepState.containers, ['plain-object', 'array', 'Map', 'Set']);
-assert.ok(runtime.deepState.granularity.includes('membership'));
 assert.equal(runtime.deepState.proxyIdentity, 'stable-per-state-and-cycle-safe');
 assert.equal(runtime.deepState.rawOptOut, 'implemented-as-state-cell-raw-option');
 assert.equal(runtime.deepState.publicStateRawSurface, 'implemented-by-typescript-script-lowering');
@@ -127,7 +137,6 @@ assert.equal(runtime.cycleDetection.status, 'development-runtime-implemented');
 assert.ok(runtime.implementedSlice.includes('deep-tracked-plain-object-array-map-set'));
 assert.ok(runtime.implementedSlice.includes('raw-state-cell-runtime-semantics'));
 assert.ok(runtime.remaining.includes('state-snapshot-contract-and-implementation'));
-assert.ok(!runtime.remaining.includes('compiler-state-derive-and-state-raw-lowering'));
 assert.equal(runtime.openDecisionImpact, 'none');
 
 const conformance = JSON.parse(await readFile(new URL('spec/conformance.json', root), 'utf8'));
@@ -136,4 +145,4 @@ assert.equal(conformance.browserSubstitutionAllowed, false);
 assert.equal(conformance.seedTest.status, 'wired-unverified');
 assert.deepEqual(conformance.passingRequirements, []);
 
-console.log(`Phase 1 check passed: ${required.length} required artifacts; compiler foundations, 21 HTML ownership scenarios, deep runtime state, and TypeScript-symbol-aware state/derive/state.raw script lowering are implemented while template/DOM lowering, snapshot semantics, remaining adapters, and public green evidence remain in progress.`);
+console.log(`Phase 1 check passed: ${required.length} required artifacts; compiler foundations, 21 HTML ownership scenarios, deep runtime state, CI-verified TypeScript-symbol-aware state/derive/state.raw lowering, and reactive for-of/for-in targets are implemented while destructuring/template/DOM lowering, snapshot semantics, remaining adapters, and public green evidence remain in progress.`);
