@@ -18,7 +18,7 @@
     "allowed": true,
     "activeSlice": "compiler-runtime-and-conformance",
     "parserAndSourceMaps": "in-progress",
-    "runtimeCore": "deep-state-implemented",
+    "runtimeCore": "deep-state-and-script-lowering-implemented",
     "conformanceInfrastructure": "foundation-implemented",
     "parserImplemented": [
       "top-level-section-partitioning",
@@ -28,8 +28,10 @@
       "hierarchical-template-ast",
       "phase0-structural-parser-corpus-certification",
       "embedded-language-adapter-boundary",
+      "typescript-embedded-script-wrapper-and-reactive-lowering",
       "stage-local-source-map-composition-contract",
       "exact-decoded-segment-composer",
+      "typescript-script-emitter-source-maps-to-original-nomos",
       "whatwg-implied-close-ownership-li-dd-dt-button",
       "whatwg-table-foster-parenting-text-and-elements",
       "whatwg-table-implied-wrappers-and-row-cell-autoclose",
@@ -37,9 +39,9 @@
       "whatwg-high-impact-formatting-adoption-agency-ownership"
     ],
     "parserRemaining": [
-      "embedded-typescript-and-css-adapter-implementation",
+      "embedded-typescript-expression-and-css-adapter-implementation",
       "remaining-active-formatting-reconstruction-and-low-frequency-special-insertion-mode-validation",
-      "token-level-generated-mapping-production"
+      "template-and-dom-generated-mapping-production"
     ],
     "runtimeImplemented": [
       "adr-0008-owner-and-scheduler-architecture",
@@ -55,11 +57,12 @@
       "sync-rerun-and-disposal-cleanup",
       "untrack",
       "post-await-tracking-cutoff",
-      "named-reactive-cycle-diagnostics"
+      "named-reactive-cycle-diagnostics",
+      "compiler-internal-update-state-helper",
+      "compiler-state-derive-and-state-raw-script-lowering"
     ],
     "runtimeRemaining": [
       "state-snapshot-contract-and-implementation",
-      "compiler-state-derive-and-state-raw-lowering",
       "request-ownership-and-cancellation",
       "generated-dom-binding-integration"
     ],
