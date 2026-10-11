@@ -183,6 +183,14 @@ export function write(state, nextValue) {
   return state.value;
 }
 
+export function updateState(state, direction, postfix = false) {
+  if (direction !== 1 && direction !== -1) throw new TypeError('updateState direction must be 1 or -1');
+  let next = read(state);
+  const previous = direction === 1 ? next++ : next--;
+  write(state, next);
+  return postfix ? previous : next;
+}
+
 function assertWritable() {
   if (activeObserver?.kind === 'derive') {
     throw new Error(`Reactive state write is not allowed while derive ${activeObserver.name} is evaluating.`);
