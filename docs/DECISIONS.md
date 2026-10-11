@@ -1,6 +1,6 @@
 # Decision register
 
-**Last updated:** 2026-10-08
+**Last updated:** 2026-10-10
 
 This register records product amendments and architecture decision status. The PRD's Open Decisions remain open unless an approved ADR/RFC explicitly changes the effective PRD and `spec/open-decisions.json` together.
 
@@ -21,9 +21,10 @@ This register records product amendments and architecture decision status. The P
 | ADR-0005 | Keep embedded TypeScript/CSS in Nomos-owned wrappers and treat TypeScript/Lightning CSS structures as opaque adapter internals | Accepted for Phase 1 compiler front end | `docs/adr/0005-embedded-language-adapter-boundary.md` |
 | ADR-0006 | Emit stage-local mappings, explicitly leave compiler scaffolding unmapped, and compose/validate a final ECMA-426 map back to the original `.nomos` source | Accepted for Phase 1 compiler front end | `docs/adr/0006-stage-local-source-map-composition.md` |
 | ADR-0007 | Bind each reserved `NCON-*` identity to a public test/environment manifest and require all declared environments green before explicit ledger promotion | Accepted for Phase 1 conformance infrastructure | `docs/adr/0007-public-conformance-promotion.md` |
+| ADR-0008 | Use one versioned fine-grained graph, one owner tree, lazy derives, and a DOM-before-sync microtask scheduler for the Phase 1 runtime core | Accepted for Phase 1 runtime | `docs/adr/0008-runtime-ownership-and-scheduler.md` |
 
 ## PRD Open Decisions
 
 The machine-readable authority for the eleven still-open items is `spec/open-decisions.json`. Every entry remains `open` with `resolution: null`.
 
-PRD-A0001 and ADR-0001 through ADR-0007 close no Open Decision. ADR-0005 does not settle `OD-009` (TypeScript 7.1+ API adoption timing), ADR-0006 does not settle `OD-003` (exact HMR compatibility signature), and ADR-0007 only defines conformance evidence/promotion mechanics. `state.snapshot` remains provisional under `OD-004`, and the product/extension name remains provisional under `OD-011`.
+PRD-A0001 and ADR-0001 through ADR-0008 close no Open Decision. ADR-0005 does not settle `OD-009`, ADR-0006 does not settle `OD-003`, ADR-0007 only defines conformance evidence/promotion mechanics, and ADR-0008 implements already-ratified runtime scheduling/ownership semantics without deciding `OD-004`. `state.snapshot` remains provisional under `OD-004`, and the product/extension name remains provisional under `OD-011`.
