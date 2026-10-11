@@ -80,3 +80,30 @@ All material repository changes are recorded here. This file tracks project stat
 - Compiler lowering for source-level `state`, `derive`, and `state.raw`, plus generated DOM observer bindings.
 - `state.snapshot` behavior specification and implementation; `OD-004` remains open and is not silently resolved.
 - Request ownership/cancellation, embedded TypeScript/CSS adapters, real code-generation source mappings, remaining narrow HTML ownership cases, and public conformance evidence.
+
+## 2026-10-10 — TypeScript reactive script lowering bridge
+
+### Added
+
+- Exact-pinned `@typescript/typescript6@6.0.2` as the executable TypeScript compatibility adapter.
+- `packages/compiler/src/script-lowering.mjs` with durable `EmbeddedScript` extraction, TypeScript-symbol-aware primitive recognition, transparent `state` / `state.raw` / `derive` lowering, collision-free helper names, root write/update lowering, and TypeScript-emitter source maps.
+- `.nomos` script map rebasing via coordinate-preserving prefix padding, keeping original line/UTF-16 columns and full original `sourcesContent`.
+- `packages/runtime/src/internal.mjs` as the compiler-only runtime ABI and `updateState` for correct prefix/postfix Number/BigInt semantics without adding a root API concept.
+- `NOMOS-REACTIVE-DERIVE-WRITE` for writes to derived bindings and statically visible state writes during synchronous derive evaluation.
+- Focused compiler and runtime ABI regression suites plus `check:phase1:lowering`.
+
+### Verified
+
+- TDD RED for compiler lowering: module absent (`ERR_MODULE_NOT_FOUND`).
+- Compiler lowering GREEN: 10/10 focused tests under Node `v22.16.0` using the locally available TypeScript compiler API as an API-compatibility harness.
+- TDD RED for runtime compiler ABI: `updateState` export absent.
+- Runtime ABI plus existing runtime regression GREEN: 20/20 under Node `v22.16.0`.
+- Current public package baseline rechecked at `@typescript/typescript6@6.0.2`, Apache-2.0; Microsoft still documents TypeScript 7.0 as lacking a stable programmatic API.
+
+### Still open
+
+- Exact-pinned pnpm install/full repository run in an environment that can fetch the dependency.
+- `EmbeddedExpression` template lowering, generated DOM bindings, and template/DOM mapping production.
+- Lightning CSS executable adapter.
+- `state.snapshot` contract/implementation (`OD-004` remains open).
+- Public conformance green evidence.
