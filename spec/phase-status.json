@@ -16,8 +16,9 @@
     "name": "Vertical Slice",
     "status": "in-progress",
     "allowed": true,
-    "activeSlice": "parser-source-maps-and-conformance",
+    "activeSlice": "compiler-runtime-and-conformance",
     "parserAndSourceMaps": "in-progress",
+    "runtimeCore": "foundation-implemented",
     "conformanceInfrastructure": "foundation-implemented",
     "parserImplemented": [
       "top-level-section-partitioning",
@@ -40,6 +41,28 @@
       "remaining-active-formatting-reconstruction-and-low-frequency-special-insertion-mode-validation",
       "token-level-generated-mapping-production"
     ],
+    "runtimeImplemented": [
+      "adr-0008-owner-and-scheduler-architecture",
+      "versioned-scalar-state-cells",
+      "lazy-memoized-derived-nodes",
+      "dynamic-synchronous-dependency-tracking",
+      "development-derive-write-guard",
+      "dom-before-sync-microtask-flush",
+      "owner-mount-and-deterministic-disposal",
+      "sync-rerun-and-disposal-cleanup",
+      "untrack",
+      "post-await-tracking-cutoff",
+      "named-reactive-cycle-diagnostics"
+    ],
+    "runtimeRemaining": [
+      "deep-tracking-plain-object-array-map-set",
+      "state-raw",
+      "state-snapshot-contract-and-implementation",
+      "compiler-state-and-derive-lowering",
+      "request-ownership-and-cancellation",
+      "generated-dom-binding-integration"
+    ],
+    "runtimeMachineSpec": "spec/runtime-core.json",
     "conformance": {
       "contract": "docs/adr/0007-public-conformance-promotion.md",
       "machineSpec": "spec/conformance.json",
@@ -51,11 +74,10 @@
     "resolvedWayfinderDecisions": [
       "https://github.com/AahPlexX/nomos/issues/2",
       "https://github.com/AahPlexX/nomos/issues/3",
+      "https://github.com/AahPlexX/nomos/issues/4",
       "https://github.com/AahPlexX/nomos/issues/5"
     ],
-    "openWayfinderDecisions": [
-      "https://github.com/AahPlexX/nomos/issues/4"
-    ],
+    "openWayfinderDecisions": [],
     "exitCriterion": "A TodoMVC-class application passes deterministic browser tests, preserves valid state through HMR, and cleans up every owned effect."
   }
 }
