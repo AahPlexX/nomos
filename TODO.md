@@ -39,10 +39,15 @@ Status keys: `[x]` verified complete, `[>]` in progress, `[ ]` not complete, `[!
   - [x] Single owner tree with children-first disposal, reverse local cleanup, then owned DOM.
   - [x] `untrack()` and named non-terminating cycle diagnostics.
   - [!] `state.snapshot` conformance semantics/implementation remain blocked on the still-required behavior contract and must not silently resolve `OD-004`.
-  - [x] Compiler script lowering for transparent source-level `state`, `derive`, and `state.raw` reads/writes, including root assignment/compound assignment and prefix/postfix updates.
-  - [ ] Extend reactive lowering to destructuring/loop-assignment edge cases when conformance fixtures require them.
+  - [x] Compiler script lowering for transparent source-level `state`, `derive`, and `state.raw` reads/writes, including assignment/compound assignment and prefix/postfix updates.
+  - [x] Direct reactive-root `for...of` and `for...in` assignment targets lower through collision-safe temporaries and `write(...)` while lexical-shadowing controls remain ordinary JavaScript.
+  - [ ] Remaining destructuring assignment-target lowering when required by conformance fixtures.
   - [ ] Generated text/attribute DOM binding integration with the DOM observer phase, producing mappings in the same pass.
   - [ ] Owner-backed exclusive/shared request cancellation in the query slice.
+- [>] Dependency-backed verification.
+  - [x] `.github/workflows/ci.yml` pins Node `22.16.0`, pnpm `12.10.1`, and installs exact dependencies.
+  - [x] CI run `38102821673` verified lowering + ABI **14/14**, runtime **20/20**, and the Phase 1 machine-state validator green.
+  - [x] Replace broken Corepack pnpm activation with `pnpm/action-setup@v6.1.0` after the first CI infrastructure failure.
 - [>] Public conformance infrastructure.
   - [x] ADR-0007 public `NCON-*` identity/environment/promotion contract.
   - [x] Public `conformance/` manifest, runner, validator, machine contract, and harness-core tests.
@@ -79,4 +84,4 @@ No Wayfinder architecture decision ticket remains open.
 - [>] Requirement rows move from `planned` to `passing` only when their exact reserved public `NCON-*` test is green in every manifest-declared environment for the same evidence set.
 - [>] Keep all eleven `spec/open-decisions.json` entries open until explicit ADR/RFC approval changes one.
 - [>] Prefer lean contract-level TDD and real dependencies where they remove substantial duplicated work without changing Nomos semantics.
-- [>] Keep `docs/STATUS.md`, this queue, `CHANGELOG.md`, decision records, machine specs, Wayfinder map, and Handoff synchronized on every material change.
+- [>] Keep `.github/workflows/ci.yml`, `docs/STATUS.md`, this queue, `CHANGELOG.md`, decision records, machine specs, Wayfinder map, and Handoff synchronized on every material change.
