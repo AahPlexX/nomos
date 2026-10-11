@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { bindAttribute } from '../packages/runtime/src/internal.mjs';
+import * as runtimeInternal from '../packages/runtime/src/internal.mjs';
 import {
   createOwner,
   createStateCell,
@@ -13,6 +13,11 @@ import {
 
 const nextMicrotask = () => new Promise((resolve) => queueMicrotask(resolve));
 
+function requireBindAttribute() {
+  assert.equal(typeof runtimeInternal.bindAttribute, 'function', 'runtimeInternal.bindAttribute must be implemented');
+  return runtimeInternal.bindAttribute;
+}
+
 function createFakeElement() {
   const attributes = new Map();
   return {
@@ -24,6 +29,7 @@ function createFakeElement() {
 }
 
 test('bindAttribute stringifies ordinary values, removes nullish values, and stops after owner disposal', async () => {
+  const bindAttribute = requireBindAttribute();
   const owner = createOwner(null, { name: 'root' });
   const value = createStateCell(1, { name: 'value' });
   const element = createFakeElement();
@@ -50,6 +56,7 @@ test('bindAttribute stringifies ordinary values, removes nullish values, and sto
 });
 
 test('bindAttribute uses presence/absence semantics for certified boolean HTML attributes', async () => {
+  const bindAttribute = requireBindAttribute();
   const owner = createOwner(null, { name: 'root' });
   const enabled = createStateCell(false, { name: 'enabled' });
   const element = createFakeElement();
