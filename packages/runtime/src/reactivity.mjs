@@ -1,3 +1,5 @@
+import { createDeepStateController, unwrapDeepProxy } from './deep-state.mjs';
+
 let activeObserver = null;
 let currentOwner = null;
 let nextId = 1;
@@ -92,14 +94,27 @@ export function disposeOwner(owner) {
 }
 
 export function createStateCell(initial, options = {}) {
-  return {
+  const state = {
     kind: 'state',
     id: nextId++,
     name: options.name ?? `state-${nextId - 1}`,
-    value: initial,
+    raw: options.raw === true,
+    rawValue: unwrapDeepProxy(initial),
+    value: undefined,
     version: 0,
     observers: new Set(),
+    deepContext: null,
   };
+  if (!state.raw) {
+    state.deepContext = createDeepStateController({
+      stateName: state.name,
+      track,
+      notify: (source) => notifySource(source, state.name),
+      assertWritable,
+    });
+  }
+  state.value = state.raw ? state.rawValue : state.deepContext.wrap(state.rawValue);
+  return state;
 }
 
 export function createDerived(compute, options = {}) {
@@ -158,19 +173,29 @@ export function read(source) {
 
 export function write(state, nextValue) {
   if (!state || state.kind !== 'state') throw new TypeError('write requires a state cell');
+  assertWritable();
+  const rawNext = unwrapDeepProxy(nextValue);
+  if (Object.is(state.rawValue, rawNext)) return state.value;
+
+  state.rawValue = rawNext;
+  state.value = state.raw ? rawNext : state.deepContext.wrap(rawNext);
+  notifySource(state, state.name);
+  return state.value;
+}
+
+function assertWritable() {
   if (activeObserver?.kind === 'derive') {
     throw new Error(`Reactive state write is not allowed while derive ${activeObserver.name} is evaluating.`);
   }
-  if (Object.is(state.value, nextValue)) return state.value;
+}
 
-  state.value = nextValue;
-  state.version += 1;
+function notifySource(source, stateName) {
+  source.version += 1;
   if (activeFlush && activeObserver?.kind === 'sync') {
-    activeFlush.states.add(state.name);
+    activeFlush.states.add(stateName);
     activeFlush.syncs.add(syncLabel(activeObserver));
   }
-  for (const observer of [...state.observers]) invalidateObserver(observer);
-  return nextValue;
+  for (const observer of [...source.observers]) invalidateObserver(observer);
 }
 
 export function untrack(fn) {
