@@ -1,17 +1,30 @@
 {
   "schemaVersion": 1,
-  "status": "phase-1-runtime-core-implemented",
+  "status": "phase-1-runtime-deep-state-implemented",
   "decision": "docs/adr/0008-runtime-ownership-and-scheduler.md",
   "research": "docs/phase-1/research/runtime-ownership-and-scheduling.md",
   "wayfinderDecision": "https://github.com/AahPlexX/nomos/issues/4",
   "dependencyPolicy": "platform-primitives-no-third-party-reactivity-core",
   "graph": {
-    "sources": ["state-cell", "derived-node"],
+    "sources": ["state-cell", "deep-property-source", "derived-node"],
     "observers": ["dom-observer", "sync-observer"],
     "dependencyCapture": "dynamic-synchronous-read-tracking",
     "versionedSources": true,
     "derivedEvaluation": "lazy-memoized-on-demand",
     "deriveWriteGuard": "development-runtime-implemented"
+  },
+  "deepState": {
+    "status": "runtime-implemented",
+    "containers": ["plain-object", "array", "Map", "Set"],
+    "granularity": ["property", "index", "membership", "size", "iteration"],
+    "proxyIdentity": "stable-per-state-and-cycle-safe",
+    "objectIteration": "tracked",
+    "arrayLengthAndIndexMutation": "tracked",
+    "mapMutation": ["set", "delete", "clear"],
+    "setMutation": ["add", "delete", "clear"],
+    "referenceHeld": ["class-instance", "Date", "DOM-node", "typed-array", "Promise", "Error", "Function", "WeakMap", "WeakSet", "frozen-object"],
+    "rawOptOut": "implemented-as-state-cell-raw-option",
+    "publicStateRawSurface": "pending-compiler-lowering"
   },
   "scheduler": {
     "primitive": "queueMicrotask",
@@ -34,6 +47,9 @@
   },
   "implementedSlice": [
     "scalar-state-cells",
+    "deep-tracked-plain-object-array-map-set",
+    "raw-state-cell-runtime-semantics",
+    "stable-cycle-safe-deep-proxy-identity",
     "lazy-derived-nodes",
     "dynamic-dependency-tracking",
     "dom-before-sync-microtask-scheduling",
@@ -44,10 +60,8 @@
     "named-cycle-diagnostics"
   ],
   "remaining": [
-    "deep-tracking-plain-object-array-map-set",
-    "state-raw",
     "state-snapshot-contract-and-implementation",
-    "compiler-state-and-derive-lowering",
+    "compiler-state-derive-and-state-raw-lowering",
     "request-ownership-and-cancellation",
     "generated-dom-binding-integration"
   ],
