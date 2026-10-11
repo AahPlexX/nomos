@@ -14,6 +14,11 @@ export function validateTableStructure(result) {
         const incoming = node.name.toLowerCase();
         const rewrite = detectTableStartTagRewrite(stack, incoming);
         if (rewrite) {
+          // The flat syntax pass also reports generic table foster-parenting.
+          // A specialized table rewrite is more precise for the same token, so
+          // replace only same-span generic ownership diagnostics rather than
+          // emitting duplicate errors for one browser tree-construction event.
+          removeOwnershipDiagnosticAtSpan(result.diagnostics, node.span);
           result.diagnostics.push(toDiagnostic(node, rewrite));
           repairStack(stack, rewrite);
         }
@@ -25,6 +30,18 @@ export function validateTableStructure(result) {
     }
   }
   return result;
+}
+
+function removeOwnershipDiagnosticAtSpan(diagnostics, span) {
+  for (let index = diagnostics.length - 1; index >= 0; index -= 1) {
+    const diagnostic = diagnostics[index];
+    if (diagnostic?.code !== 'NOMOS-PARSE-HTML-OWNERSHIP') continue;
+    if (sameSpan(diagnostic.span, span)) diagnostics.splice(index, 1);
+  }
+}
+
+function sameSpan(a, b) {
+  return a?.start?.offset === b?.start?.offset && a?.end?.offset === b?.end?.offset;
 }
 
 function toDiagnostic(node, rewrite) {

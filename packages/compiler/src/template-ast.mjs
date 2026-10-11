@@ -1,3 +1,5 @@
+import { parseElementAttributes } from './attribute-ir.mjs';
+
 const VOID_HTML_ELEMENTS = new Set([
   'area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input',
   'link', 'meta', 'param', 'source', 'track', 'wbr',
@@ -24,17 +26,13 @@ export function buildTemplateAst(source, syntax) {
   }
 
   const lineStarts = buildLineStarts(source);
-  const root = {
-    type: 'Template',
-    span: syntax.span,
-    children: [],
-  };
+  const root = { type: 'Template', span: syntax.span, children: [] };
 
   const structural = syntax.nodes
     .filter((node) => node.type !== 'Attribute' && node.type !== 'Directive')
     .slice()
     .sort(compareNodes);
-  const ownedMetadata = syntax.nodes.filter((node) => node.type === 'Attribute' || node.type === 'Directive');
+  const ownedDirectives = syntax.nodes.filter((node) => node.type === 'Directive');
 
   const stack = [{ kind: 'container', node: root, children: root.children }];
   let cursor = syntax.span.start.offset;
@@ -46,7 +44,7 @@ export function buildTemplateAst(source, syntax) {
 
     switch (token.type) {
       case 'ElementOpen': {
-        const metadata = ownedMetadata.filter((node) =>
+        const directives = ownedDirectives.filter((node) =>
           node.span.start.offset >= token.span.start.offset &&
           node.span.end.offset <= token.span.end.offset);
         const element = {
@@ -58,8 +56,8 @@ export function buildTemplateAst(source, syntax) {
           span: cloneSpan(token.span),
           openSpan: cloneSpan(token.span),
           closeSpan: null,
-          attributes: metadata.filter((node) => node.type === 'Attribute').map(toAttribute),
-          directives: metadata.filter((node) => node.type === 'Directive').map(toDirective),
+          attributes: parseElementAttributes(source, token.span, token.name, lineStarts),
+          directives: directives.map(toDirective),
           children: [],
         };
         currentChildren(stack).push(element);
@@ -156,11 +154,8 @@ export function buildTemplateAst(source, syntax) {
 function createInitialBranch(token) {
   const kind = token.kind === 'if' ? 'then' : token.kind === 'each' ? 'body' : 'pending';
   return {
-    type: 'Branch',
-    kind,
-    markerSpan: cloneSpan(token.span),
-    span: cloneSpan(token.span),
-    children: [],
+    type: 'Branch', kind,
+    markerSpan: cloneSpan(token.span), span: cloneSpan(token.span), children: [],
   };
 }
 
@@ -177,10 +172,6 @@ function blockType(kind) {
   throw new Error(`Unsupported block kind: ${kind}`);
 }
 
-function toAttribute(node) {
-  return { type: 'Attribute', name: node.name, span: cloneSpan(node.span) };
-}
-
 function toDirective(node) {
   return { type: 'Directive', kind: node.kind, name: node.name, span: cloneSpan(node.span) };
 }
@@ -188,15 +179,11 @@ function toDirective(node) {
 function appendText(source, lineStarts, children, start, end) {
   if (end <= start) return;
   children.push({
-    type: 'Text',
-    value: source.slice(start, end),
-    span: makeSpan(lineStarts, start, end),
+    type: 'Text', value: source.slice(start, end), span: makeSpan(lineStarts, start, end),
   });
 }
 
-function currentChildren(stack) {
-  return stack.at(-1).children;
-}
+function currentChildren(stack) { return stack.at(-1).children; }
 
 function findStackIndex(stack, predicate) {
   for (let index = stack.length - 1; index >= 0; index -= 1) {
@@ -210,19 +197,11 @@ function compareNodes(a, b) {
 }
 
 function cloneSpan(span) {
-  return {
-    start: { ...span.start },
-    end: { ...span.end },
-  };
+  return { start: { ...span.start }, end: { ...span.end } };
 }
 
-function spanFrom(start, end) {
-  return { start: { ...start }, end: { ...end } };
-}
-
-function makeSpan(lineStarts, start, end) {
-  return { start: position(lineStarts, start), end: position(lineStarts, end) };
-}
+function spanFrom(start, end) { return { start: { ...start }, end: { ...end } }; }
+function makeSpan(lineStarts, start, end) { return { start: position(lineStarts, start), end: position(lineStarts, end) }; }
 
 function buildLineStarts(source) {
   const starts = [0];
@@ -230,9 +209,7 @@ function buildLineStarts(source) {
     if (source[index] === '\r') {
       if (source[index + 1] === '\n') index += 1;
       starts.push(index + 1);
-    } else if (source[index] === '\n') {
-      starts.push(index + 1);
-    }
+    } else if (source[index] === '\n') starts.push(index + 1);
   }
   return starts;
 }
