@@ -22,22 +22,23 @@ Status keys: `[x]` verified complete, `[>]` in progress, `[ ]` not complete, `[!
   - [x] ADR-0006 stage-local source-map composition contract.
   - [x] Exact decoded mapping validation, stage composition, unmapped scaffolding preservation, and ECMA-426 encoding core.
   - [x] HTML ownership: 21 certified WHATWG scenarios spanning paragraph/list/button, major table insertion modes, and high-impact formatting/adoption-agency recovery.
-  - [ ] Finish only the remaining material active-formatting/special insertion-mode gaps; do not build a duplicate browser parser.
+  - [ ] Finish only remaining material active-formatting/special insertion-mode gaps; do not build a duplicate browser parser.
   - [ ] Produce token/segment mappings from real lowering/code-generation stages and compose them through the source-map core.
   - [ ] Implement `EmbeddedScript` / `EmbeddedExpression` adapter using exact-pinned TypeScript compatibility API.
   - [ ] Implement `EmbeddedStylesheet` adapter using exact-pinned Lightning CSS.
 - [>] State, derivation, synchronization, and ownership.
   - [x] ADR-0008 resolves the owner graph and scheduler architecture without adding root concepts.
   - [x] Versioned scalar state cells and `Object.is` notification suppression.
+  - [x] Deep reactive tracking for plain objects, arrays, `Map`, and `Set` using the same dependency graph.
+  - [x] Property/index/membership/size/iteration dependency precision with stable cycle-safe proxy identity.
+  - [x] Runtime raw-state semantics using the same cell model; source-level `state.raw` still requires compiler lowering.
   - [x] Lazy, memoized, dynamic-dependency derived nodes with development derive-write guard.
   - [x] One microtask scheduler with DOM phase before sync phase and DOM reentry before remaining sync work.
   - [x] `sync()` mount gating, synchronous-read tracking, cleanup before rerun/disposal, and post-`await` tracking cutoff.
   - [x] Single owner tree with children-first disposal, reverse local cleanup, then owned DOM.
   - [x] `untrack()` and named non-terminating cycle diagnostics.
-  - [ ] Deep reactive tracking for plain objects, arrays, `Map`, and `Set` using the same graph.
-  - [ ] `state.raw` over the same cell model.
   - [!] `state.snapshot` conformance semantics/implementation remain blocked on the still-required behavior contract and must not silently resolve `OD-004`.
-  - [ ] Compiler lowering for transparent primitive state/derive reads and state writes.
+  - [ ] Compiler lowering for transparent source-level `state`, `derive`, and `state.raw` reads/writes.
   - [ ] Generated DOM binding integration with the DOM observer phase.
   - [ ] Owner-backed exclusive/shared request cancellation in the query slice.
 - [>] Public conformance infrastructure.
@@ -45,7 +46,7 @@ Status keys: `[x]` verified complete, `[>]` in progress, `[ ]` not complete, `[!
   - [x] Public `conformance/` manifest, runner, validator, machine contract, and harness-core tests.
   - [x] Wire first public compiler test `NCON-NREQ-0145`.
   - [ ] Execute `NCON-NREQ-0145` against a complete checkout/CI evidence set; keep `NREQ-0145` planned until then.
-  - [ ] Add public Node conformance for runtime requirements as their complete contract slices become executable; avoid duplicating development tests mechanically.
+  - [ ] Add public Node conformance for runtime requirements as their complete contract slices become executable; avoid mechanically duplicating development tests.
   - [ ] Add real-browser environment profiles when the browser harness exists; never substitute unit-only DOM emulation.
 - [ ] Text and attribute bindings.
 - [ ] Events and native-control bindings.
