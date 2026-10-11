@@ -18,7 +18,7 @@
     "allowed": true,
     "activeSlice": "compiler-runtime-and-conformance",
     "parserAndSourceMaps": "in-progress",
-    "runtimeCore": "foundation-implemented",
+    "runtimeCore": "deep-state-implemented",
     "conformanceInfrastructure": "foundation-implemented",
     "parserImplemented": [
       "top-level-section-partitioning",
@@ -44,6 +44,9 @@
     "runtimeImplemented": [
       "adr-0008-owner-and-scheduler-architecture",
       "versioned-scalar-state-cells",
+      "deep-tracking-plain-object-array-map-set",
+      "raw-state-cell-runtime-semantics",
+      "stable-cycle-safe-deep-proxy-identity",
       "lazy-memoized-derived-nodes",
       "dynamic-synchronous-dependency-tracking",
       "development-derive-write-guard",
@@ -55,10 +58,8 @@
       "named-reactive-cycle-diagnostics"
     ],
     "runtimeRemaining": [
-      "deep-tracking-plain-object-array-map-set",
-      "state-raw",
       "state-snapshot-contract-and-implementation",
-      "compiler-state-and-derive-lowering",
+      "compiler-state-derive-and-state-raw-lowering",
       "request-ownership-and-cancellation",
       "generated-dom-binding-integration"
     ],
