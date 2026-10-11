@@ -24,21 +24,25 @@ HTML ownership validation records **21 certified browser-rewrite scenarios** acr
 
 ## Current runtime state
 
-Wayfinder issue #4 is resolved by **ADR-0008 — Runtime ownership and scheduler architecture**. The runtime uses one versioned fine-grained dependency graph and one parent/child owner tree:
+Wayfinder issue #4 is resolved by **ADR-0008 — Runtime ownership and scheduler architecture**. The runtime uses one versioned fine-grained dependency graph and one parent/child owner tree.
 
-- state writes update synchronously;
-- derives are read-only, lazy, memoized, dynamic-dependency tracked, and recompute on demand;
-- development runtime rejects writes while a derive evaluates;
-- DOM observers and sync observers share the same graph but flush in separate ordered phases;
-- the scheduler uses one `queueMicrotask()` flush, drains DOM work before sync work, and yields back to DOM if a sync creates more DOM work;
-- sync tracking ends when the synchronous callback invocation returns, so reads after `await` are not dependencies;
-- sync cleanup runs before rerun and on disposal;
-- owner disposal is children first, then local cleanup in reverse creation order, then owned DOM;
-- non-terminating sync cycles throw a dedicated error naming participating states and synchronization owners.
+The executable runtime now includes:
 
-Executable implementation: `packages/runtime/src/reactivity.mjs`. Machine authority: `spec/runtime-core.json`.
+- synchronous scalar state writes with `Object.is` no-op suppression;
+- deep tracked plain objects, arrays, `Map`, and `Set` on the same graph;
+- property/index/membership/size/iteration dependency sources so unrelated sibling mutations do not invalidate readers;
+- stable cycle-safe proxy identity per state cell;
+- reference-held behavior for class instances, dates, DOM nodes, typed arrays, promises, errors, functions, weak collections, and frozen objects;
+- runtime raw-state semantics through the internal state-cell raw option, which is the lowering target for future `state.raw(...)` source syntax;
+- lazy, memoized derives with dynamic dependencies and a development derive-write guard;
+- one `queueMicrotask()` scheduler with DOM work before sync work and DOM reentry before remaining sync work;
+- sync mount gating, synchronous-read tracking, cleanup before rerun/disposal, and post-`await` tracking cutoff;
+- deterministic children-first owner disposal, reverse local cleanup, then owned DOM;
+- `untrack()` and named non-terminating cycle diagnostics.
 
-The runtime core remains **IN PROGRESS** overall because deep tracking for plain objects/arrays/Map/Set, `state.raw`, snapshot specification/implementation, compiler state/derive lowering, request cancellation ownership, and generated DOM binding integration are not yet complete. `state.snapshot` is intentionally not claimed conformant while its required semantics and `OD-004` remain unresolved.
+Implementation is split between `packages/runtime/src/reactivity.mjs` and `packages/runtime/src/deep-state.mjs`. Machine authority: `spec/runtime-core.json`.
+
+The runtime remains **IN PROGRESS** overall because compiler lowering still must translate source-level `state`, `derive`, and `state.raw` usage to the internal ABI; generated DOM bindings and request ownership/cancellation are not integrated; and `state.snapshot` remains intentionally unimplemented while its required built-in/cycle/error semantics and `OD-004` remain unresolved.
 
 ## Public conformance state
 
@@ -52,9 +56,11 @@ Hierarchical AST GREEN: 4 passed / 0 failed under Node v22.16.0.
 Conformance harness core GREEN: 4 passed / 0 failed under Node v22.16.0.
 Source-map composition GREEN: 4 passed / 0 failed under Node v22.16.0 after recorded RED.
 Table/formatting ownership focused suites remain recorded green; current machine ownership count: 21 scenarios.
-Runtime-core TDD RED: skeletal non-reactive implementation produced assertion failures for memoization, dynamic dependencies, derive-write guard, scheduling, async tracking, cycle detection, microtask delivery, and sync cleanup.
+Runtime-core TDD RED: skeletal non-reactive implementation produced behavioral failures.
 Runtime-core GREEN: 10 passed / 0 failed under Node v22.16.0.
-Runtime core source passes Node syntax validation; runtime machine JSON parses successfully.
+Deep-state RED: 5/8 contract tests failed before implementation; the three passing controls covered raw nested mutation, reference-held excluded values, and identity on the then-unproxied baseline.
+Deep-state + runtime regression GREEN: 18 passed / 0 failed under Node v22.16.0 after deep tracking implementation and module separation.
+Modified runtime modules and focused tests pass Node syntax validation; updated runtime/phase machine JSON parses successfully.
 ```
 
 The current environment does not provide the repository-pinned `pnpm` executable. Do not claim a full `pnpm check` or a green public `NCON-*` evidence set until one actually occurs against the complete repository.
@@ -75,9 +81,9 @@ Portable Handoff: `/tmp/nomos-phase1-handoff.md`. Canonical facts remain in this
 
 ## Immediate next action
 
-1. Implement deep tracked state for plain objects, arrays, `Map`, and `Set`, plus `state.raw`, against the ADR-0008 graph without creating a second dependency system.
-2. Define the compiler lowering ABI for transparent primitive state/derive reads and writes, then connect generated DOM bindings to the DOM observer phase.
+1. Define and implement compiler lowering for transparent source-level `state`, `derive`, and `state.raw` reads/writes against the now-capable runtime cell ABI.
+2. Connect generated text/attribute DOM bindings to the ADR-0008 DOM observer phase.
 3. Implement ADR-0005 TypeScript/CSS adapters using exact-pinned dependency baselines.
 4. Produce real token/segment mappings in lowering/code-generation and compose them through the ADR-0006 core.
-5. Continue the narrow remaining HTML ownership edge cases when they materially block compiler correctness rather than duplicating the entire browser parser.
-6. Add public runtime conformance tests at the requirement boundary and promote rows only under ADR-0007 evidence rules.
+5. Continue only material remaining HTML ownership edge cases rather than duplicating the browser parser.
+6. Add public runtime conformance tests at complete requirement boundaries and promote rows only under ADR-0007 evidence rules.
