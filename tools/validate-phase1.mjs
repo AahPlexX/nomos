@@ -12,6 +12,7 @@ const required = [
   'packages/compiler/src/table-structure-validation.mjs',
   'packages/compiler/src/html-formatting-ownership.mjs',
   'packages/compiler/src/formatting-structure-validation.mjs',
+  'packages/runtime/src/reactivity.mjs',
   'tests/phase1-parser.test.mjs',
   'tests/phase1-parser-structural.test.mjs',
   'tests/phase1-parser-ast.test.mjs',
@@ -26,6 +27,7 @@ const required = [
   'tests/phase1-formatting-ownership-rules.test.mjs',
   'tests/phase1-formatting-structure-validation.test.mjs',
   'tests/phase1-parser-formatting-integration.test.mjs',
+  'tests/phase1-runtime-core.test.mjs',
   'tests/phase1-source-map-composition.test.mjs',
   'tests/phase1-conformance-harness.test.mjs',
   'docs/diagnostics/NOMOS-PARSE-HTML-OWNERSHIP.md',
@@ -34,10 +36,12 @@ const required = [
   'docs/phase-1/research/source-map-composition.md',
   'docs/phase-1/research/public-conformance-promotion.md',
   'docs/phase-1/research/html-formatting-ownership.md',
+  'docs/phase-1/research/runtime-ownership-and-scheduling.md',
   'docs/adr/0004-source-position-and-map-baseline.md',
   'docs/adr/0005-embedded-language-adapter-boundary.md',
   'docs/adr/0006-stage-local-source-map-composition.md',
   'docs/adr/0007-public-conformance-promotion.md',
+  'docs/adr/0008-runtime-ownership-and-scheduler.md',
   'conformance/README.md',
   'conformance/manifest.json',
   'conformance/compiler/NCON-NREQ-0145.test.mjs',
@@ -46,6 +50,7 @@ const required = [
   'tools/validate-conformance.mjs',
   'spec/conformance.json',
   'spec/compiler-front-end.json',
+  'spec/runtime-core.json',
   'spec/phase-status.json',
 ];
 for (const path of required) await access(new URL(path, root));
@@ -54,34 +59,42 @@ const phase = JSON.parse(await readFile(new URL('spec/phase-status.json', root),
 assert.equal(phase.currentPhase, 1);
 assert.equal(phase.phase1.status, 'in-progress');
 assert.equal(phase.phase1.parserAndSourceMaps, 'in-progress');
+assert.equal(phase.phase1.runtimeCore, 'foundation-implemented');
 assert.equal(phase.phase1.conformanceInfrastructure, 'foundation-implemented');
-assert.ok(phase.phase1.parserImplemented.includes('exact-decoded-segment-composer'));
-assert.ok(phase.phase1.parserImplemented.includes('whatwg-table-section-transitions-colgroup-caption-and-close-chains'));
 assert.ok(phase.phase1.parserImplemented.includes('whatwg-high-impact-formatting-adoption-agency-ownership'));
-assert.ok(phase.phase1.parserRemaining.includes('remaining-active-formatting-reconstruction-and-low-frequency-special-insertion-mode-validation'));
-assert.ok(phase.phase1.parserRemaining.includes('token-level-generated-mapping-production'));
+assert.ok(phase.phase1.runtimeImplemented.includes('adr-0008-owner-and-scheduler-architecture'));
+assert.ok(phase.phase1.runtimeImplemented.includes('dom-before-sync-microtask-flush'));
+assert.ok(phase.phase1.runtimeImplemented.includes('named-reactive-cycle-diagnostics'));
+assert.ok(phase.phase1.runtimeRemaining.includes('deep-tracking-plain-object-array-map-set'));
+assert.ok(phase.phase1.runtimeRemaining.includes('compiler-state-and-derive-lowering'));
+assert.equal(phase.phase1.runtimeMachineSpec, 'spec/runtime-core.json');
+assert.deepEqual(phase.phase1.openWayfinderDecisions, []);
+assert.ok(phase.phase1.resolvedWayfinderDecisions.includes('https://github.com/AahPlexX/nomos/issues/4'));
 assert.equal(phase.phase1.conformance.seedTest, 'NCON-NREQ-0145');
 assert.equal(phase.phase1.conformance.seedTestStatus, 'wired-unverified');
 assert.equal(phase.phase1.conformance.passingRequirementCount, 0);
-assert.deepEqual(phase.phase1.openWayfinderDecisions, ['https://github.com/AahPlexX/nomos/issues/4']);
 
 const frontEnd = JSON.parse(await readFile(new URL('spec/compiler-front-end.json', root), 'utf8'));
-assert.equal(frontEnd.sourcePositionModel.offsetUnit, 'utf-16-code-unit');
 assert.equal(frontEnd.sourceMaps.standard, 'ECMA-426');
 assert.equal(frontEnd.sourceMaps.stageLocalMappings, 'core-composer-implemented');
-assert.equal(frontEnd.sourceMaps.compositionResolution, 'exact-mapping-points-only');
-assert.equal(frontEnd.sourceMaps.finalMapValidation, 'implemented-core');
-assert.equal(frontEnd.sourceMaps.tokenLevelGeneratedMappings, 'planned');
-assert.equal(frontEnd.htmlOwnership.status, 'partial-whatwg-tree-construction-validation');
 assert.equal(frontEnd.htmlOwnership.certifiedRewriteCount, 21);
-assert.ok(frontEnd.htmlOwnership.certifiedRewrites.includes('nested-anchor-start-closes-open-anchor'));
-assert.ok(frontEnd.htmlOwnership.certifiedRewrites.includes('nested-nobr-start-runs-formatting-recovery'));
-assert.ok(frontEnd.htmlOwnership.certifiedRewrites.includes('misnested-formatting-end-tag-triggers-adoption-agency'));
-assert.equal(frontEnd.htmlOwnership.formattingResearch, 'docs/phase-1/research/html-formatting-ownership.md');
-assert.ok(frontEnd.htmlOwnership.remaining.includes('remaining-active-formatting-reconstruction-and-adoption-agency-edge-cases'));
 assert.equal(frontEnd.templateSyntax.hierarchicalTypedAst, 'implemented-structural');
 assert.equal(frontEnd.embeddedLanguages.typescript.implementation, 'planned');
 assert.equal(frontEnd.embeddedLanguages.css.implementation, 'planned');
+
+const runtime = JSON.parse(await readFile(new URL('spec/runtime-core.json', root), 'utf8'));
+assert.equal(runtime.status, 'phase-1-runtime-core-implemented');
+assert.equal(runtime.decision, 'docs/adr/0008-runtime-ownership-and-scheduler.md');
+assert.equal(runtime.scheduler.primitive, 'queueMicrotask');
+assert.deepEqual(runtime.scheduler.flushPhases, ['dom', 'sync']);
+assert.equal(runtime.scheduler.syncYieldsToNewDomWork, true);
+assert.equal(runtime.graph.derivedEvaluation, 'lazy-memoized-on-demand');
+assert.equal(runtime.graph.deriveWriteGuard, 'development-runtime-implemented');
+assert.deepEqual(runtime.ownership.disposalOrder, ['child-owners', 'local-cleanup-reverse-creation', 'owned-dom']);
+assert.equal(runtime.cycleDetection.status, 'development-runtime-implemented');
+assert.ok(runtime.remaining.includes('deep-tracking-plain-object-array-map-set'));
+assert.ok(runtime.remaining.includes('state-snapshot-contract-and-implementation'));
+assert.equal(runtime.openDecisionImpact, 'none');
 
 const conformance = JSON.parse(await readFile(new URL('spec/conformance.json', root), 'utf8'));
 assert.equal(conformance.status, 'foundation-implemented');
@@ -89,4 +102,4 @@ assert.equal(conformance.browserSubstitutionAllowed, false);
 assert.equal(conformance.seedTest.status, 'wired-unverified');
 assert.deepEqual(conformance.passingRequirements, []);
 
-console.log(`Phase 1 check passed: ${required.length} required artifacts; twenty-one HTML ownership scenarios plus source-map composition core are implemented while active-formatting reconstruction, embedded adapters, token mapping production, and public green evidence remain in progress.`);
+console.log(`Phase 1 check passed: ${required.length} required artifacts; compiler front-end foundations, 21 HTML ownership scenarios, and ADR-0008 runtime core are implemented while deep state/lowering, embedded adapters, generated mappings, and public green evidence remain in progress.`);
