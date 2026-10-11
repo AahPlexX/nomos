@@ -36,46 +36,43 @@ All material repository changes are recorded here. This file tracks project stat
 - Added `EmbeddedScript`, symbol-aware `state` / `state.raw` / `derive` lowering, transparent reads, supported root writes/updates, collision-free helpers, and original-`.nomos` TypeScript source maps.
 - Added internal `updateState` and reactive direct-root `for...of` / `for...in` assignment-target lowering.
 - Added `.github/workflows/ci.yml` with Node `22.16.0`, pnpm `12.10.1`, and exact dependency installation; corrected initial Corepack bootstrap to `pnpm/action-setup@v6.1.0`.
-- CI run `38102821673` verified lowering/ABI **14/14**, runtime **20/20**, and the Phase 1 machine validator.
 
-## 2026-10-11 — EmbeddedExpression and text-binding runtime seam
+## 2026-10-11 — EmbeddedExpression, browser DOM, and typed attribute IR
 
-- Added durable `EmbeddedExpression` extraction with exact original `.nomos` spans and TypeScript 6 adapter metadata.
-- Template expressions use TypeScript parsing/symbol identity rather than a second expression parser; lexical shadowing remains ordinary TypeScript.
-- Invalid interpolation syntax translates TypeScript diagnostics back to original `.nomos` spans.
-- Added `TextBinding` IR, collision-safe `bindText`/`read` helper aliases, and first template expression mapping points.
-- Added internal owner-backed `bindText` on the existing ADR-0008 DOM observer/scheduler.
-- RED `38120782593`: pinned environment reached tests; the feature suite failed on absent `template-lowering.mjs` after 14 existing lowering/ABI tests passed.
-- GREEN `38120937878`: lowering/ABI/expression **16/16**, runtime **21/21**.
+- Added TypeScript-backed `EmbeddedExpression`, text-binding IR, and owner-backed `bindText` without introducing a second expression parser or scheduler.
+- Added browser-parsed template DOM materialization via `HTMLTemplateElement`, deterministic text markers, owned cloned roots, and Trusted Types policy `nomos`.
+- Added exact-span IR for all five ratified attribute forms: static, dynamic, mixed, shorthand, spread; directives remain separate.
+- Enabled the parser CI gate and repaired duplicate same-span table ownership reporting without weakening validation.
+- Browser DOM RED `38122206062` / GREEN `38122323711`; attribute IR RED `38122824413` / GREEN `38122979344`.
 
-## 2026-10-11 — Browser-parsed static DOM materialization
+## 2026-10-11 — Standard HTML dynamic attribute assignment
 
-- Added `template-dom-lowering.mjs` and internal runtime `mountTemplate`.
-- Supported static HTML is preserved as one browser-parsed skeleton with collision-free text markers rather than reconstructing HTML semantics via raw `createTextNode` calls.
-- Runtime parses through `HTMLTemplateElement`, clones content, replaces markers with live `Text` nodes, owns cloned roots, and uses a cached `nomos` Trusted Types policy when enforcement is active.
-- Added explicit `NOMOS-LOWER-UNSUPPORTED-TEMPLATE-FEATURE` guards for template features whose dedicated lowerers are not complete.
-- RED `38122206062`: focused unit/browser checks failed on missing `lowerTemplateDom` / `mountTemplate` after the exact environment initialized successfully.
-- GREEN `38122323711`: DOM **3/3**, Chrome `154.0.8037.97` under Trusted Types enforcement, lowering **16/16**, runtime **21/21**.
+### Added
 
-## 2026-10-11 — Typed attribute IR and parser-gate hardening
+- `template-dom-lowering.mjs` now lowers dynamic `name={expression}`, mixed quoted values, and shorthand `{identifier}` attributes on standard HTML elements.
+- Attribute expressions reuse the TypeScript 6 `EmbeddedExpression` adapter and existing reactive `read` ABI rather than adding a second expression system.
+- Dynamic-attribute elements use collision-free temporary element markers inside the browser-parsed skeleton; runtime `mountTemplate` discovers elements, removes markers, and returns deterministic element slots.
+- Internal `bindAttribute` runs on the ADR-0008 DOM-observer phase and stops automatically after owner disposal.
+- Ordinary content attributes remove on `null`/`undefined` and otherwise use `String(value)` + `setAttribute`.
+- Certified boolean HTML attributes use presence/absence semantics; `inert` is covered by executable tests.
+- Attribute setup/expression source-map points are emitted during generation.
 
-### Attribute representation
+### Safety boundaries
 
-- Added `packages/compiler/src/attribute-ir.mjs` and integrated it into the hierarchical AST.
-- All five ratified non-directive forms are now durable exact-span Nomos IR: static, dynamic, mixed, shorthand, and spread.
-- Static values retain boolean/quoted distinction; mixed values retain ordered text/expression segments; dynamic/shorthand/spread expressions retain exact outer/body spans.
-- Nested brace expressions are preserved and directives remain separate on `Element.directives`.
-- This slice deliberately does not assign DOM semantics yet; custom-element pre-upgrade property behavior remains untouched while `OD-008` is open.
+- Spread attributes remain explicitly guarded pending source-order merge/precedence semantics.
+- Dynamic custom-element assignment remains guarded while `OD-008` is open.
+- Dynamic URL-bearing attributes remain guarded until the URL protocol validator exists.
+- Inline event-handler attributes are rejected; event semantics remain dedicated to `on:`.
+- Native-control property-backed live state remains a later `bind:` slice.
 
-### Parser verification and latent defect repair
+### TDD and verification
 
-- Added `pnpm check:phase1:parser` to the pinned main CI workflow instead of leaving parser integration as a manual-only gate.
-- RED run `38122824413`: the two new attribute IR tests failed as intended; the newly enforced parser gate also exposed six pre-existing table integration failures caused by duplicate ownership reporting.
-- Fixed duplicate reporting at the proper validation seam: when a specialized table rewrite exists, it replaces only a generic `NOMOS-PARSE-HTML-OWNERSHIP` diagnostic with the exact same source span.
-- GREEN run `38122979344`: parser **66/66**, DOM **3/3 + real Chrome**, lowering **16/16**, runtime **21/21**, machine state green. No tests or ownership expectations were weakened.
+- The first runtime test attempt exposed a test-linking issue due to a not-yet-existing named export; that attempt is not counted as behavioral RED.
+- Behavioral RED `38168546695`: parser **66/66** and real Chrome stayed green; focused DOM units were **3/7**, failing by assertion for absent `bindAttribute` and still-guarded dynamic attributes.
+- GREEN `38168894701`: parser **66/66**, DOM **7/7 + Chrome 154.0.8037.97 under Trusted Types**, lowering **16/16**, runtime **23/23**, prior machine validator green.
+- Runtime attribute-function coverage is now **3/4 required dynamic forms**: dynamic, mixed, shorthand complete; spread remains.
 
 ### Next frontier
 
-- Define and publish the safe standard-HTML attribute/property assignment policy from authoritative platform behavior.
-- Lower dynamic/mixed/shorthand attributes from the new IR onto deterministic element slots, keeping custom elements/property-backed native controls behind explicit policy boundaries.
-- Emit attribute-stage source mappings during generation, then proceed to events/native-control bindings, structural blocks, components, reactive destructuring, and CSS integration.
+- Define spread merge precedence test-first and complete 4/4 runtime attribute forms.
+- Publish/test the built-in attribute/property assignment table, then implement URL protocol validation and proceed to `on:` / `bind:` behavior.
