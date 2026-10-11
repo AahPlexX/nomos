@@ -8,12 +8,16 @@
   "engines": {
     "node": ">=22.13.0"
   },
+  "dependencies": {
+    "@typescript/typescript6": "6.0.2"
+  },
   "scripts": {
     "test": "node --test tests/*.test.mjs",
     "check:phase0": "node tools/validate-phase0.mjs",
     "check:phase1": "node tools/validate-phase1.mjs",
     "check:phase1:parser": "node --test \"tests/phase1-parser*.test.mjs\" \"tests/phase1-table-*.test.mjs\" \"tests/phase1-formatting-*.test.mjs\"",
     "check:phase1:runtime": "node --test \"tests/phase1-runtime-*.test.mjs\"",
+    "check:phase1:lowering": "node --test tests/phase1-compiler-reactive-lowering.test.mjs tests/phase1-runtime-compiler-abi.test.mjs",
     "check:conformance": "node tools/validate-conformance.mjs",
     "test:conformance": "node tools/run-conformance.mjs",
     "check": "pnpm test && pnpm check:prd && pnpm check:phase0 && pnpm check:phase1 && pnpm check:conformance",
