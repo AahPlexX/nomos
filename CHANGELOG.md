@@ -65,21 +65,14 @@ All material repository changes are recorded here. This file tracks project stat
 - `Map` and `Set` now provide reactive membership, size, iteration, and mutation behavior for `set`/`add`, `delete`, and `clear`, including stable wrapping of deep values.
 - Proxy identity is stable per state cell and cycle-safe.
 - Class instances, dates, DOM nodes, typed arrays, promises, errors, functions, weak collections, and frozen objects remain reference-held rather than internally reactive.
-- Runtime raw-state behavior is implemented with the same state-cell ABI via `{ raw: true }`; source-level `state.raw(...)` remains a compiler-lowering task rather than a second runtime system.
+- Runtime raw-state behavior is implemented with the same state-cell ABI via `{ raw: true }`.
 - Added `tests/phase1-runtime-deep-state.test.mjs`; the existing runtime wildcard gate automatically includes it.
 
 ### Verified
 
-- RED: before implementation, the deep-state suite passed 3/8 controls and failed 5/8 required deep behaviors (nested object mutation, object-key iteration, arrays, Map, and Set).
+- RED: before implementation, the deep-state suite passed 3/8 controls and failed 5/8 required deep behaviors.
 - GREEN: deep-state suite reached 8/8.
-- Regression gate: `phase1-runtime-core.test.mjs` plus `phase1-runtime-deep-state.test.mjs` reached 18/18 under Node `v22.16.0` after module separation.
-- `reactivity.mjs`, `deep-state.mjs`, and the focused tests pass `node --check`; updated runtime and phase machine JSON parse successfully.
-
-### Still open
-
-- Compiler lowering for source-level `state`, `derive`, and `state.raw`, plus generated DOM observer bindings.
-- `state.snapshot` behavior specification and implementation; `OD-004` remains open and is not silently resolved.
-- Request ownership/cancellation, embedded TypeScript/CSS adapters, real code-generation source mappings, remaining narrow HTML ownership cases, and public conformance evidence.
+- Regression gate: runtime core plus deep state reached 18/18 under Node `v22.16.0` after module separation.
 
 ## 2026-10-10 — TypeScript reactive script lowering bridge
 
@@ -92,18 +85,39 @@ All material repository changes are recorded here. This file tracks project stat
 - `NOMOS-REACTIVE-DERIVE-WRITE` for writes to derived bindings and statically visible state writes during synchronous derive evaluation.
 - Focused compiler and runtime ABI regression suites plus `check:phase1:lowering`.
 
+### Earlier verification
+
+- Compiler lowering had recorded 10/10 focused tests under Node `v22.16.0` using an API-compatibility harness.
+- Runtime ABI plus existing runtime regression reached 20/20 under Node `v22.16.0`.
+
+## 2026-10-10 — Pinned CI gate and reactive loop assignment lowering
+
+### Added
+
+- `.github/workflows/ci.yml` as the reproducible dependency-backed verification surface for Phase 1 compiler/runtime work.
+- Pinned workflow runtime: Node `22.16.0`, pnpm `12.10.1`, exact repository dependencies including `@typescript/typescript6@6.0.2`.
+- Reactive direct-root `for...of` and `for...in` assignment-target lowering through a collision-safe generated loop temporary followed by the existing internal `write(...)` ABI.
+- Static derive-write detection now includes direct reactive loop assignment targets.
+- Regression controls preserve ordinary lexical-shadowed `for (let key in ...)` behavior.
+
+### CI bootstrap correction
+
+- The first workflow attempt failed before any tests because Corepack could not activate pnpm 12.10.1 from its cache (`MODULE_NOT_FOUND` for the pnpm binary).
+- The workflow was corrected to use `pnpm/action-setup@v6.1.0`, which successfully installed pnpm 12.10.1 before Node/dependency verification.
+- Because the first test-only workflow never reached the test command, the loop-target slice must **not** be described as an observed executable RED→GREEN cycle. The regression tests were authored before the fix, but RED execution was blocked by CI infrastructure.
+
 ### Verified
 
-- TDD RED for compiler lowering: module absent (`ERR_MODULE_NOT_FOUND`).
-- Compiler lowering GREEN: 10/10 focused tests under Node `v22.16.0` using the locally available TypeScript compiler API as an API-compatibility harness.
-- TDD RED for runtime compiler ABI: `updateState` export absent.
-- Runtime ABI plus existing runtime regression GREEN: 20/20 under Node `v22.16.0`.
-- Current public package baseline rechecked at `@typescript/typescript6@6.0.2`, Apache-2.0; Microsoft still documents TypeScript 7.0 as lacking a stable programmatic API.
+- GitHub Actions run `38102821673`: toolchain setup green with Node `22.16.0`, pnpm `12.10.1`, and `@typescript/typescript6@6.0.2`.
+- `check:phase1:lowering`: **14/14 passed**, including the new `for...of` / `for...in` regression cases and compiler/runtime ABI tests.
+- `check:phase1:runtime`: **20/20 passed**.
+- `check:phase1`: green; at that run it validated 56 required artifacts.
+- This CI evidence is development/regression evidence only and does not promote public `NCON-*` requirement rows under ADR-0007.
 
 ### Still open
 
-- Exact-pinned pnpm install/full repository run in an environment that can fetch the dependency.
-- `EmbeddedExpression` template lowering, generated DOM bindings, and template/DOM mapping production.
+- Reactive destructuring assignment-target lowering.
+- `EmbeddedExpression` template lowering, generated text/attribute DOM bindings, and template/DOM mapping production.
 - Lightning CSS executable adapter.
 - `state.snapshot` contract/implementation (`OD-004` remains open).
 - Public conformance green evidence.
