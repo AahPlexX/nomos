@@ -14,7 +14,7 @@ concurrency:
 
 jobs:
   verify:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
       - name: Checkout
@@ -35,9 +35,13 @@ jobs:
         run: |
           node --version
           pnpm --version
+          google-chrome --version
 
       - name: Install exact dependencies
         run: pnpm install --no-frozen-lockfile
+
+      - name: Verify template DOM slice
+        run: pnpm check:phase1:dom-slice
 
       - name: Verify Phase 1 lowering
         run: pnpm check:phase1:lowering
