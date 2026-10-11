@@ -1,3 +1,4 @@
+export { bindText } from './dom-bindings.mjs';
 export {
   createDerived,
   createStateCell,

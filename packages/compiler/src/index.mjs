@@ -27,6 +27,11 @@ export {
   lowerScript,
 } from './script-lowering.mjs';
 export {
+  createEmbeddedExpression,
+  lowerEmbeddedExpression,
+} from './expression-lowering.mjs';
+export { lowerTemplateTextBindings } from './template-lowering.mjs';
+export {
   composeDecodedMappings,
   createIdentitySourceMap,
   createSourceMapFromDecodedMappings,
