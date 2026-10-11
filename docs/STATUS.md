@@ -5,51 +5,56 @@
 **Required delivery branch:** `origin/main`  
 **Current phase:** 1 — Vertical Slice  
 **Phase state:** IN PROGRESS  
-**Active slice:** Compiler lowering, runtime reactivity/browser DOM, and public conformance infrastructure  
+**Active slice:** Compiler lowering, runtime browser DOM/attributes, and public conformance infrastructure  
 **Phase 0:** COMPLETE under PRD Amendment 0001
 
 ## Current compiler state
 
-The front end has lossless section partitioning, exact UTF-16 positions, flat/hierarchical template structures, typed exact-span attribute IR, 21 certified WHATWG ownership scenarios, ECMA-426 mapping primitives, executable TypeScript `EmbeddedScript`/`EmbeddedExpression` adapters, reactive script lowering, and a real-browser static-template/text-interpolation DOM path.
+The front end has lossless sections, exact UTF-16 positions, flat/hierarchical template structures, typed exact-span five-form attribute IR, 21 certified WHATWG ownership scenarios, ECMA-426 mapping primitives, TypeScript-backed script/expression lowering, browser-parsed static DOM/text interpolation, and the first executable standard-HTML attribute assignment slice.
 
 Accepted architecture remains ADR-0005/0006/0007/0008. All Wayfinder architecture tickets are resolved. All eleven PRD Open Decisions remain separate and open.
 
-### Typed template attributes
+### Standard HTML attribute binding
 
-`packages/compiler/src/attribute-ir.mjs` now preserves all five ratified non-directive attribute forms in durable Nomos IR:
+`template-dom-lowering.mjs` now consumes the existing typed attribute IR for three runtime-assigned forms on standard HTML elements:
 
-- static attributes, including boolean and quoted values;
-- dynamic `{expression}` values;
-- mixed quoted text/interpolation values;
-- shorthand `{identifier}`;
-- spread `{...expression}`.
+- dynamic `name={expression}`;
+- mixed `name="text {expression}"`;
+- shorthand `{identifier}`.
 
-Names, complete attribute spans, value spans, mixed parts, and expression body spans remain anchored to the original `.nomos` source. Nested brace expressions are preserved. Nomos directives remain separate on `Element.directives`; the new IR does not invent directive semantics.
+Dynamic-attribute elements receive collision-free temporary element markers in the static browser-parsed skeleton. Runtime `mountTemplate` discovers those elements after cloning, removes the marker attributes, and exposes deterministic element slots. Internal `bindAttribute` runs on the existing ADR-0008 DOM-observer phase.
 
-The pinned parser gate also exposed a latent duplicate-reporting defect: generic foster-parent validation and specialized table validation could both diagnose the same start-tag span. `table-structure-validation.mjs` now lets the specialized table rewrite replace only a same-span generic ownership diagnostic. No unrelated diagnostic is suppressed.
+Ordinary content attributes remove on `null`/`undefined` and otherwise use string content-attribute semantics. Certified HTML boolean attributes use presence/absence semantics; `inert` is covered by the executable contract. Source-map points are emitted for attribute setup and expression starts during the same generation pass.
+
+Safety boundaries remain explicit rather than guessed:
+
+- spread `{...expression}` remains guarded until merge/precedence semantics are defined and tested;
+- dynamic custom-element assignment remains guarded while `OD-008` is open;
+- expression-derived URL-bearing attributes remain guarded until the URL protocol validator is implemented;
+- inline event-handler attributes remain rejected; event behavior belongs to `on:` lowering;
+- property-backed native-control live state remains a later `bind:`/native-control slice.
+
+**Attribute-binding function status: 3/4 runtime forms complete** (dynamic, mixed, shorthand complete; spread remaining).
 
 ### Browser-parsed template DOM
 
-`template-dom-lowering.mjs` + runtime `mountTemplate` implement the first executable DOM slice. Supported static template source becomes one browser-parsed HTML skeleton; interpolation spans become deterministic comment markers; `mountTemplate` clones `HTMLTemplateElement.content`, replaces markers with real `Text` nodes, and registers cloned roots with ADR-0008 ownership. `bindText` updates those nodes through the existing DOM-observer phase.
-
-Trusted Types enforcement uses the existing required `nomos` policy-name contract. Source-map points are emitted for template mount, binding setup, and expression starts in the same lowering pass.
-
-Dynamic/mixed/shorthand/spread attributes are now represented correctly but **not yet assigned at runtime**. Directives, raw HTML, structural blocks, components, and unsafe interpolation contexts also remain explicitly rejected instead of being miscompiled.
+Static HTML remains one browser-parsed `HTMLTemplateElement` skeleton. Text slots use collision-free comments replaced with real `Text` nodes. Attribute-bound elements use collision-free temporary data attributes removed immediately after clone discovery. Cloned roots stay owner-managed and are removed on disposal. Trusted Types enforcement uses the required `nomos` policy name.
 
 ## Verification state
 
-GitHub Actions is the pinned Phase 1 verification surface.
+GitHub Actions is the pinned Phase 1 verification surface using Node `22.16.0`, pnpm `12.10.1`, TypeScript compatibility API `6.0.2`, and Chrome `154.0.8037.97`.
 
-- Browser-DOM RED `38122206062`: exact environment reached the intended missing `lowerTemplateDom` / `mountTemplate` seam.
-- Browser-DOM GREEN `38122323711`: DOM boundary **3/3**, real Chrome `154.0.8037.97` under Trusted Types enforcement, lowering **16/16**, runtime **21/21**.
-- Attribute-IR RED `38122824413`: the new attribute tests failed as intended; the newly enabled parser gate also exposed six pre-existing duplicate table ownership failures.
-- Attribute-IR/table-fix GREEN `38122979344`: parser **66/66**, DOM boundary **3/3 + real Chrome**, lowering **16/16**, runtime **21/21**, and the 68-artifact machine validator all passed. No tests were weakened.
+- Browser-DOM RED `38122206062`; GREEN `38122323711` established static DOM/text materialization.
+- Attribute-IR/table GREEN `38122979344` established parser **66/66** and typed five-form IR.
+- Latest pre-binding clean head `38123250039`: parser **66/66**, DOM **3/3 + Chrome/Trusted Types**, lowering **16/16**, runtime **21/21**, machine validator **70 artifacts**.
+- Attribute-binding behavioral RED `38168546695`: parser and real Chrome stayed green; focused DOM units were **3/7**, with failures caused by absent `bindAttribute` and still-guarded dynamic attributes.
+- Attribute-binding GREEN `38168894701`: parser **66/66**, focused DOM **7/7 + real Chrome/Trusted Types**, lowering **16/16**, runtime **23/23**, prior 70-artifact machine validator green.
 
-Development/CI evidence does **not** automatically promote normative `NCON-*` rows; ADR-0007 governs public conformance separately.
+Development/CI evidence does **not** automatically promote normative `NCON-*` rows; ADR-0007 remains authoritative.
 
 ## Public conformance state
 
-`NCON-NREQ-0145` remains wired but `NREQ-0145` is still **planned**, not passing. Passing requirement count remains zero.
+`NCON-NREQ-0145` remains wired but planned; passing requirement count remains zero.
 
 ## Wayfinder / Handoff
 
@@ -61,10 +66,9 @@ Portable Handoff: `/tmp/nomos-phase1-handoff.md`. Canonical facts are repository
 
 ## Immediate next action
 
-1. Define and test the safe standard-HTML dynamic attribute assignment policy from authoritative HTML/DOM behavior; do not guess custom-element pre-upgrade semantics while `OD-008` is open.
-2. Reuse typed attribute IR and existing TypeScript expression lowering to compile the first dynamic/mixed/shorthand standard-HTML attribute subset onto deterministic element slots.
-3. Emit attribute-stage source-map points during the same generation pass.
-4. Publish/test the built-in assignment table before extending into property-backed native controls.
-5. Add events/native-control bindings after that table is explicit.
-6. Continue structural blocks/components, reactive destructuring, and the CSS adapter as their prerequisites are ready.
-7. Keep `state.snapshot` blocked until its explicit contract/`OD-004` is resolved.
+1. Define spread-attribute source-order merge/precedence semantics test-first and implement the fourth required runtime attribute form without weakening the existing safety guards.
+2. Publish/test the built-in attribute/property assignment table before property-backed native-control expansion.
+3. Implement the dynamic URL protocol safety validator before allowing expression-derived URL-bearing attributes.
+4. Begin `on:` events and `bind:` native-control semantics after assignment policy is explicit.
+5. Continue structural blocks/components, reactive destructuring, and the CSS adapter as prerequisites permit.
+6. Keep `state.snapshot` blocked until its explicit contract/`OD-004` is resolved.
