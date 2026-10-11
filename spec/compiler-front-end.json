@@ -67,7 +67,8 @@
     "finalMapTarget": "original-.nomos-source",
     "finalMapValidation": "implemented-core",
     "scriptLoweringMappings": "implemented-with-original-nomos-sourcesContent",
-    "tokenLevelGeneratedMappings": "template-and-dom-lowering-planned"
+    "templateTextBindingMappings": "implemented-expression-start-to-original-nomos",
+    "tokenLevelGeneratedMappings": "partial-text-interpolation-expression-starts-only"
   },
   "phase0ParserCorpus": {
     "allValidFixtures": "certified-structural",
@@ -78,7 +79,7 @@
     "flatTreeType": "TemplateSyntaxTree",
     "hierarchicalTreeType": "Template",
     "hierarchicalTypedAst": "implemented-structural",
-    "typedEmbeddedExpressions": "boundary-resolved-implementation-planned"
+    "typedEmbeddedExpressions": "implemented-text-interpolation-slice"
   },
   "embeddedLanguages": {
     "decision": "docs/adr/0005-embedded-language-adapter-boundary.md",
@@ -93,8 +94,8 @@
       "dependencyPin": "6.0.2",
       "scriptWrapper": "implemented",
       "scriptLowering": "implemented-state-derive-state-raw",
-      "expressionAdapter": "planned",
-      "implementation": "embedded-script-and-reactive-lowering-implemented"
+      "expressionAdapter": "implemented-text-interpolation",
+      "implementation": "embedded-script-and-text-expression-lowering-implemented"
     },
     "css": {
       "wrapperKind": "EmbeddedStylesheet",
@@ -105,7 +106,7 @@
     "dependencyInstallation": "typescript6-pinned-and-ci-verified-lightningcss-deferred"
   },
   "reactiveLowering": {
-    "status": "script-core-implemented",
+    "status": "script-core-and-template-text-binding-ir-implemented",
     "bindingRecognition": "typescript-symbol-resolution",
     "supportedDeclarations": ["state", "state.raw", "derive"],
     "supportedRootWrites": [
@@ -117,23 +118,31 @@
       "for-in-assignment-target"
     ],
     "deepPropertyWrites": "runtime-proxy-path",
-    "helperCollisionAvoidance": "implemented-including-loop-temporaries",
+    "helperCollisionAvoidance": "implemented-including-loop-temporaries-and-template-binding-helpers",
     "internalRuntimeModule": "nomos/internal/runtime",
     "internalRuntimeFile": "packages/runtime/src/internal.mjs",
     "staticDeriveWriteDiagnostic": "NOMOS-REACTIVE-DERIVE-WRITE",
+    "templateTextBindings": {
+      "status": "binding-ir-and-runtime-seam-implemented",
+      "expressionEngine": "typescript6-symbol-aware",
+      "runtimeHelper": "bindText",
+      "schedulerPhase": "dom",
+      "nodeMaterialization": "planned",
+      "sourceMapping": "per-binding-expression-start-to-original-nomos"
+    },
     "verification": {
       "workflow": ".github/workflows/ci.yml",
       "node": "22.16.0",
       "pnpm": "12.10.1",
       "typescript": "6.0.2",
-      "loweringAndAbiTests": 14,
-      "runtimeTests": 20,
-      "lastVerifiedRun": 38102821673
+      "loweringAndAbiTests": 16,
+      "runtimeTests": 21,
+      "lastVerifiedRun": 38120937878
     },
     "remaining": [
       "destructuring-assignment-target-edge-cases",
-      "template-expression-lowering",
-      "generated-dom-binding-lowering"
+      "generated-dom-node-materialization",
+      "dynamic-attribute-lowering"
     ]
   },
   "conformance": {

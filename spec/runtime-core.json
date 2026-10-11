@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "status": "phase-1-runtime-deep-state-and-script-lowering-implemented",
+  "status": "phase-1-runtime-deep-state-script-and-text-binding-seam-implemented",
   "decision": "docs/adr/0008-runtime-ownership-and-scheduler.md",
   "research": "docs/phase-1/research/runtime-ownership-and-scheduling.md",
   "wayfinderDecision": "https://github.com/AahPlexX/nomos/issues/4",
@@ -29,9 +29,17 @@
   "compilerAbi": {
     "moduleSpecifier": "nomos/internal/runtime",
     "implementationFile": "packages/runtime/src/internal.mjs",
-    "exports": ["createStateCell", "createDerived", "read", "write", "updateState"],
+    "exports": ["bindText", "createStateCell", "createDerived", "read", "write", "updateState"],
     "updateStatePrefixPostfixSemantics": "implemented-number-and-bigint",
     "publicRootBudgetImpact": "none-internal-only"
+  },
+  "domBindings": {
+    "status": "text-helper-implemented",
+    "implementationFile": "packages/runtime/src/dom-bindings.mjs",
+    "textHelper": "bindText",
+    "scheduling": "dom-observer",
+    "ownership": "owner-disposal-stops-updates",
+    "nodeMaterialization": "compiler-planned"
   },
   "scheduler": {
     "primitive": "queueMicrotask",
@@ -66,12 +74,13 @@
     "async-tracking-cutoff",
     "named-cycle-diagnostics",
     "internal-prefix-postfix-update-helper",
-    "typescript-symbol-aware-state-derive-state-raw-lowering"
+    "typescript-symbol-aware-state-derive-state-raw-lowering",
+    "owner-backed-text-binding-helper"
   ],
   "remaining": [
     "state-snapshot-contract-and-implementation",
     "request-ownership-and-cancellation",
-    "generated-dom-binding-integration"
+    "generated-dom-node-materialization-and-attribute-binding-integration"
   ],
   "openDecisionImpact": "none"
 }

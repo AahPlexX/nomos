@@ -1,7 +1,7 @@
 # Phase 1 parser, embedded languages, lowering, and source maps
 
 **Status:** IN PROGRESS  
-**Last updated:** 2026-10-10
+**Last updated:** 2026-10-11
 
 ## Implemented compiler-front-end layers
 
@@ -11,54 +11,68 @@
 4. `html-formatting-ownership.mjs` / `formatting-structure-validation.mjs` — high-impact formatting/adoption-agency ownership validation.
 5. `template-ast.mjs` — hierarchical ownership transform while preserving the flat stream.
 6. `script-lowering.mjs` — TypeScript-backed `EmbeddedScript` adapter and symbol-aware lowering for `state`, `state.raw`, and `derive`.
-7. `source-map.mjs` — ECMA-426 identity support, decoded mapping validation/composition, unmapped-scaffolding preservation, and version-3 encoding.
+7. `expression-lowering.mjs` — TypeScript-backed `EmbeddedExpression` records, symbol-aware reactive reads, lexical-shadowing preservation, and source-translated syntax diagnostics for text interpolations.
+8. `template-lowering.mjs` — `TextBinding` IR, collision-safe runtime helper aliases, owner-backed binding setup statements, and first template expression mapping production.
+9. `source-map.mjs` — ECMA-426 identity support, decoded mapping validation/composition, unmapped-scaffolding preservation, and version-3 encoding.
 
-The parser structurally certifies the Phase 0 fixture corpus and currently records **21 certified WHATWG ownership-rewrite scenarios**. Coverage remains intentionally narrower than a duplicate browser parser; unresolved ownership work is limited to remaining active-formatting reconstruction and lower-frequency special/table/template insertion modes.
+The parser structurally certifies the Phase 0 fixture corpus and records **21 certified WHATWG ownership-rewrite scenarios**. Coverage remains intentionally narrower than a duplicate browser parser; unresolved ownership work is limited to material active-formatting reconstruction and lower-frequency special/table/template insertion modes.
 
 ## Embedded TypeScript implementation
 
-ADR-0005 remains the architecture boundary: Nomos owns durable `EmbeddedScript` / `EmbeddedExpression` records and exact `.nomos` spans; TypeScript AST/Program objects remain opaque adapter internals.
+ADR-0005 remains the architecture boundary: Nomos owns durable `EmbeddedScript` / `EmbeddedExpression` records and exact `.nomos` spans; TypeScript AST/Program/checker objects remain adapter internals.
 
-The script half of that boundary is now executable:
+### EmbeddedScript
+
+The script boundary is executable:
 
 - root dependency is exact-pinned to `@typescript/typescript6@6.0.2`;
-- `EmbeddedScript` owns raw body text, exact body span, `ts`/explicit `js` language, original filename, virtual filename, and adapter metadata;
-- source-level primitive recognition follows TypeScript symbols from actual `nomos` imports, including aliases, instead of identifier spelling;
-- shadowing therefore does not accidentally trigger Nomos transforms;
-- helper identifiers are generated collision-free against user identifiers;
-- `state(initial)` lowers to the internal state-cell ABI;
-- `state.raw(initial)` lowers to the same cell ABI with `raw: true`;
-- `derive(() => value)` lowers to the internal lazy-derived ABI;
-- transparent state/derive reads lower to runtime `read` operations;
-- direct root assignment, compound assignment, prefix update, and postfix update lower to runtime writes/update helpers;
-- nested property writes continue through the deep-state proxy rather than a second mutation system;
-- writes to a derive and statically visible state writes during synchronous derive evaluation emit `NOMOS-REACTIVE-DERIVE-WRITE`.
+- `EmbeddedScript` owns raw body text, exact body span, language (`ts` or explicit `js`), original filename, virtual filename, and adapter metadata;
+- source-level primitive recognition follows TypeScript symbols from actual `nomos` imports, including aliases and lexical shadowing;
+- `state`, `state.raw`, `derive`, transparent reads, root writes, prefix/postfix updates, and direct reactive-root `for...of` / `for...in` assignment targets lower to the internal runtime ABI;
+- nested property writes continue through the deep-state proxy;
+- helper and loop-temporary identifiers are collision-safe;
+- writes to derives and statically visible state writes during synchronous derive evaluation emit `NOMOS-REACTIVE-DERIVE-WRITE`.
 
-`EmbeddedExpression` parsing/lowering for template expressions remains planned. Lightning CSS remains planned and uninstalled until executable stylesheet adapter code consumes it.
+Reactive destructuring assignment targets remain unfinished.
+
+### EmbeddedExpression and text binding IR
+
+The first expression slice is also executable:
+
+- each interpolation produces an `EmbeddedExpression` owning its exact brace span, expression-body span, raw TypeScript expression text, original filename, deterministic virtual filename, and adapter version metadata;
+- TypeScript parses the expression inside a deterministic synthetic wrapper rather than Nomos implementing a separate expression parser;
+- reactive bindings supplied by script lowering are represented as synthetic declarations and resolved through TypeScript symbol identity;
+- lexical shadowing inside the expression therefore prevents accidental reactive rewriting;
+- reactive reads lower to the existing internal `read(...)` ABI;
+- TypeScript syntax diagnostics are translated back to original `.nomos` offsets/spans;
+- successful interpolation lowering produces `TextBinding` IR and an owner-backed `bindText(...)` setup statement.
+
+This is not yet complete template semantic type checking. Nonreactive script constants/imports remain lexical references in generated expression code; a later integrated component/type-checking stage must provide the complete template-visible scope and diagnostics required by the PRD.
 
 ## Generated source maps
 
-ADR-0006 remains authoritative. The existing exact decoded-map composition core is unchanged.
+ADR-0006 remains authoritative. The exact decoded-map composition core is unchanged.
 
-Reactive script lowering now also produces real TypeScript-emitter version-3 source maps. For `.nomos` component scripts, the compiler preserves the original line/UTF-16-column coordinates by padding the pre-script prefix with coordinate-preserving whitespace before TypeScript parsing, then rewrites `sources`/`sourcesContent` back to the original `.nomos` file and full source. This avoids guessing offsets after emit.
+Reactive script lowering produces TypeScript-emitter version-3 source maps rebased to the original `.nomos` source while retaining full `sourcesContent`.
 
-Remaining source-map work is now specifically template/DOM lowering and final multi-stage integration; script lowering is no longer a mapping-free stage.
+The text-binding slice now emits the first template-stage mappings as well. Every successful `TextBinding` records one exact decoded mapping point from the start of its generated expression code to the start of the original `.nomos` interpolation body. That point is encoded as an ECMA-426 version-3 source map with full original source content.
+
+This is intentionally **partial mapping production**, not token-complete template/DOM mapping. Static DOM scaffolding remains unmapped and actual DOM node materialization/attribute code generation are not implemented yet. Their mappings must be produced in those generation passes and composed through the existing ADR-0006 primitives rather than reconstructed afterward.
 
 ## Verification history relevant to the current frontier
 
 - Source-map composition core: 4/4 focused tests under Node `v22.16.0` after recorded RED.
-- HTML ownership: 21 machine-recorded certified rewrite scenarios across implied-close, table, and high-impact formatting families.
-- Reactive script lowering RED: module absent (`ERR_MODULE_NOT_FOUND`).
-- Reactive script lowering GREEN: 10/10 focused lowering tests under Node `v22.16.0` using the locally available TypeScript compiler API as an API-compatibility harness.
-- Runtime compiler ABI RED: `updateState` export absent.
-- Runtime compiler ABI + existing runtime regressions GREEN: 20/20 under Node `v22.16.0`.
-- The repository exact-pins `@typescript/typescript6@6.0.2`; this environment does not provide a fresh pnpm installation of that exact package, so a whole-repository pinned-dependency run is not claimed.
+- HTML ownership: 21 machine-recorded certified rewrite scenarios.
+- Reactive script lowering: prior recorded module-absent RED; script-focused GREEN established before pinned CI.
+- Pinned CI later verified script lowering/ABI at 14/14 and runtime at 20/20.
+- Text-binding RED run `38120782593`: exact pinned environment reached tests; 14 existing lowering/ABI tests passed and the feature suite failed because `template-lowering.mjs` did not exist.
+- Text-binding GREEN run `38120937878`: lowering/ABI/expression **16/16**, runtime **21/21**, and the then-current Phase 1 machine-state validator green.
 
 ## Remaining before `Parser and source maps` can close
 
-- `EmbeddedExpression` adapter/lowering for template expressions;
+- real DOM node materialization and dynamic/mixed/shorthand/spread attribute generation with mappings produced in the same passes;
+- complete template semantic/type-check integration beyond the first text-expression slice;
 - `EmbeddedStylesheet` adapter using exact-pinned Lightning CSS when executable code consumes it;
-- template/DOM code generation with mapping production and composition;
 - remaining material HTML ownership edge cases;
 - public `NCON-*` coverage and green evidence for applicable requirements;
 - later Vite/HMR integration without silently resolving `OD-003`.

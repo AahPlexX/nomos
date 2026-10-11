@@ -13,10 +13,13 @@ const required = [
   'packages/compiler/src/table-structure-validation.mjs',
   'packages/compiler/src/html-formatting-ownership.mjs',
   'packages/compiler/src/formatting-structure-validation.mjs',
+  'packages/compiler/src/script-lowering.mjs',
+  'packages/compiler/src/expression-lowering.mjs',
+  'packages/compiler/src/template-lowering.mjs',
   'packages/runtime/src/reactivity.mjs',
   'packages/runtime/src/deep-state.mjs',
+  'packages/runtime/src/dom-bindings.mjs',
   'packages/runtime/src/internal.mjs',
-  'packages/compiler/src/script-lowering.mjs',
   'tests/phase1-parser.test.mjs',
   'tests/phase1-parser-structural.test.mjs',
   'tests/phase1-parser-ast.test.mjs',
@@ -34,7 +37,9 @@ const required = [
   'tests/phase1-runtime-core.test.mjs',
   'tests/phase1-runtime-deep-state.test.mjs',
   'tests/phase1-runtime-compiler-abi.test.mjs',
+  'tests/phase1-runtime-text-binding.test.mjs',
   'tests/phase1-compiler-reactive-lowering.test.mjs',
+  'tests/phase1-template-expression-lowering.test.mjs',
   'tests/phase1-source-map-composition.test.mjs',
   'tests/phase1-conformance-harness.test.mjs',
   'docs/diagnostics/NOMOS-PARSE-HTML-OWNERSHIP.md',
@@ -67,13 +72,18 @@ const phase = JSON.parse(await readFile(new URL('spec/phase-status.json', root),
 assert.equal(phase.currentPhase, 1);
 assert.equal(phase.phase1.status, 'in-progress');
 assert.equal(phase.phase1.parserAndSourceMaps, 'in-progress');
-assert.equal(phase.phase1.runtimeCore, 'deep-state-and-script-lowering-implemented');
+assert.equal(phase.phase1.runtimeCore, 'deep-state-script-and-text-binding-seam-implemented');
 assert.equal(phase.phase1.conformanceInfrastructure, 'foundation-implemented');
 assert.ok(phase.phase1.parserImplemented.includes('whatwg-high-impact-formatting-adoption-agency-ownership'));
 assert.ok(phase.phase1.parserImplemented.includes('typescript-embedded-script-wrapper-and-reactive-lowering'));
 assert.ok(phase.phase1.parserImplemented.includes('typescript-reactive-loop-assignment-target-lowering'));
+assert.ok(phase.phase1.parserImplemented.includes('typescript-embedded-expression-and-text-binding-ir-lowering'));
 assert.ok(phase.phase1.parserImplemented.includes('typescript-script-emitter-source-maps-to-original-nomos'));
+assert.ok(phase.phase1.parserImplemented.includes('template-text-binding-original-source-mapping'));
+assert.ok(phase.phase1.parserRemaining.includes('embedded-css-adapter-implementation'));
 assert.ok(phase.phase1.parserRemaining.includes('remaining-reactive-destructuring-assignment-target-lowering'));
+assert.ok(phase.phase1.parserRemaining.includes('dom-node-materialization-and-attribute-binding-mapping-production'));
+assert.ok(!phase.phase1.parserRemaining.some((entry) => entry.includes('typescript-expression')));
 assert.ok(phase.phase1.runtimeImplemented.includes('adr-0008-owner-and-scheduler-architecture'));
 assert.ok(phase.phase1.runtimeImplemented.includes('deep-tracking-plain-object-array-map-set'));
 assert.ok(phase.phase1.runtimeImplemented.includes('raw-state-cell-runtime-semantics'));
@@ -83,14 +93,17 @@ assert.ok(phase.phase1.runtimeImplemented.includes('named-reactive-cycle-diagnos
 assert.ok(phase.phase1.runtimeImplemented.includes('compiler-internal-update-state-helper'));
 assert.ok(phase.phase1.runtimeImplemented.includes('compiler-state-derive-and-state-raw-script-lowering'));
 assert.ok(phase.phase1.runtimeImplemented.includes('compiler-reactive-for-of-and-for-in-target-lowering'));
+assert.ok(phase.phase1.runtimeImplemented.includes('internal-owner-backed-text-binding-helper'));
 assert.ok(phase.phase1.runtimeRemaining.includes('state-snapshot-contract-and-implementation'));
+assert.ok(phase.phase1.runtimeRemaining.includes('generated-dom-node-materialization-and-attribute-binding-integration'));
 assert.equal(phase.phase1.runtimeMachineSpec, 'spec/runtime-core.json');
 assert.equal(phase.phase1.verification.workflow, '.github/workflows/ci.yml');
 assert.equal(phase.phase1.verification.node, '22.16.0');
 assert.equal(phase.phase1.verification.pnpm, '12.10.1');
 assert.equal(phase.phase1.verification.typescript6, '6.0.2');
-assert.equal(phase.phase1.verification.loweringAndAbiTests, 14);
-assert.equal(phase.phase1.verification.runtimeTests, 20);
+assert.equal(phase.phase1.verification.loweringAndAbiTests, 16);
+assert.equal(phase.phase1.verification.runtimeTests, 21);
+assert.equal(phase.phase1.verification.lastVerifiedRun, 38120937878);
 assert.deepEqual(phase.phase1.openWayfinderDecisions, []);
 assert.equal(phase.phase1.conformance.seedTestStatus, 'wired-unverified');
 assert.equal(phase.phase1.conformance.passingRequirementCount, 0);
@@ -99,25 +112,36 @@ const frontEnd = JSON.parse(await readFile(new URL('spec/compiler-front-end.json
 assert.equal(frontEnd.sourceMaps.standard, 'ECMA-426');
 assert.equal(frontEnd.sourceMaps.stageLocalMappings, 'core-composer-plus-typescript-script-emitter-implemented');
 assert.equal(frontEnd.sourceMaps.scriptLoweringMappings, 'implemented-with-original-nomos-sourcesContent');
+assert.equal(frontEnd.sourceMaps.templateTextBindingMappings, 'implemented-expression-start-to-original-nomos');
+assert.equal(frontEnd.sourceMaps.tokenLevelGeneratedMappings, 'partial-text-interpolation-expression-starts-only');
 assert.equal(frontEnd.htmlOwnership.certifiedRewriteCount, 21);
 assert.equal(frontEnd.templateSyntax.hierarchicalTypedAst, 'implemented-structural');
+assert.equal(frontEnd.templateSyntax.typedEmbeddedExpressions, 'implemented-text-interpolation-slice');
 assert.equal(frontEnd.embeddedLanguages.typescript.dependencyPin, '6.0.2');
 assert.equal(frontEnd.embeddedLanguages.typescript.scriptWrapper, 'implemented');
 assert.equal(frontEnd.embeddedLanguages.typescript.scriptLowering, 'implemented-state-derive-state-raw');
-assert.equal(frontEnd.embeddedLanguages.typescript.expressionAdapter, 'planned');
-assert.equal(frontEnd.reactiveLowering.status, 'script-core-implemented');
+assert.equal(frontEnd.embeddedLanguages.typescript.expressionAdapter, 'implemented-text-interpolation');
+assert.equal(frontEnd.embeddedLanguages.css.implementation, 'planned');
+assert.equal(frontEnd.reactiveLowering.status, 'script-core-and-template-text-binding-ir-implemented');
 assert.equal(frontEnd.reactiveLowering.bindingRecognition, 'typescript-symbol-resolution');
 assert.ok(frontEnd.reactiveLowering.supportedRootWrites.includes('for-of-assignment-target'));
 assert.ok(frontEnd.reactiveLowering.supportedRootWrites.includes('for-in-assignment-target'));
 assert.ok(frontEnd.reactiveLowering.remaining.includes('destructuring-assignment-target-edge-cases'));
+assert.ok(frontEnd.reactiveLowering.remaining.includes('generated-dom-node-materialization'));
+assert.ok(frontEnd.reactiveLowering.remaining.includes('dynamic-attribute-lowering'));
+assert.equal(frontEnd.reactiveLowering.templateTextBindings.status, 'binding-ir-and-runtime-seam-implemented');
+assert.equal(frontEnd.reactiveLowering.templateTextBindings.expressionEngine, 'typescript6-symbol-aware');
+assert.equal(frontEnd.reactiveLowering.templateTextBindings.runtimeHelper, 'bindText');
+assert.equal(frontEnd.reactiveLowering.templateTextBindings.schedulerPhase, 'dom');
+assert.equal(frontEnd.reactiveLowering.templateTextBindings.nodeMaterialization, 'planned');
 assert.equal(frontEnd.reactiveLowering.verification.workflow, '.github/workflows/ci.yml');
-assert.equal(frontEnd.reactiveLowering.verification.loweringAndAbiTests, 14);
-assert.equal(frontEnd.reactiveLowering.verification.runtimeTests, 20);
+assert.equal(frontEnd.reactiveLowering.verification.loweringAndAbiTests, 16);
+assert.equal(frontEnd.reactiveLowering.verification.runtimeTests, 21);
+assert.equal(frontEnd.reactiveLowering.verification.lastVerifiedRun, 38120937878);
 assert.equal(frontEnd.reactiveLowering.internalRuntimeFile, 'packages/runtime/src/internal.mjs');
-assert.equal(frontEnd.embeddedLanguages.css.implementation, 'planned');
 
 const runtime = JSON.parse(await readFile(new URL('spec/runtime-core.json', root), 'utf8'));
-assert.equal(runtime.status, 'phase-1-runtime-deep-state-and-script-lowering-implemented');
+assert.equal(runtime.status, 'phase-1-runtime-deep-state-script-and-text-binding-seam-implemented');
 assert.equal(runtime.decision, 'docs/adr/0008-runtime-ownership-and-scheduler.md');
 assert.ok(runtime.graph.sources.includes('deep-property-source'));
 assert.equal(runtime.deepState.status, 'runtime-implemented');
@@ -127,6 +151,13 @@ assert.equal(runtime.deepState.rawOptOut, 'implemented-as-state-cell-raw-option'
 assert.equal(runtime.deepState.publicStateRawSurface, 'implemented-by-typescript-script-lowering');
 assert.equal(runtime.compilerAbi.implementationFile, 'packages/runtime/src/internal.mjs');
 assert.ok(runtime.compilerAbi.exports.includes('updateState'));
+assert.ok(runtime.compilerAbi.exports.includes('bindText'));
+assert.equal(runtime.domBindings.status, 'text-helper-implemented');
+assert.equal(runtime.domBindings.implementationFile, 'packages/runtime/src/dom-bindings.mjs');
+assert.equal(runtime.domBindings.textHelper, 'bindText');
+assert.equal(runtime.domBindings.scheduling, 'dom-observer');
+assert.equal(runtime.domBindings.ownership, 'owner-disposal-stops-updates');
+assert.equal(runtime.domBindings.nodeMaterialization, 'compiler-planned');
 assert.equal(runtime.scheduler.primitive, 'queueMicrotask');
 assert.deepEqual(runtime.scheduler.flushPhases, ['dom', 'sync']);
 assert.equal(runtime.scheduler.syncYieldsToNewDomWork, true);
@@ -136,7 +167,9 @@ assert.deepEqual(runtime.ownership.disposalOrder, ['child-owners', 'local-cleanu
 assert.equal(runtime.cycleDetection.status, 'development-runtime-implemented');
 assert.ok(runtime.implementedSlice.includes('deep-tracked-plain-object-array-map-set'));
 assert.ok(runtime.implementedSlice.includes('raw-state-cell-runtime-semantics'));
+assert.ok(runtime.implementedSlice.includes('owner-backed-text-binding-helper'));
 assert.ok(runtime.remaining.includes('state-snapshot-contract-and-implementation'));
+assert.ok(runtime.remaining.includes('generated-dom-node-materialization-and-attribute-binding-integration'));
 assert.equal(runtime.openDecisionImpact, 'none');
 
 const conformance = JSON.parse(await readFile(new URL('spec/conformance.json', root), 'utf8'));
@@ -145,4 +178,4 @@ assert.equal(conformance.browserSubstitutionAllowed, false);
 assert.equal(conformance.seedTest.status, 'wired-unverified');
 assert.deepEqual(conformance.passingRequirements, []);
 
-console.log(`Phase 1 check passed: ${required.length} required artifacts; compiler foundations, 21 HTML ownership scenarios, deep runtime state, CI-verified TypeScript-symbol-aware state/derive/state.raw lowering, and reactive for-of/for-in targets are implemented while destructuring/template/DOM lowering, snapshot semantics, remaining adapters, and public green evidence remain in progress.`);
+console.log(`Phase 1 check passed: ${required.length} required artifacts; compiler foundations, 21 HTML ownership scenarios, deep runtime state, CI-verified script lowering, EmbeddedExpression text-binding IR, owner-backed bindText, and first template mapping points are implemented while DOM node materialization, attribute lowering, snapshot semantics, CSS adapter work, and public green evidence remain in progress.`);

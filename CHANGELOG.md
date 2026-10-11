@@ -61,12 +61,11 @@ All material repository changes are recorded here. This file tracks project stat
 ### Added
 
 - `packages/runtime/src/deep-state.mjs` isolates deep proxy/collection tracking from the ADR-0008 scheduler and owner core.
-- Plain objects and arrays now track property/index/iteration dependencies; array length and truncation invalidate the appropriate dependents.
-- `Map` and `Set` now provide reactive membership, size, iteration, and mutation behavior for `set`/`add`, `delete`, and `clear`, including stable wrapping of deep values.
+- Plain objects and arrays now track property/index/iteration dependencies; array length and truncation invalidate appropriate dependents.
+- `Map` and `Set` now provide reactive membership, size, iteration, and mutation behavior for `set`/`add`, `delete`, and `clear`.
 - Proxy identity is stable per state cell and cycle-safe.
-- Class instances, dates, DOM nodes, typed arrays, promises, errors, functions, weak collections, and frozen objects remain reference-held rather than internally reactive.
-- Runtime raw-state behavior is implemented with the same state-cell ABI via `{ raw: true }`.
-- Added `tests/phase1-runtime-deep-state.test.mjs`; the existing runtime wildcard gate automatically includes it.
+- Class instances, dates, DOM nodes, typed arrays, promises, errors, functions, weak collections, and frozen objects remain reference-held.
+- Runtime raw-state behavior uses the same state-cell ABI via `{ raw: true }`.
 
 ### Verified
 
@@ -102,22 +101,43 @@ All material repository changes are recorded here. This file tracks project stat
 
 ### CI bootstrap correction
 
-- The first workflow attempt failed before any tests because Corepack could not activate pnpm 12.10.1 from its cache (`MODULE_NOT_FOUND` for the pnpm binary).
-- The workflow was corrected to use `pnpm/action-setup@v6.1.0`, which successfully installed pnpm 12.10.1 before Node/dependency verification.
-- Because the first test-only workflow never reached the test command, the loop-target slice must **not** be described as an observed executable RED→GREEN cycle. The regression tests were authored before the fix, but RED execution was blocked by CI infrastructure.
+- The first workflow attempt failed before tests because Corepack could not activate pnpm 12.10.1 from its cache.
+- The workflow was corrected to use `pnpm/action-setup@v6.1.0`.
+- Because the first test-only workflow never reached the test command, the loop-target slice is not described as an observed executable RED→GREEN cycle.
 
 ### Verified
 
-- GitHub Actions run `38102821673`: toolchain setup green with Node `22.16.0`, pnpm `12.10.1`, and `@typescript/typescript6@6.0.2`.
-- `check:phase1:lowering`: **14/14 passed**, including the new `for...of` / `for...in` regression cases and compiler/runtime ABI tests.
+- GitHub Actions run `38102821673`: exact toolchain setup green.
+- `check:phase1:lowering`: **14/14 passed**.
 - `check:phase1:runtime`: **20/20 passed**.
-- `check:phase1`: green; at that run it validated 56 required artifacts.
-- This CI evidence is development/regression evidence only and does not promote public `NCON-*` requirement rows under ADR-0007.
+- `check:phase1`: green.
+- CI evidence remains development/regression evidence and does not promote public `NCON-*` requirement rows under ADR-0007.
 
-### Still open
+## 2026-10-11 — EmbeddedExpression and text-binding runtime seam
 
-- Reactive destructuring assignment-target lowering.
-- `EmbeddedExpression` template lowering, generated text/attribute DOM bindings, and template/DOM mapping production.
-- Lightning CSS executable adapter.
-- `state.snapshot` contract/implementation (`OD-004` remains open).
-- Public conformance green evidence.
+### Added
+
+- `packages/compiler/src/expression-lowering.mjs` implements durable `EmbeddedExpression` extraction with exact original `.nomos` spans and TypeScript 6 adapter metadata.
+- Template expressions are parsed with the already-pinned TypeScript 6 compiler API rather than a second Nomos expression parser.
+- Reactive script bindings supplied to template lowering are resolved by TypeScript symbol identity; lexical shadowing inside a template expression remains ordinary TypeScript.
+- Invalid interpolation syntax produces TypeScript diagnostics translated to original `.nomos` offsets/spans.
+- `packages/compiler/src/template-lowering.mjs` emits `TextBinding` IR with collision-safe helper/node identifiers and owner-backed `bindText(...)` setup statements.
+- Every successful text binding emits an ECMA-426 version-3 map point from the generated expression start to the original `.nomos` expression-body start, retaining full original `sourcesContent`.
+- `packages/runtime/src/dom-bindings.mjs` adds internal `bindText`, delegating scheduling and cleanup to the existing ADR-0008 DOM observer/owner system.
+- `packages/runtime/src/internal.mjs` exposes `bindText` only through the compiler-internal ABI; public root API budget is unchanged.
+
+### TDD evidence
+
+- RED run `38120782593`: pinned toolchain/dependencies installed successfully; 14 existing lowering/ABI tests passed, then the new feature suite failed with `ERR_MODULE_NOT_FOUND` for absent `packages/compiler/src/template-lowering.mjs`. Runtime/machine-state steps were skipped by the failed lowering gate.
+- GREEN run `38120937878`: `check:phase1:lowering` reached **16/16**, including reactive-read/shadowing/mapping and invalid-syntax expression cases.
+- The same GREEN run: `check:phase1:runtime` reached **21/21**, including owner-backed `bindText` mount/update/disposal behavior.
+- The Phase 1 validator was green on the then-current 57-artifact machine state before this documentation/validator synchronization.
+
+### Boundary retained
+
+- This slice does not yet materialize actual DOM text nodes from the template AST; `TextBinding.nodeIdentifier` is code-generation IR for the next slice.
+- Dynamic/mixed/shorthand/spread attribute lowering is not implemented yet.
+- The expression adapter does not claim complete cross-component/template semantic type checking for all script/import scopes yet.
+- Reactive destructuring assignment targets remain open.
+- `state.snapshot` remains blocked on its explicit contract/`OD-004`.
+- No public `NCON-*` requirement row is promoted by these development tests.
