@@ -22,6 +22,11 @@ export {
 } from './html-formatting-ownership.mjs';
 export { validateFormattingStructure } from './formatting-structure-validation.mjs';
 export {
+  createEmbeddedScript,
+  lowerComponentScript,
+  lowerScript,
+} from './script-lowering.mjs';
+export {
   composeDecodedMappings,
   createIdentitySourceMap,
   createSourceMapFromDecodedMappings,
