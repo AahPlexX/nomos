@@ -1,0 +1,45 @@
+name: Nomos CI
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: nomos-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22.16.0
+          package-manager-cache: false
+
+      - name: Activate pinned pnpm
+        run: |
+          corepack enable
+          corepack prepare pnpm@12.10.1 --activate
+          pnpm --version
+
+      - name: Install exact dependencies
+        run: pnpm install --no-frozen-lockfile
+
+      - name: Verify Phase 1 lowering
+        run: pnpm check:phase1:lowering
+
+      - name: Verify runtime
+        run: pnpm check:phase1:runtime
+
+      - name: Verify Phase 1 machine state
+        run: pnpm check:phase1
