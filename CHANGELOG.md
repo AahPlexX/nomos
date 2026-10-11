@@ -51,25 +51,32 @@ All material repository changes are recorded here. This file tracks project stat
 
 ## 2026-10-10 — Runtime ownership, scheduler, and reactive core
 
+- ADR-0008 resolves Wayfinder issue #4 with one versioned fine-grained graph, one owner tree, lazy derives, and an ordered DOM-before-sync microtask scheduler.
+- Added `packages/runtime/src/reactivity.mjs`, scalar cells, derives, dynamic dependencies, derive-write guards, `untrack()`, mount-gated DOM/sync observers, sync cleanup, deterministic owner disposal, and named cycle errors.
+- Proper behavioral RED was established against a skeletal runtime; GREEN reached 10/10 focused runtime contract tests under Node `v22.16.0`.
+- `spec/runtime-core.json` and the Phase 1 validator were added; no normative requirement row was promoted from development tests alone.
+
+## 2026-10-10 — Deep reactive state and raw-state runtime semantics
+
 ### Added
 
-- ADR-0008 resolves Wayfinder issue #4 with one versioned fine-grained graph, one owner tree, lazy derives, and an ordered DOM-before-sync microtask scheduler.
-- `packages/runtime/src/reactivity.mjs` implements the first executable Phase 1 runtime core using platform `Map`, `Set`, and `queueMicrotask()` primitives rather than a third-party reactivity engine.
-- Versioned scalar state cells, lazy memoized derives, dynamic dependency capture/removal, development derive-write guards, `untrack()`, mount-gated DOM/sync observers, sync cleanup, deterministic owner disposal, and named reactive-cycle errors.
-- `spec/runtime-core.json` records the implemented core and explicitly separates deep state, `state.raw`, snapshot semantics, compiler lowering, request cancellation, and generated DOM binding work.
-- `docs/phase-1/research/runtime-ownership-and-scheduling.md` caches the architecture research and dependency decision.
-- `tests/phase1-runtime-core.test.mjs` provides a lean 10-test contract suite; `check:phase1:runtime` runs it directly.
+- `packages/runtime/src/deep-state.mjs` isolates deep proxy/collection tracking from the ADR-0008 scheduler and owner core.
+- Plain objects and arrays now track property/index/iteration dependencies; array length and truncation invalidate the appropriate dependents.
+- `Map` and `Set` now provide reactive membership, size, iteration, and mutation behavior for `set`/`add`, `delete`, and `clear`, including stable wrapping of deep values.
+- Proxy identity is stable per state cell and cycle-safe.
+- Class instances, dates, DOM nodes, typed arrays, promises, errors, functions, weak collections, and frozen objects remain reference-held rather than internally reactive.
+- Runtime raw-state behavior is implemented with the same state-cell ABI via `{ raw: true }`; source-level `state.raw(...)` remains a compiler-lowering task rather than a second runtime system.
+- Added `tests/phase1-runtime-deep-state.test.mjs`; the existing runtime wildcard gate automatically includes it.
 
 ### Verified
 
-- Proper RED was re-established against a deliberately reverted skeletal runtime: the suite exited non-zero with behavioral assertion failures for memoization, dynamic dependencies, derive-write protection, scheduler ordering, async tracking, cycle detection, automatic microtask delivery, and sync cleanup.
-- GREEN: 10/10 runtime contract tests pass under Node `v22.16.0`.
-- Runtime source passes `node --check`; runtime machine state parses as valid JSON.
-- No normative requirement row is promoted from development tests alone; ADR-0007 public conformance evidence remains required.
+- RED: before implementation, the deep-state suite passed 3/8 controls and failed 5/8 required deep behaviors (nested object mutation, object-key iteration, arrays, Map, and Set).
+- GREEN: deep-state suite reached 8/8.
+- Regression gate: `phase1-runtime-core.test.mjs` plus `phase1-runtime-deep-state.test.mjs` reached 18/18 under Node `v22.16.0` after module separation.
+- `reactivity.mjs`, `deep-state.mjs`, and the focused tests pass `node --check`; updated runtime and phase machine JSON parse successfully.
 
 ### Still open
 
-- Deep reactive tracking for plain objects, arrays, `Map`, and `Set`; `state.raw`; and compiler lowering to the internal cell ABI.
+- Compiler lowering for source-level `state`, `derive`, and `state.raw`, plus generated DOM observer bindings.
 - `state.snapshot` behavior specification and implementation; `OD-004` remains open and is not silently resolved.
-- Request ownership/cancellation and generated DOM binding integration.
-- Embedded TypeScript/CSS adapters, real code-generation source mappings, remaining narrow HTML ownership cases, and public conformance evidence.
+- Request ownership/cancellation, embedded TypeScript/CSS adapters, real code-generation source mappings, remaining narrow HTML ownership cases, and public conformance evidence.
