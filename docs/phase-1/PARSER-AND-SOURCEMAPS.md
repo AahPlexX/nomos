@@ -8,64 +8,56 @@
 1. `parser.mjs` — lossless top-level section partitioning and exact UTF-16 source positions.
 2. `template-syntax.mjs` — flat structural syntax stream for diagnostics and source ownership.
 3. `attribute-ir.mjs` — typed exact-span IR for static, dynamic, mixed, shorthand, and spread attributes; directives remain separate.
-4. `html-table-ownership.mjs` / `table-structure-validation.mjs` — certified WHATWG table ownership rules, stack repair, and same-span generic-diagnostic replacement.
-5. `html-formatting-ownership.mjs` / `formatting-structure-validation.mjs` — high-impact formatting/adoption-agency ownership validation.
-6. `template-ast.mjs` — hierarchical ownership transform consuming typed attribute IR while retaining the flat syntax stream for diagnostics/debugging.
-7. `script-lowering.mjs` — TypeScript-backed `EmbeddedScript` and symbol-aware reactive lowering.
-8. `expression-lowering.mjs` — TypeScript-backed `EmbeddedExpression`, symbol-aware reactive reads, shadowing preservation, and source-translated syntax diagnostics.
-9. `template-lowering.mjs` — `TextBinding` IR and owner-backed binding setup statements.
-10. `template-dom-lowering.mjs` — static browser-parsed HTML skeleton, interpolation markers, executable `mountTemplate`/`bindText` code, explicit unsupported-feature guards, and template mapping points.
-11. `source-map.mjs` — ECMA-426 identity support, decoded mapping validation/composition, unmapped-scaffolding preservation, and version-3 encoding.
+4. HTML ownership modules — 21 certified WHATWG ownership scenarios plus same-span specialized table-diagnostic precedence.
+5. `template-ast.mjs` — hierarchical ownership transform consuming typed attribute IR.
+6. `script-lowering.mjs` / `expression-lowering.mjs` — TypeScript 6-backed reactive script and embedded-expression lowering.
+7. `template-lowering.mjs` — text-binding IR.
+8. `template-dom-lowering.mjs` — browser-parsed static skeleton, text markers, deterministic element markers, dynamic/mixed/shorthand standard-HTML attribute lowering, safety guards, and template/attribute mapping points.
+9. `source-map.mjs` — ECMA-426 mapping validation/composition and version-3 encoding.
 
-The pinned parser gate now runs on every main push. Latest run `38122979344` is **66/66** green. The parser still records 21 certified WHATWG ownership-rewrite scenarios; coverage remains intentionally narrower than a duplicate browser parser.
+The pinned parser gate is **66/66** green. Coverage remains intentionally narrower than a duplicate browser parser.
 
-## Typed attribute IR
+## Typed attributes and executable assignment
 
-The ratified grammar has five non-directive forms and the hierarchical AST now preserves all five rather than retaining only attribute names:
+The hierarchical AST preserves all five ratified forms: static, dynamic, mixed, shorthand, spread. Raw `.nomos` spans remain authoritative and directives remain separate.
 
-- `static`: exact name/span plus nullable value/value span and quote metadata;
-- `dynamic`: exact attribute/name/value spans plus expression raw text/body span;
-- `mixed`: exact quoted value with ordered `TextPart` / `ExpressionPart` segments;
-- `shorthand`: exact `{identifier}` span and expression record;
-- `spread`: exact `{...expression}` span and expression record.
+Runtime assignment now consumes three forms on standard HTML elements:
 
-Nested brace expressions are preserved. Raw source remains authoritative; this stage does not decode HTML entities or assign DOM semantics. Directives remain on `Element.directives`.
+- dynamic `name={expression}`;
+- mixed quoted values with text/expression parts;
+- shorthand `{identifier}`.
 
-## Ownership diagnostic precedence
+Expressions reuse the TypeScript 6 `EmbeddedExpression` adapter. Elements requiring assignment receive collision-free temporary marker attributes in the static HTML skeleton. Runtime `mountTemplate` discovers and removes those markers after browser parsing and exposes deterministic element slots; `bindAttribute` schedules updates on the existing ADR-0008 DOM phase.
 
-The newly enabled CI parser gate exposed six existing integration cases where generic table foster-parenting and the specialized table validator both diagnosed the same start-tag token. The fix does not disable either validator. When a specialized table rewrite is detected, `table-structure-validation.mjs` removes only an existing `NOMOS-PARSE-HTML-OWNERSHIP` diagnostic with the exact same source span, then emits the more precise table diagnostic. All parser tests, including the formerly failing integration cases, now pass.
+Ordinary content attributes remove on `null`/`undefined` and otherwise stringify. Certified boolean HTML attributes use presence/absence semantics. Full policy and platform references are cached in `docs/phase-1/research/html-attribute-assignment.md`.
 
-## Embedded TypeScript implementation
-
-ADR-0005 remains the boundary: Nomos owns durable embedded records and exact `.nomos` spans; TypeScript AST/Program/checker objects remain adapter internals. `@typescript/typescript6@6.0.2` remains exact-pinned. Script/expression lowering share the same adapter rather than duplicating an expression parser.
+Spread remains guarded until explicit merge/precedence semantics are test-first defined. Dynamic custom-element assignment remains guarded under `OD-008`; dynamic URL-bearing expressions remain guarded pending the protocol safety validator; inline event attributes remain rejected; property-backed native-control state belongs to `bind:`.
 
 ## Browser-parsed DOM materialization
 
-Supported static template source is retained as one HTML skeleton, dynamic text interpolation spans become collision-free comment markers, and runtime `mountTemplate` lets `HTMLTemplateElement` perform actual HTML parsing before replacing markers with live `Text` binding nodes. Cloned roots are ADR-0008-owned and are removed on disposal. Trusted Types enforcement uses the existing `nomos` policy-name contract.
-
-Typed attribute IR is now available, but dynamic/mixed/shorthand/spread **runtime assignment is still intentionally rejected** until its assignment policy/lowering is implemented. Custom-element property/pre-upgrade behavior remains untouched while `OD-008` is open.
+Supported static source remains one browser-parsed `HTMLTemplateElement` skeleton. Text interpolation spans become comment markers replaced with `Text` nodes. Attribute-bound elements use temporary marker attributes removed immediately after clone discovery. Cloned roots remain ADR-0008-owned. Trusted Types enforcement uses the existing `nomos` policy-name contract.
 
 ## Generated source maps
 
-ADR-0006 remains authoritative. Script maps target original `.nomos`; text/template DOM lowering emits explicit mapping points during generation. Template mapping remains partial, not token-complete. Attribute/event/structural/component stages must add their own mapping points when implemented rather than reconstructing provenance later.
+ADR-0006 remains authoritative. Script maps target original `.nomos`. Template DOM lowering now emits explicit mapping points for mount setup, text binding setup/expression starts, attribute binding setup, and attribute expression starts in the same generation pass. Mapping remains point-based rather than token-complete; future event/block/component stages must emit their own provenance instead of reconstructing it later.
 
 ## Verification history at the current frontier
 
-- Source-map composition core: 4/4 focused tests after recorded RED.
-- Text-expression RED `38120782593`; GREEN `38120937878`: lowering **16/16**, runtime **21/21**.
-- Browser-DOM RED `38122206062`; GREEN `38122323711`: DOM **3/3** plus real Chrome `154.0.8037.97` under Trusted Types enforcement.
-- Attribute IR RED `38122824413`: the intended attribute tests failed and the newly enabled parser gate exposed six latent duplicate ownership failures.
-- Attribute/table GREEN `38122979344`: parser **66/66**, DOM **3/3 + real Chrome**, lowering **16/16**, runtime **21/21**, machine validator green. No regression expectations were weakened.
+- Parser: **66/66**.
+- Attribute-binding behavioral RED `38168546695`: parser/Chrome remained green; focused DOM units **3/7** because `bindAttribute` and standard-HTML dynamic assignment were absent.
+- Attribute-binding GREEN `38168894701`: DOM **7/7** plus Chrome `154.0.8037.97` under Trusted Types, lowering **16/16**, runtime **23/23**.
+- Public conformance promotion remains separate under ADR-0007.
 
 ## Remaining before `Parser and source maps` can close
 
-- dynamic/mixed/shorthand/spread attribute lowering and the built-in attribute/property assignment table;
+- spread-attribute merge/precedence lowering to complete 4/4 dynamic attribute forms;
+- URL protocol safety validation and built-in attribute/property assignment table;
 - events/native-control bindings;
 - structural blocks, lists, components, and complete template semantic/type checking;
 - richer mappings emitted by those stages;
 - `EmbeddedStylesheet` adapter using exact-pinned Lightning CSS when executable code consumes it;
 - remaining material HTML ownership edge cases;
 - public `NCON-*` evidence at complete requirement boundaries;
-- later Vite/HMR integration without silently resolving `OD-003`.
+- Vite/HMR integration without silently resolving `OD-003`.
 
 Machine authority: `spec/compiler-front-end.json`, `spec/runtime-core.json`, and `spec/phase-status.json`. Wayfinder map: https://github.com/AahPlexX/nomos/issues/1.
