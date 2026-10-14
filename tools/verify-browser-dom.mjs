@@ -13,9 +13,10 @@ const missing = [];
 if (typeof compiler.lowerTemplateDom !== 'function') missing.push('compiler.lowerTemplateDom');
 if (typeof runtimeInternal.mountTemplate !== 'function') missing.push('runtimeInternal.mountTemplate');
 if (typeof runtimeInternal.bindAttribute !== 'function') missing.push('runtimeInternal.bindAttribute');
+if (typeof runtimeInternal.bindAttributes !== 'function') missing.push('runtimeInternal.bindAttributes');
 assert.deepEqual(missing, [], `template DOM materialization seam is incomplete: ${missing.join(', ')}`);
 
-const source = `<main data-label="A &amp; B" data-count={count} class="count {count}" inert={inert}>A &amp; B {1 + 2}<svg><circle></circle></svg></main>`;
+const source = `<main data-label="A &amp; B" data-count={count} {...attrs} class="count {count}" inert={inert}>A &amp; B {1 + 2}<svg><circle></circle></svg></main>`;
 const component = compiler.parseComponent(source, { filename: 'BrowserDom.nomos' });
 const lowered = compiler.lowerTemplateDom(source, component, {
   filename: 'BrowserDom.nomos',
@@ -23,7 +24,8 @@ const lowered = compiler.lowerTemplateDom(source, component, {
 });
 assert.equal(lowered.diagnostics.length, 0);
 assert.ok(lowered.code);
-assert.equal(lowered.attributeBindings.length, 3);
+assert.equal(lowered.attributeBindings.length, 4);
+assert.equal(lowered.attributeGroups.length, 1);
 
 const runtimeImportClause = lowered.runtimeImports
   .map(({ imported, local }) => `${imported} as ${local}`)
@@ -37,6 +39,7 @@ import { createOwner, disposeOwner, mountOwner, runWithOwner } from '/packages/r
 const target = document.querySelector('#app');
 const owner = createOwner(null, { name: 'browser-root' });
 const count = 4;
+const attrs = { 'data-count': 9, class: 'spread-class', inert: false, 'data-spread': 'ok' };
 const inert = true;
 const elementMarkerAttribute = ${elementMarkerAttributeLiteral};
 
@@ -50,9 +53,10 @@ ${indent(lowered.code, 4)}
   const main = target.querySelector('main');
   if (!main) throw new Error('main element was not materialized');
   if (main.getAttribute('data-label') !== 'A & B') throw new Error('static attribute entity decoding diverged from HTML parsing');
-  if (main.getAttribute('data-count') !== '4') throw new Error('dynamic ordinary attribute mismatch: ' + main.getAttribute('data-count'));
-  if (main.getAttribute('class') !== 'count 4') throw new Error('mixed attribute mismatch: ' + main.getAttribute('class'));
-  if (!main.hasAttribute('inert') || main.getAttribute('inert') !== '') throw new Error('boolean attribute presence semantics mismatch');
+  if (main.getAttribute('data-count') !== '9') throw new Error('spread did not override an earlier explicit attribute: ' + main.getAttribute('data-count'));
+  if (main.getAttribute('data-spread') !== 'ok') throw new Error('spread-only ordinary attribute mismatch');
+  if (main.getAttribute('class') !== 'count 4') throw new Error('later explicit attribute did not override spread: ' + main.getAttribute('class'));
+  if (!main.hasAttribute('inert') || main.getAttribute('inert') !== '') throw new Error('later explicit boolean attribute did not override spread');
   if (elementMarkerAttribute && main.hasAttribute(elementMarkerAttribute)) throw new Error('temporary Nomos element marker leaked into mounted DOM');
   if (main.textContent !== 'A & B 3') throw new Error('static/dynamic text materialization mismatch: ' + JSON.stringify(main.textContent));
   const circle = main.querySelector('circle');
@@ -85,11 +89,11 @@ const server = createServer(async (request, response) => {
       response.end(browserModule);
       return;
     }
-    if (request.url?.startsWith('/packages/runtime/src/') && request.url.endsWith('.mjs')) {
+    if (request.url?.startsWith('/packages/') && request.url.endsWith('.mjs')) {
       const relative = normalize(request.url.slice(1));
       const absolute = resolve(repoRoot, relative);
-      const runtimeRoot = resolve(repoRoot, 'packages/runtime/src');
-      if (!absolute.startsWith(runtimeRoot + '/') && absolute !== runtimeRoot) {
+      const allowedRoots = [resolve(repoRoot, 'packages/runtime/src'), resolve(repoRoot, 'packages/shared/src')];
+      if (!allowedRoots.some((root) => absolute === root || absolute.startsWith(root + '/'))) {
         response.writeHead(403).end('forbidden');
         return;
       }
