@@ -1,4 +1,9 @@
 import { createDomEffect, ownDom } from './reactivity.mjs';
+import {
+  assertSafeSpreadHtmlAttributeName,
+  isBooleanHtmlAttribute,
+  normalizeHtmlAttributeName,
+} from '../../shared/src/html-attribute-policy.mjs';
 
 const TRUSTED_TYPES_POLICY = Symbol.for('nomos.trusted-types-policy');
 
@@ -21,15 +26,92 @@ export function bindAttribute(element, name, compute, options = {}) {
   const boolean = options.boolean === true;
 
   return createDomEffect(() => {
-    const value = compute();
-    if (boolean) {
-      if (value) element.setAttribute(name, '');
-      else element.removeAttribute(name);
-      return;
-    }
-    if (value === null || value === undefined) element.removeAttribute(name);
-    else element.setAttribute(name, String(value));
+    applyAttributeValue(element, name, compute(), boolean);
   }, options);
+}
+
+export function bindAttributes(element, plan, options = {}) {
+  if (!element || typeof element.setAttribute !== 'function' || typeof element.removeAttribute !== 'function' || typeof element.getAttribute !== 'function' || typeof element.hasAttribute !== 'function') {
+    throw new TypeError('bindAttributes requires an attribute-capable element');
+  }
+  if (!Array.isArray(plan)) throw new TypeError('bindAttributes plan must be an array');
+
+  const normalizedPlan = plan.map((entry, index) => normalizePlanEntry(element, entry, index));
+  let previousManaged = new Set();
+
+  return createDomEffect(() => {
+    const desired = new Map();
+
+    for (const entry of normalizedPlan) {
+      if (entry.kind === 'static') {
+        desired.set(entry.name, entry.baseline);
+        continue;
+      }
+      if (entry.kind === 'value') {
+        desired.set(entry.name, attributeAction(entry.name, entry.compute()));
+        continue;
+      }
+
+      const source = entry.compute();
+      if (source === null || source === undefined) continue;
+      const object = Object(source);
+      for (const key of Object.keys(object)) {
+        const name = assertSafeSpreadHtmlAttributeName(key);
+        desired.set(name, attributeAction(name, object[key]));
+      }
+    }
+
+    const nextManaged = new Set(desired.keys());
+    for (const name of previousManaged) {
+      if (!nextManaged.has(name)) element.removeAttribute(name);
+    }
+    for (const [name, action] of desired) applyAttributeAction(element, name, action);
+    previousManaged = nextManaged;
+  }, options);
+}
+
+function normalizePlanEntry(element, entry, index) {
+  if (!entry || typeof entry !== 'object') throw new TypeError(`bindAttributes plan entry ${index} must be an object`);
+  if (entry.kind === 'spread') {
+    if (typeof entry.compute !== 'function') throw new TypeError(`bindAttributes spread entry ${index} compute must be a function`);
+    return { kind: 'spread', compute: entry.compute };
+  }
+  if (entry.kind !== 'static' && entry.kind !== 'value') throw new TypeError(`bindAttributes plan entry ${index} has unsupported kind`);
+  if (typeof entry.name !== 'string' || entry.name.length === 0) throw new TypeError(`bindAttributes plan entry ${index} name must be a non-empty string`);
+  const name = normalizeHtmlAttributeName(entry.name);
+  if (entry.kind === 'static') {
+    return {
+      kind: 'static',
+      name,
+      baseline: element.hasAttribute(name)
+        ? { present: true, value: element.getAttribute(name) ?? '' }
+        : { present: false, value: null },
+    };
+  }
+  if (typeof entry.compute !== 'function') throw new TypeError(`bindAttributes value entry ${index} compute must be a function`);
+  return { kind: 'value', name, compute: entry.compute };
+}
+
+function attributeAction(name, value) {
+  if (isBooleanHtmlAttribute(name)) return value ? { present: true, value: '' } : { present: false, value: null };
+  return value === null || value === undefined
+    ? { present: false, value: null }
+    : { present: true, value: String(value) };
+}
+
+function applyAttributeValue(element, name, value, boolean) {
+  if (boolean) {
+    if (value) element.setAttribute(name, '');
+    else element.removeAttribute(name);
+    return;
+  }
+  if (value === null || value === undefined) element.removeAttribute(name);
+  else element.setAttribute(name, String(value));
+}
+
+function applyAttributeAction(element, name, action) {
+  if (action.present) element.setAttribute(name, action.value ?? '');
+  else element.removeAttribute(name);
 }
 
 export function mountTemplate(target, html, {
