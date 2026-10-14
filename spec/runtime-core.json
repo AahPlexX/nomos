@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "status": "phase-1-runtime-browser-template-dom-and-standard-html-attributes-implemented",
+  "status": "phase-1-runtime-browser-template-dom-and-all-standard-html-runtime-attribute-forms-implemented",
   "decision": "docs/adr/0008-runtime-ownership-and-scheduler.md",
   "research": "docs/phase-1/research/runtime-ownership-and-scheduling.md",
   "wayfinderDecision": "https://github.com/AahPlexX/nomos/issues/4",
@@ -29,37 +29,49 @@
   "compilerAbi": {
     "moduleSpecifier": "nomos/internal/runtime",
     "implementationFile": "packages/runtime/src/internal.mjs",
-    "exports": ["bindAttribute", "bindText", "mountTemplate", "createStateCell", "createDerived", "read", "write", "updateState"],
+    "exports": ["bindAttribute", "bindAttributes", "bindText", "mountTemplate", "createStateCell", "createDerived", "read", "write", "updateState"],
     "updateStatePrefixPostfixSemantics": "implemented-number-and-bigint",
     "publicRootBudgetImpact": "none-internal-only"
   },
   "domBindings": {
-    "status": "static-template-text-and-standard-html-attribute-binding-implemented",
+    "status": "static-template-text-and-all-standard-html-runtime-attribute-binding-forms-implemented",
     "implementationFile": "packages/runtime/src/dom-bindings.mjs",
+    "sharedAttributePolicy": "packages/shared/src/html-attribute-policy.mjs",
     "textHelper": "bindText",
     "attributeHelper": "bindAttribute",
+    "groupedAttributeHelper": "bindAttributes",
     "templateHelper": "mountTemplate",
     "staticParser": "HTMLTemplateElement",
     "dynamicTextMarkers": "comment-markers-replaced-with-Text-nodes",
     "dynamicElementMarkers": "temporary-collision-free-attributes-removed-after-clone-discovery",
     "attributeForms": {
       "requiredDynamicForms": 4,
-      "implemented": ["dynamic", "mixed", "shorthand"],
-      "remaining": ["spread"],
-      "implementedCount": 3
+      "implemented": ["dynamic", "mixed", "shorthand", "spread"],
+      "remaining": [],
+      "implementedCount": 4
     },
-    "ordinaryAttributeSemantics": "nullish-removes-otherwise-String-and-setAttribute",
-    "booleanAttributeSemantics": "truthy-presence-empty-string-falsy-absence",
+    "ordinaryAttributeSemantics": "winning-nullish-removes-otherwise-String-and-setAttribute",
+    "booleanAttributeSemantics": "winning-truthy-presence-empty-string-falsy-absence",
+    "spreadSemantics": {
+      "precedence": "authored-left-to-right-later-entry-wins",
+      "enumeration": "own-enumerable-string-keys",
+      "nullishSource": "no-op",
+      "nameNormalization": "standard-html-ascii-lowercase",
+      "droppedKeyBehavior": "restore-earlier-source-order-fallback-or-remove",
+      "staticFallbackSource": "browser-parsed-cloned-element",
+      "observerModel": "one-dom-observer-per-spread-containing-element",
+      "unsafeNameValidation": "validate-complete-plan-before-dom-mutation"
+    },
     "scheduling": "dom-observer",
     "ownership": "cloned-root-nodes-owned-and-binding-observers-stop-on-disposal",
-    "nodeMaterialization": "implemented-static-html-text-and-standard-html-attribute-slice",
+    "nodeMaterialization": "implemented-static-html-text-and-all-standard-html-runtime-attribute-forms",
     "trustedTypes": {
       "policyName": "nomos",
       "policyCachedPerWindow": true,
       "hostCspMustAllowPolicyName": true
     },
     "browserVerification": {
-      "run": 38169465234,
+      "run": 38638143259,
       "chrome": "154.0.8037.97",
       "trustedTypesEnforced": true,
       "verifiedBehaviors": [
@@ -69,12 +81,14 @@
         "dynamic-ordinary-attribute-assignment",
         "mixed-attribute-assignment",
         "boolean-attribute-presence-absence",
+        "spread-overrides-earlier-explicit-attribute",
+        "later-explicit-attribute-overrides-spread",
+        "spread-only-ordinary-attribute-assignment",
         "temporary-element-marker-removal",
         "owned-root-disposal"
       ]
     },
     "guarded": [
-      "spread-attribute-merge-precedence",
       "dynamic-custom-element-assignment-od-008",
       "dynamic-url-attribute-protocol-validation",
       "inline-event-attributes",
@@ -117,12 +131,13 @@
     "typescript-symbol-aware-state-derive-state-raw-lowering",
     "owner-backed-text-binding-helper",
     "owner-backed-browser-parsed-static-template-mount",
-    "owner-backed-standard-html-dynamic-mixed-shorthand-attribute-binding"
+    "owner-backed-standard-html-dynamic-mixed-shorthand-attribute-binding",
+    "owner-backed-source-ordered-standard-html-spread-attribute-binding"
   ],
   "remaining": [
     "state-snapshot-contract-and-implementation",
     "request-ownership-and-cancellation",
-    "spread-attribute-merge-precedence",
+    "attribute-property-assignment-table",
     "dynamic-url-attribute-safety",
     "event-and-native-control-binding-integration",
     "structural-block-and-component-dom-ownership"
