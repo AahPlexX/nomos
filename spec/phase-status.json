@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "asOf": "2026-10-11",
+  "asOf": "2026-10-14",
   "sourcePrdPreserved": true,
   "sourcePrdSha256": "b07950df46be388b10497063c5aabc01a20402a13dcebea0c8ec847869147690",
   "effectiveAmendments": ["docs/prd/amendments/0001-remove-phase0-external-review-gate.md"],
@@ -18,7 +18,7 @@
     "allowed": true,
     "activeSlice": "compiler-runtime-browser-dom-attributes-and-conformance",
     "parserAndSourceMaps": "in-progress",
-    "runtimeCore": "browser-template-dom-and-standard-html-attributes-implemented",
+    "runtimeCore": "browser-template-dom-and-all-standard-html-runtime-attribute-forms-implemented",
     "conformanceInfrastructure": "foundation-implemented",
     "parserImplemented": [
       "top-level-section-partitioning",
@@ -35,11 +35,13 @@
       "typescript-embedded-expression-and-text-binding-ir-lowering",
       "browser-parsed-static-template-dom-materialization",
       "standard-html-dynamic-mixed-shorthand-attribute-lowering",
+      "standard-html-source-ordered-spread-attribute-lowering",
+      "shared-standard-html-attribute-policy",
       "stage-local-source-map-composition-contract",
       "exact-decoded-segment-composer",
       "typescript-script-emitter-source-maps-to-original-nomos",
       "template-text-binding-original-source-mapping",
-      "template-dom-text-and-attribute-mapping",
+      "template-dom-text-attribute-and-spread-mapping",
       "whatwg-implied-close-ownership-li-dd-dt-button",
       "whatwg-table-foster-parenting-text-and-elements",
       "whatwg-table-implied-wrappers-and-row-cell-autoclose",
@@ -50,7 +52,7 @@
       "embedded-css-adapter-implementation",
       "remaining-reactive-destructuring-assignment-target-lowering",
       "remaining-active-formatting-reconstruction-and-low-frequency-special-insertion-mode-validation",
-      "spread-attribute-merge-precedence-lowering",
+      "attribute-property-assignment-table",
       "dynamic-url-attribute-safety-validation",
       "event-native-control-structural-block-and-component-template-lowering",
       "complete-template-semantic-type-checking",
@@ -76,12 +78,13 @@
       "compiler-reactive-for-of-and-for-in-target-lowering",
       "internal-owner-backed-text-binding-helper",
       "owner-backed-browser-parsed-static-template-mount",
-      "owner-backed-standard-html-dynamic-mixed-shorthand-attribute-binding"
+      "owner-backed-standard-html-dynamic-mixed-shorthand-attribute-binding",
+      "owner-backed-source-ordered-standard-html-spread-attribute-binding"
     ],
     "runtimeRemaining": [
       "state-snapshot-contract-and-implementation",
       "request-ownership-and-cancellation",
-      "spread-attribute-merge-precedence",
+      "attribute-property-assignment-table",
       "dynamic-url-attribute-safety",
       "event-native-control-binding-integration",
       "structural-block-and-component-dom-ownership"
@@ -89,23 +92,23 @@
     "runtimeMachineSpec": "spec/runtime-core.json",
     "verification": {
       "workflow": ".github/workflows/ci.yml",
-      "lastVerifiedRun": 38169465234,
+      "lastVerifiedRun": 38638143259,
       "node": "22.16.0",
       "pnpm": "12.10.1",
       "typescript6": "6.0.2",
       "chrome": "154.0.8037.97",
       "parserTests": 66,
       "loweringAndAbiTests": 16,
-      "runtimeTests": 23,
-      "domSliceUnitTests": 7,
-      "browserDomRun": 38169465234,
+      "runtimeTests": 26,
+      "domSliceUnitTests": 11,
+      "browserDomRun": 38638143259,
       "browserTrustedTypesEnforced": true
     },
     "attributeBindingFunctions": {
       "required": 4,
-      "complete": 3,
-      "implemented": ["dynamic", "mixed", "shorthand"],
-      "remaining": ["spread"]
+      "complete": 4,
+      "implemented": ["dynamic", "mixed", "shorthand", "spread"],
+      "remaining": []
     },
     "conformance": {
       "contract": "docs/adr/0007-public-conformance-promotion.md",
