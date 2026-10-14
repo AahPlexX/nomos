@@ -47,32 +47,36 @@ All material repository changes are recorded here. This file tracks project stat
 
 ## 2026-10-11 — Standard HTML dynamic attribute assignment
 
-### Added
+- Added standard-HTML dynamic, mixed, and shorthand assignment using the existing TypeScript expression adapter, deterministic element slots, owner-backed `bindAttribute`, boolean presence/absence semantics, and attribute mapping points.
+- Kept custom-element assignment behind `OD-008`, dynamic URL-bearing attributes behind the URL-safety gate, inline event-handler attributes rejected, and property-backed native controls reserved for `bind:`.
+- Behavioral RED `38168546695`; corrected browser-verified GREEN `38169465234` established the first 3/4 required runtime attribute forms.
 
-- `template-dom-lowering.mjs` now lowers dynamic `name={expression}`, mixed quoted values, and shorthand `{identifier}` attributes on standard HTML elements.
-- Attribute expressions reuse the TypeScript 6 `EmbeddedExpression` adapter and existing reactive `read` ABI rather than adding a second expression system.
-- Dynamic-attribute elements use collision-free temporary element markers inside the browser-parsed skeleton; runtime `mountTemplate` discovers elements, removes markers, and returns deterministic element slots.
-- Internal `bindAttribute` runs on the ADR-0008 DOM-observer phase and stops automatically after owner disposal.
-- Ordinary content attributes remove on `null`/`undefined` and otherwise use `String(value)` + `setAttribute`.
-- Certified boolean HTML attributes use presence/absence semantics; `inert` is covered by executable tests.
-- Attribute setup/expression source-map points are emitted during generation.
+## 2026-10-14 — Source-ordered spread attributes complete 4/4 runtime forms
 
-### Safety boundaries
+### Contract and implementation
 
-- Spread attributes remain explicitly guarded pending source-order merge/precedence semantics.
-- Dynamic custom-element assignment remains guarded while `OD-008` is open.
-- Dynamic URL-bearing attributes remain guarded until the URL protocol validator exists.
-- Inline event-handler attributes are rejected; event semantics remain dedicated to `on:`.
-- Native-control property-backed live state remains a later `bind:` slice.
+- Standard-HTML `{...expression}` now lowers through the typed spread IR rather than the unsupported-feature path.
+- Spread-containing elements compile to one owner-backed `bindAttributes` plan so collision precedence cannot depend on independent observer scheduling.
+- Authored attributes are evaluated left-to-right and later entries win.
+- `null` / `undefined` spread sources are no-ops; other sources contribute enumerable own string-key properties only.
+- Attribute names are ASCII-normalized for standard HTML before collision handling.
+- Spread values reuse existing ordinary and boolean content-attribute semantics.
+- When a spread drops a key, the grouped plan recomputes from source order, restoring an earlier static/dynamic fallback or removing the stale key.
+- Static grouped fallbacks are captured from the browser-parsed element so HTML entity decoding remains authoritative.
+- Added shared `packages/shared/src/html-attribute-policy.mjs` to keep compiler/runtime boolean, URL, event-name, and normalization policy synchronized.
+- Runtime spread keys beginning with `on` or matching the currently guarded URL-bearing set are rejected before DOM mutation.
+- Dynamic custom-element spread remains guarded under `OD-008`.
+- Spread expression/setup source-map points are emitted by the existing template DOM generation pass.
 
 ### TDD and verification
 
-- The first runtime test attempt exposed a test-linking issue due to a not-yet-existing named export; that attempt is not counted as behavioral RED.
-- Behavioral RED `38168546695`: parser **66/66** and real Chrome stayed green; focused DOM units were **3/7**, failing by assertion for absent `bindAttribute` and still-guarded dynamic attributes.
-- GREEN `38168894701`: parser **66/66**, DOM **7/7 + Chrome 154.0.8037.97 under Trusted Types**, lowering **16/16**, runtime **23/23**, prior machine validator green.
-- Runtime attribute-function coverage is now **3/4 required dynamic forms**: dynamic, mixed, shorthand complete; spread remains.
+- Behavioral RED `38637069602`: parser and existing Chrome materialization remained green while grouped runtime spread binding was absent and compiler spread lowering still emitted the unsupported guard.
+- The first implementation attempt exposed two stale test-contract assumptions: one mapping assertion targeted the middle of the identifier, and an older DOM test still expected standard-HTML spread to be unsupported. Both were corrected without weakening directive/structural guards.
+- Implementation GREEN `38638143259`: parser **66/66**, focused DOM/browser units **11/11**, Chrome `154.0.8037.97` under Trusted Types, lowering **16/16**, runtime **26/26**.
+- All four required runtime-assigned standard-HTML forms are now implemented: dynamic, mixed, shorthand, spread.
 
 ### Next frontier
 
-- Define spread merge precedence test-first and complete 4/4 runtime attribute forms.
-- Publish/test the built-in attribute/property assignment table, then implement URL protocol validation and proceed to `on:` / `bind:` behavior.
+- Publish/test the complete built-in standard-HTML attribute/property assignment table.
+- Implement the dynamic URL protocol safety validator.
+- Then proceed to `on:` event lowering and `bind:` native-control semantics without guessing custom-element behavior under `OD-008`.
