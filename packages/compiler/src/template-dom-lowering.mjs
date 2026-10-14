@@ -1,6 +1,12 @@
 import { lowerEmbeddedExpression } from './expression-lowering.mjs';
 import { lowerTemplateTextBindings } from './template-lowering.mjs';
 import { createSourceMapFromDecodedMappings } from './source-map.mjs';
+import {
+  isBooleanHtmlAttribute,
+  isGuardedDynamicUrlAttribute,
+  isInlineEventHtmlAttribute,
+  normalizeHtmlAttributeName,
+} from '../../shared/src/html-attribute-policy.mjs';
 
 const MARKER_BASE = 'nomos:text:';
 const ELEMENT_MARKER_BASE = 'data-nomos-el';
@@ -8,15 +14,7 @@ const UNSAFE_INTERPOLATION_ANCESTORS = new Set([
   'iframe', 'noembed', 'noframes', 'noscript', 'plaintext', 'script', 'style',
   'template', 'textarea', 'title', 'xmp',
 ]);
-const BOOLEAN_HTML_ATTRIBUTES = new Set([
-  'allowfullscreen', 'async', 'autofocus', 'autoplay', 'checked', 'controls',
-  'default', 'defer', 'disabled', 'formnovalidate', 'inert', 'ismap', 'itemscope',
-  'loop', 'multiple', 'muted', 'nomodule', 'novalidate', 'open', 'playsinline',
-  'readonly', 'required', 'reversed', 'selected',
-]);
-const URL_HTML_ATTRIBUTES = new Set([
-  'action', 'cite', 'formaction', 'href', 'poster', 'src',
-]);
+const RUNTIME_ATTRIBUTE_KINDS = new Set(['dynamic', 'mixed', 'shorthand', 'spread']);
 
 export function lowerTemplateDom(source, component, {
   script = null,
@@ -56,10 +54,13 @@ export function lowerTemplateDom(source, component, {
   const staticHtml = buildStaticHtml(source, component, text.bindings, markerPrefix, attributes.bindings, elementMarkerAttribute);
 
   const mountTemplateLocal = uniqueName('__n_mountTemplate', used);
-  const bindAttributeLocal = attributes.bindings.length > 0 ? uniqueName('__n_bindAttribute', used) : null;
+  const independentBindings = attributes.bindings.filter((binding) => !binding.grouped);
+  const bindAttributeLocal = independentBindings.length > 0 ? uniqueName('__n_bindAttribute', used) : null;
+  const bindAttributesLocal = attributes.groups.length > 0 ? uniqueName('__n_bindAttributes', used) : null;
   const viewIdentifier = uniqueName('__n_view', used);
   const runtimeImports = [{ imported: 'mountTemplate', local: mountTemplateLocal }, ...text.runtimeImports];
-  if (attributes.bindings.length > 0) runtimeImports.push({ imported: 'bindAttribute', local: bindAttributeLocal });
+  if (independentBindings.length > 0) runtimeImports.push({ imported: 'bindAttribute', local: bindAttributeLocal });
+  if (attributes.groups.length > 0) runtimeImports.push({ imported: 'bindAttributes', local: bindAttributesLocal });
   if (!existingRead && attributes.bindings.some((binding) => binding.reactiveReadCount > 0)) {
     runtimeImports.push({ imported: 'read', local: attributeReadLocal });
   }
@@ -92,15 +93,20 @@ export function lowerTemplateDom(source, component, {
   }
 
   const elementIdentifiers = new Map();
-  for (const binding of attributes.bindings) {
-    let elementIdentifier = elementIdentifiers.get(binding.elementIndex);
+  const elementIdentifierFor = (elementIndex, position) => {
+    let elementIdentifier = elementIdentifiers.get(elementIndex);
     if (!elementIdentifier) {
-      elementIdentifier = uniqueName(`__n_element_${binding.elementIndex}`, used);
-      elementIdentifiers.set(binding.elementIndex, elementIdentifier);
+      elementIdentifier = uniqueName(`__n_element_${elementIndex}`, used);
+      elementIdentifiers.set(elementIndex, elementIdentifier);
       const declarationLine = lines.length;
-      lines.push(`const ${elementIdentifier} = ${viewIdentifier}.elements[${binding.elementIndex}];`);
-      decodedMappings.push({ generated: { line: declarationLine, column: 0 }, original: originalPosition(filename, binding.span.start) });
+      lines.push(`const ${elementIdentifier} = ${viewIdentifier}.elements[${elementIndex}];`);
+      decodedMappings.push({ generated: { line: declarationLine, column: 0 }, original: originalPosition(filename, position) });
     }
+    return elementIdentifier;
+  };
+
+  for (const binding of independentBindings) {
+    const elementIdentifier = elementIdentifierFor(binding.elementIndex, binding.span.start);
     const setupLine = lines.length;
     const setupCode = `${bindAttributeLocal}(${elementIdentifier}, ${JSON.stringify(binding.name)}, () => (${binding.expressionCode}), { name: ${JSON.stringify(`attr:${binding.name}`)}, boolean: ${binding.boolean} });`;
     lines.push(setupCode);
@@ -108,6 +114,28 @@ export function lowerTemplateDom(source, component, {
     const expressionColumn = setupCode.indexOf(binding.expressionCode);
     if (expressionColumn >= 0 && binding.mappingPosition) {
       decodedMappings.push({ generated: { line: setupLine, column: expressionColumn }, original: originalPosition(filename, binding.mappingPosition) });
+    }
+  }
+
+  for (const group of attributes.groups) {
+    const elementIdentifier = elementIdentifierFor(group.elementIndex, group.span.start);
+    const planParts = group.entries.map((entry) => {
+      if (entry.kind === 'static') return `{ kind: "static", name: ${JSON.stringify(entry.name)} }`;
+      if (entry.kind === 'spread') return `{ kind: "spread", compute: () => (${entry.binding.expressionCode}) }`;
+      return `{ kind: "value", name: ${JSON.stringify(entry.name)}, compute: () => (${entry.binding.expressionCode}) }`;
+    });
+    const setupLine = lines.length;
+    const setupCode = `${bindAttributesLocal}(${elementIdentifier}, [${planParts.join(', ')}], { name: ${JSON.stringify(`attrs:${group.elementIndex}`)} });`;
+    lines.push(setupCode);
+    decodedMappings.push({ generated: { line: setupLine, column: 0 }, original: originalPosition(filename, group.span.start) });
+    let searchFrom = 0;
+    for (const entry of group.entries) {
+      if (!entry.binding?.mappingPosition) continue;
+      const expressionColumn = setupCode.indexOf(entry.binding.expressionCode, searchFrom);
+      if (expressionColumn >= 0) {
+        decodedMappings.push({ generated: { line: setupLine, column: expressionColumn }, original: originalPosition(filename, entry.binding.mappingPosition) });
+        searchFrom = expressionColumn + entry.binding.expressionCode.length;
+      }
     }
   }
 
@@ -121,6 +149,7 @@ export function lowerTemplateDom(source, component, {
     type: 'TemplateDomLowering', code, map, decodedMappings, staticHtml,
     markerPrefix, markerCount: text.bindings.length, bindings: text.bindings,
     attributeBindings: attributes.bindings,
+    attributeGroups: attributes.groups,
     elementMarkerAttribute,
     elementCount: attributes.elementCount,
     diagnostics: [], runtimeModule: text.runtimeModule, runtimeImports,
@@ -130,6 +159,7 @@ export function lowerTemplateDom(source, component, {
 
 function lowerAttributeBindings(source, component, { script, filename, readLocal }) {
   const bindings = [];
+  const groups = [];
   const diagnostics = [];
   const reactiveBindings = script?.bindings ?? [];
   let elementIndex = 0;
@@ -138,25 +168,52 @@ function lowerAttributeBindings(source, component, { script, filename, readLocal
     if (section.kind !== 'template' || !section.ast) continue;
     visit(section.ast);
   }
-  return { bindings, diagnostics, elementCount: elementIndex };
+  return { bindings, groups, diagnostics, elementCount: elementIndex };
 
   function visit(node) {
     if (!node || typeof node !== 'object') return;
     if (node.type === 'Element') {
-      const dynamic = (node.attributes ?? []).filter((attribute) => attribute.kind === 'dynamic' || attribute.kind === 'mixed' || attribute.kind === 'shorthand');
-      if (dynamic.length > 0) {
+      const authoredAttributes = node.attributes ?? [];
+      const runtimeAttributes = authoredAttributes.filter((attribute) => RUNTIME_ATTRIBUTE_KINDS.has(attribute.kind));
+      if (runtimeAttributes.length > 0) {
         const currentElement = elementIndex++;
-        for (const attribute of dynamic) {
+        const hasSpread = runtimeAttributes.some((attribute) => attribute.kind === 'spread');
+        const bindingByAttribute = new Map();
+
+        for (const attribute of runtimeAttributes) {
           const lowered = lowerAttributeValue(attribute);
           diagnostics.push(...lowered.diagnostics);
           if (lowered.code == null) continue;
-          bindings.push({
+          const binding = {
             type: 'AttributeBinding', kind: attribute.kind, name: attribute.name,
             span: cloneSpan(attribute.span), elementIndex: currentElement,
-            boolean: BOOLEAN_HTML_ATTRIBUTES.has(attribute.name.toLowerCase()),
+            boolean: attribute.name ? isBooleanHtmlAttribute(attribute.name) : false,
             expressionCode: lowered.code,
             reactiveReadCount: lowered.reactiveReadCount,
             mappingPosition: lowered.mappingPosition,
+            grouped: hasSpread,
+          };
+          bindings.push(binding);
+          bindingByAttribute.set(attribute, binding);
+        }
+
+        if (hasSpread) {
+          const entries = [];
+          for (const attribute of authoredAttributes) {
+            if (attribute.kind === 'static') {
+              entries.push({ kind: 'static', name: normalizeHtmlAttributeName(attribute.name), span: cloneSpan(attribute.span) });
+              continue;
+            }
+            const binding = bindingByAttribute.get(attribute);
+            if (!binding) continue;
+            if (attribute.kind === 'spread') entries.push({ kind: 'spread', binding, span: cloneSpan(attribute.span) });
+            else entries.push({ kind: 'value', name: normalizeHtmlAttributeName(attribute.name), binding, span: cloneSpan(attribute.span) });
+          }
+          groups.push({
+            type: 'AttributeBindingGroup',
+            elementIndex: currentElement,
+            span: cloneSpan(runtimeAttributes[0].span),
+            entries,
           });
         }
       }
@@ -213,13 +270,13 @@ function collectUnsupportedTemplateFeatures(component) {
       if (node.category === 'component') diagnostics.push(unsupportedDiagnostic('component', node.span, `Component <${node.name}> lowering is not part of the current DOM slice.`));
       if (node.directives?.length) for (const directive of node.directives) diagnostics.push(unsupportedDiagnostic('directive', directive.span, `Directive ${directive.kind}:${directive.name} requires its dedicated lowering stage.`));
       for (const attribute of node.attributes ?? []) {
-        const name = attribute.name?.toLowerCase();
-        if (attribute.kind === 'spread') diagnostics.push(unsupportedDiagnostic('spread-attribute', attribute.span, 'Spread attributes require explicit merge/precedence semantics before lowering.'));
-        if (name?.startsWith('on')) diagnostics.push(unsupportedDiagnostic('inline-event-attribute', attribute.span, 'Inline event-handler attributes are not emitted; use on: directives.'));
-        if ((attribute.kind === 'dynamic' || attribute.kind === 'mixed' || attribute.kind === 'shorthand') && node.category !== 'html') {
+        const name = attribute.name ? normalizeHtmlAttributeName(attribute.name) : null;
+        const runtimeAssigned = RUNTIME_ATTRIBUTE_KINDS.has(attribute.kind);
+        if (name && isInlineEventHtmlAttribute(name)) diagnostics.push(unsupportedDiagnostic('inline-event-attribute', attribute.span, 'Inline event-handler attributes are not emitted; use on: directives.'));
+        if (runtimeAssigned && node.category !== 'html') {
           diagnostics.push(unsupportedDiagnostic('dynamic-custom-element-attribute', attribute.span, 'Dynamic non-standard-element attributes are guarded while custom-element assignment semantics remain unresolved.'));
         }
-        if ((attribute.kind === 'dynamic' || attribute.kind === 'mixed' || attribute.kind === 'shorthand') && name && URL_HTML_ATTRIBUTES.has(name)) {
+        if (attribute.kind !== 'spread' && runtimeAssigned && name && isGuardedDynamicUrlAttribute(name)) {
           diagnostics.push(unsupportedDiagnostic('dynamic-url-attribute-unvalidated', attribute.span, `Dynamic ${name} requires the URL safety validator before lowering.`));
         }
       }
@@ -246,7 +303,7 @@ function unsupportedDiagnostic(feature, span, message) {
 function failedResult(filename, targetIdentifier, diagnostics, bindings = [], attributeBindings = []) {
   return {
     type: 'TemplateDomLowering', code: null, map: null, decodedMappings: [], staticHtml: null,
-    markerPrefix: null, markerCount: 0, bindings, attributeBindings,
+    markerPrefix: null, markerCount: 0, bindings, attributeBindings, attributeGroups: [],
     elementMarkerAttribute: null, elementCount: 0,
     diagnostics, runtimeModule: 'nomos/internal/runtime', runtimeImports: [],
     targetIdentifier, viewIdentifier: null, filename,
