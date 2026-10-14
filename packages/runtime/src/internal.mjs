@@ -1,4 +1,4 @@
-export { bindAttribute, bindText, mountTemplate } from './dom-bindings.mjs';
+export { bindAttribute, bindAttributes, bindText, mountTemplate } from './dom-bindings.mjs';
 export {
   createDerived,
   createStateCell,
