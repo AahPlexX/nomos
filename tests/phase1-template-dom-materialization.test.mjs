@@ -33,16 +33,15 @@ test('lowers a static HTML skeleton plus interpolations into one browser-parsed 
   assert.ok(result.decodedMappings.length >= 3);
 });
 
-test('refuses still-unsupported spread/directive/structural features instead of silently emitting incorrect DOM', () => {
+test('refuses still-unsupported directive and structural features instead of silently emitting incorrect DOM', () => {
   requireDomSlice();
-  const source = `<button {...attrs} on:click={save}>{#if ready}Ready{/if}</button>`;
+  const source = `<button on:click={save}>{#if ready}Ready{/if}</button>`;
   const component = compiler.parseComponent(source, { filename: 'Unsupported.nomos' });
   const result = compiler.lowerTemplateDom(source, component, { filename: 'Unsupported.nomos' });
   assert.equal(result.code, null);
   assert.equal(result.map, null);
   assert.ok(result.diagnostics.length > 0);
   assert.ok(result.diagnostics.every((diagnostic) => diagnostic.code === 'NOMOS-LOWER-UNSUPPORTED-TEMPLATE-FEATURE'));
-  assert.ok(result.diagnostics.some((diagnostic) => diagnostic.feature === 'spread-attribute'));
   assert.ok(result.diagnostics.some((diagnostic) => diagnostic.feature === 'directive'));
   assert.ok(result.diagnostics.some((diagnostic) => diagnostic.feature === 'structural-block'));
 });
