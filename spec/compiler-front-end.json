@@ -70,7 +70,7 @@
     "finalMapValidation": "implemented-core",
     "scriptLoweringMappings": "implemented-with-original-nomos-sourcesContent",
     "templateTextBindingMappings": "implemented-expression-start-to-original-nomos",
-    "templateDomMappings": "implemented-mount-text-attribute-binding-and-expression-points-to-original-nomos",
+    "templateDomMappings": "implemented-mount-text-attribute-spread-binding-and-expression-points-to-original-nomos",
     "tokenLevelGeneratedMappings": "partial-template-dom-points-not-token-complete"
   },
   "phase0ParserCorpus": {
@@ -117,20 +117,27 @@
     "dependencyInstallation": "typescript6-pinned-and-ci-verified-lightningcss-deferred"
   },
   "templateDom": {
-    "status": "browser-parsed-static-skeleton-text-and-standard-html-attributes-implemented",
+    "status": "browser-parsed-static-skeleton-text-and-all-standard-html-runtime-attribute-forms-implemented",
     "compiler": "packages/compiler/src/template-dom-lowering.mjs",
     "runtime": "packages/runtime/src/dom-bindings.mjs",
+    "sharedAttributePolicy": "packages/shared/src/html-attribute-policy.mjs",
     "staticHtmlParsing": "HTMLTemplateElement-browser-parser",
     "dynamicTextSlots": "collision-free-comment-markers-replaced-with-Text-nodes",
     "dynamicElementSlots": "collision-free-temporary-attributes-removed-after-browser-clone-discovery",
     "attributeBinding": {
       "research": "docs/phase-1/research/html-attribute-assignment.md",
       "requiredDynamicForms": 4,
-      "implementedForms": ["dynamic", "mixed", "shorthand"],
-      "remainingForms": ["spread"],
-      "implementedCount": 3,
-      "ordinaryContentAttributeSemantics": "nullish-remove-otherwise-String-setAttribute",
-      "booleanContentAttributeSemantics": "truthy-presence-empty-string-falsy-absence",
+      "implementedForms": ["dynamic", "mixed", "shorthand", "spread"],
+      "remainingForms": [],
+      "implementedCount": 4,
+      "ordinaryContentAttributeSemantics": "winning-nullish-removes-otherwise-String-setAttribute",
+      "booleanContentAttributeSemantics": "winning-truthy-presence-empty-string-falsy-absence",
+      "spreadPrecedence": "authored-left-to-right-later-entry-wins",
+      "spreadEnumeration": "own-enumerable-string-keys",
+      "spreadNullishSource": "no-op",
+      "spreadDroppedKeys": "restore-earlier-source-order-fallback-or-remove",
+      "spreadObserverModel": "single-grouped-dom-observer-per-spread-containing-element",
+      "spreadUnsafeNameValidation": "on-and-guarded-url-names-rejected-before-dom-mutation",
       "customElementDynamicAssignment": "guarded-od-008",
       "dynamicUrlAttributes": "guarded-until-protocol-validator",
       "inlineEventAttributes": "rejected-use-on-directive"
@@ -142,7 +149,7 @@
       "hostMustAllowPolicyName": true
     },
     "browserVerification": {
-      "run": 38169465234,
+      "run": 38638143259,
       "chrome": "154.0.8037.97",
       "trustedTypesEnforced": true,
       "verifiedBehaviors": [
@@ -152,13 +159,15 @@
         "dynamic-ordinary-attribute-assignment",
         "mixed-attribute-assignment",
         "boolean-attribute-presence-absence",
+        "spread-overrides-earlier-explicit-attribute",
+        "later-explicit-attribute-overrides-spread",
+        "spread-only-ordinary-attribute-assignment",
         "temporary-element-marker-removal",
         "owned-root-disposal"
       ]
     },
     "explicitlyRejectedUntilDedicatedLowering": [
-      "spread-attributes",
-      "dynamic-custom-element-attributes",
+      "dynamic-custom-element-attributes-including-spread",
       "dynamic-url-attributes-before-validator",
       "inline-event-attributes",
       "directives",
@@ -169,7 +178,7 @@
     ]
   },
   "reactiveLowering": {
-    "status": "script-core-browser-template-text-and-three-standard-html-attribute-forms-implemented",
+    "status": "script-core-browser-template-text-and-all-four-standard-html-runtime-attribute-forms-implemented",
     "bindingRecognition": "typescript-symbol-resolution",
     "supportedDeclarations": ["state", "state.raw", "derive"],
     "supportedRootWrites": [
@@ -201,15 +210,15 @@
       "chrome": "154.0.8037.97",
       "parserTests": 66,
       "loweringAndAbiTests": 16,
-      "runtimeTests": 23,
-      "domSliceUnitTests": 7,
-      "browserDomRun": 38169465234,
-      "lastVerifiedRun": 38169465234
+      "runtimeTests": 26,
+      "domSliceUnitTests": 11,
+      "browserDomRun": 38638143259,
+      "lastVerifiedRun": 38638143259
     },
     "remaining": [
       "destructuring-assignment-target-edge-cases",
-      "spread-attribute-merge-precedence",
       "dynamic-url-attribute-safety",
+      "attribute-property-assignment-table",
       "event-and-native-control-lowering",
       "structural-block-lowering",
       "component-lowering",
