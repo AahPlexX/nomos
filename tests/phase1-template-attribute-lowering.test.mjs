@@ -56,7 +56,8 @@ test('lowers spread attributes with neighboring explicit attributes into one sou
   assert.doesNotMatch(result.staticHtml, /\{\.\.\.attrs\}|\{before\}|\{after\}/);
   assert.match(result.code, /bindAttributes/);
   assert.match(result.code, /kind:\s*"spread"/);
-  assert.ok(result.decodedMappings.some((mapping) => mapping.original?.column === source.indexOf('attrs', source.indexOf('{...attrs}')) + 3));
+  const spreadExpressionStart = source.indexOf('attrs', source.indexOf('{...attrs}'));
+  assert.ok(result.decodedMappings.some((mapping) => mapping.original?.column === spreadExpressionStart));
 });
 
 test('keeps custom-element dynamic/spread attributes, URL expressions, and inline event attributes guarded', () => {
