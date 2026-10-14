@@ -5,6 +5,7 @@ import {
   createOwner,
   createStateCell,
   disposeOwner,
+  flushRuntime,
   mountOwner,
   read,
   runWithOwner,
@@ -155,4 +156,29 @@ test('bindAttributes spreads only enumerable own string keys', async () => {
   assert.equal(element.hasAttribute('inherited'), false);
   assert.equal(element.hasAttribute('hidden'), false);
   assert.deepEqual(element.getAttributeNames(), ['visible']);
+});
+
+test('bindAttributes rejects unsafe runtime spread keys before mutating the element', () => {
+  const bindAttributes = requireBindAttributes();
+  for (const unsafe of [
+    { onclick: 'alert(1)', safe: 'changed' },
+    { href: 'javascript:alert(1)', safe: 'changed' },
+  ]) {
+    const owner = createOwner(null, { name: 'root' });
+    const spread = createStateCell({ safe: 'initial' }, { name: 'spread' });
+    const element = createFakeElement();
+    runWithOwner(owner, () => {
+      bindAttributes(element, [{ kind: 'spread', compute: () => read(spread) }], { name: 'attrs' });
+    });
+    mountOwner(owner);
+    flushRuntime();
+    assert.equal(element.getAttribute('safe'), 'initial');
+
+    write(spread, unsafe);
+    assert.throws(() => flushRuntime(), /Spread attribute .* is blocked/);
+    assert.equal(element.getAttribute('safe'), 'initial');
+    assert.equal(element.hasAttribute('onclick'), false);
+    assert.equal(element.hasAttribute('href'), false);
+    disposeOwner(owner);
+  }
 });
