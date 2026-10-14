@@ -36,10 +36,33 @@ test('lowers dynamic, mixed, and shorthand standard-HTML attributes onto determi
   assert.ok(result.decodedMappings.some((mapping) => mapping.original?.column === source.indexOf('data-count')));
 });
 
-test('keeps spread, custom-element dynamic attributes, URL expressions, and inline event attributes guarded', () => {
+test('lowers spread attributes with neighboring explicit attributes into one source-ordered element binding plan', () => {
+  const source = `<script lang="ts">import { state } from 'nomos'; let before = state('before'); let attrs = state({ 'data-collision': 'spread', class: 'spread' }); let after = state('after');</script><button data-collision={before} {...attrs} class={after}>Go</button>`;
+  const component = compiler.parseComponent(source, { filename: 'SpreadAttributes.nomos' });
+  const script = lowerComponentScript(source, component, { filename: 'SpreadAttributes.nomos' });
+  const result = compiler.lowerTemplateDom(source, component, {
+    script,
+    filename: 'SpreadAttributes.nomos',
+    targetIdentifier: 'target',
+  });
+
+  assert.equal(result.diagnostics.length, 0);
+  assert.ok(result.code);
+  assert.deepEqual(result.attributeBindings.map((binding) => binding.kind), ['dynamic', 'spread', 'dynamic']);
+  assert.ok(result.attributeBindings.every((binding) => binding.elementIndex === 0));
+  assert.ok(result.runtimeImports.some((entry) => entry.imported === 'bindAttributes'));
+  assert.ok(result.runtimeImports.some((entry) => entry.imported === 'read'));
+  assert.match(result.staticHtml, /<button\s+data-nomos-el(?:-[0-9]+)?="0"/);
+  assert.doesNotMatch(result.staticHtml, /\{\.\.\.attrs\}|\{before\}|\{after\}/);
+  assert.match(result.code, /bindAttributes/);
+  assert.match(result.code, /kind:\s*"spread"/);
+  assert.ok(result.decodedMappings.some((mapping) => mapping.original?.column === source.indexOf('attrs', source.indexOf('{...attrs}')) + 3));
+});
+
+test('keeps custom-element dynamic/spread attributes, URL expressions, and inline event attributes guarded', () => {
   const cases = [
-    [`<div {...attrs}></div>`, 'spread-attribute'],
     [`<x-card value={value}></x-card>`, 'dynamic-custom-element-attribute'],
+    [`<x-card {...attrs}></x-card>`, 'dynamic-custom-element-attribute'],
     [`<a href={url}>link</a>`, 'dynamic-url-attribute-unvalidated'],
     [`<button onclick="alert(1)">Go</button>`, 'inline-event-attribute'],
   ];
