@@ -1,6 +1,6 @@
 # Nomos execution queue
 
-**Last updated:** 2026-10-11  
+**Last updated:** 2026-10-14  
 **Binding scope:** `PRD.md` plus effective amendments  
 **Current phase:** Phase 1 — Vertical Slice
 
@@ -16,20 +16,19 @@ Status keys: `[x]` verified complete, `[>]` in progress, `[ ]` not complete, `[!
 - [>] Parser and source maps.
   - [x] Lossless top-level sections, exact UTF-16 coordinates, flat syntax tree, hierarchical AST.
   - [x] Typed exact-span attribute IR for static, dynamic, mixed, shorthand, and spread forms; directives remain separate.
-  - [x] Parser CI gate latest verified **66/66**.
+  - [x] Parser CI gate verified **66/66**.
   - [x] Same-span generic/specialized table ownership diagnostics deduplicated without weakening ownership checks.
-  - [x] ECMA-426 decoded mapping/composition core and script/template/text/attribute mapping points.
+  - [x] ECMA-426 decoded mapping/composition core and script/template/text/attribute/spread mapping points.
   - [x] 21 certified WHATWG ownership scenarios.
   - [x] TypeScript-backed `EmbeddedScript` and `EmbeddedExpression` lowering.
   - [x] Browser-parsed static template DOM + live text interpolation.
-  - [x] Lower standard-HTML dynamic, mixed, and shorthand attributes from typed IR with deterministic element slots.
-  - [ ] Define/test/implement spread-attribute merge precedence to complete the fourth runtime attribute form.
+  - [x] Lower all four required standard-HTML runtime attribute forms from typed IR: dynamic, mixed, shorthand, spread.
   - [ ] Finish only material remaining active-formatting/special insertion-mode gaps.
   - [ ] Implement `EmbeddedStylesheet` with exact-pinned Lightning CSS when executable CSS code consumes it.
 - [>] State, derivation, synchronization, ownership.
   - [x] ADR-0008 graph/owner/scheduler; scalar/deep/raw state; derives; `untrack`; sync cleanup; cycle diagnostics.
   - [x] Script lowering for implemented state/derive reads/writes and direct reactive-root loop targets.
-  - [x] Internal owner-backed `bindText`, `bindAttribute`, and `mountTemplate`.
+  - [x] Internal owner-backed `bindText`, `bindAttribute`, grouped `bindAttributes`, and `mountTemplate`.
   - [ ] Remaining reactive destructuring assignment targets when required by conformance fixtures.
   - [!] `state.snapshot` remains blocked on its explicit contract and `OD-004`.
   - [ ] Query request ownership/cancellation.
@@ -39,15 +38,18 @@ Status keys: `[x]` verified complete, `[>]` in progress, `[ ]` not complete, `[!
   - [x] Dynamic `name={expr}` standard-HTML assignment.
   - [x] Mixed `name="text {expr}"` standard-HTML assignment.
   - [x] Shorthand `{identifier}` standard-HTML assignment.
-  - [ ] Spread `{...expr}` assignment/merge semantics.
+  - [x] Spread `{...expr}` assignment with authored-left-to-right precedence; later entries win.
+  - [x] Spread consumes enumerable own string keys; nullish spread sources are no-ops.
+  - [x] When spread keys disappear, earlier source-order fallbacks are restored and stale keys are removed.
+  - [x] Runtime spread validation blocks `on*` and currently-unvalidated URL-bearing keys before DOM mutation.
   - [x] Ordinary content attributes remove on nullish values and otherwise stringify; certified boolean attributes use presence/absence.
   - [!] Dynamic custom-element assignment remains guarded while `OD-008` is open.
   - [ ] Dynamic URL protocol validator before expression-derived URL-bearing attributes are enabled.
   - [ ] Publish/test built-in attribute/property assignment table before property-backed native-control expansion.
 - [>] Verification.
   - [x] CI pins Ubuntu 24.04, Node `22.16.0`, pnpm `12.10.1`, exact dependencies, and verifies Chrome.
-  - [x] Attribute-binding behavioral RED `38168546695`: parser/Chrome green, DOM focused units **3/7** because binding behavior was absent.
-  - [x] Attribute-binding GREEN `38168894701`: parser **66/66**, DOM **7/7 + Chrome/Trusted Types**, lowering **16/16**, runtime **23/23**.
+  - [x] Spread behavioral RED `38637069602`: parser/previous browser path green; grouped spread runtime/lowering absent as intended.
+  - [x] Spread implementation GREEN `38638143259`: parser **66/66**, focused DOM **11/11 + Chrome/Trusted Types**, lowering **16/16**, runtime **26/26**.
 - [>] Public conformance infrastructure.
   - [x] ADR-0007 + manifest/runner/validator foundation; `NCON-NREQ-0145` wired.
   - [ ] Promote only under complete ADR-0007 evidence; passing requirement count remains zero.
