@@ -16,7 +16,7 @@ if (typeof runtimeInternal.bindAttribute !== 'function') missing.push('runtimeIn
 if (typeof runtimeInternal.bindAttributes !== 'function') missing.push('runtimeInternal.bindAttributes');
 assert.deepEqual(missing, [], `template DOM materialization seam is incomplete: ${missing.join(', ')}`);
 
-const source = `<main data-label="A &amp; B" data-count={count} {...attrs} class="count {count}" inert={inert}>A &amp; B {1 + 2}<svg><circle></circle></svg></main>`;
+const source = `<main data-label="A &amp; B" data-count={count} {...attrs} class="count {count}" inert={inert}>A &amp; B {1 + 2}<svg><circle></circle></svg></main><a href={href}>Docs</a>`;
 const component = compiler.parseComponent(source, { filename: 'BrowserDom.nomos' });
 const lowered = compiler.lowerTemplateDom(source, component, {
   filename: 'BrowserDom.nomos',
@@ -24,7 +24,7 @@ const lowered = compiler.lowerTemplateDom(source, component, {
 });
 assert.equal(lowered.diagnostics.length, 0);
 assert.ok(lowered.code);
-assert.equal(lowered.attributeBindings.length, 4);
+assert.equal(lowered.attributeBindings.length, 5);
 assert.equal(lowered.attributeGroups.length, 1);
 
 const runtimeImportClause = lowered.runtimeImports
@@ -41,6 +41,7 @@ const owner = createOwner(null, { name: 'browser-root' });
 const count = 4;
 const attrs = { 'data-count': 9, class: 'spread-class', inert: false, 'data-spread': 'ok' };
 const inert = true;
+const href = '/safe-docs';
 const elementMarkerAttribute = ${elementMarkerAttributeLiteral};
 
 try {
@@ -62,6 +63,11 @@ ${indent(lowered.code, 4)}
   const circle = main.querySelector('circle');
   if (!circle) throw new Error('SVG child was not materialized');
   if (circle.namespaceURI !== 'http://www.w3.org/2000/svg') throw new Error('SVG namespace was not preserved: ' + circle.namespaceURI);
+
+  const anchor = target.querySelector('a');
+  if (!anchor) throw new Error('dynamic URL anchor was not materialized');
+  if (anchor.getAttribute('href') !== '/safe-docs') throw new Error('dynamic URL attribute did not use the runtime binding path: ' + anchor.getAttribute('href'));
+  if (elementMarkerAttribute && anchor.hasAttribute(elementMarkerAttribute)) throw new Error('temporary Nomos URL element marker leaked into mounted DOM');
 
   disposeOwner(owner);
   if (target.childNodes.length !== 0) throw new Error('owned template roots were not removed on disposal');
