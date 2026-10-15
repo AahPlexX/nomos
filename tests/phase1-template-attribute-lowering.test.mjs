@@ -60,11 +60,31 @@ test('lowers spread attributes with neighboring explicit attributes into one sou
   assert.ok(result.decodedMappings.some((mapping) => mapping.original?.column === spreadExpressionStart));
 });
 
-test('keeps custom-element dynamic/spread attributes, URL expressions, and inline event attributes guarded', () => {
+test('lowers statically named dynamic URL attributes through the shared runtime binding path', () => {
+  const source = `<script lang="ts">import { state } from 'nomos'; let href = state('/docs'); let path = state('submit'); let poster = state('/poster.png');</script><a href={href}>Docs</a><form action="/{path}"></form><video {poster}></video>`;
+  const component = compiler.parseComponent(source, { filename: 'DynamicUrls.nomos' });
+  const script = lowerComponentScript(source, component, { filename: 'DynamicUrls.nomos' });
+  const result = compiler.lowerTemplateDom(source, component, {
+    script,
+    filename: 'DynamicUrls.nomos',
+    targetIdentifier: 'target',
+  });
+
+  assert.equal(result.diagnostics.length, 0);
+  assert.ok(result.code);
+  assert.deepEqual(result.attributeBindings.map((binding) => binding.kind), ['dynamic', 'mixed', 'shorthand']);
+  assert.deepEqual(result.attributeBindings.map((binding) => binding.name), ['href', 'action', 'poster']);
+  assert.ok(result.runtimeImports.some((entry) => entry.imported === 'bindAttribute'));
+  assert.ok(result.runtimeImports.some((entry) => entry.imported === 'read'));
+  assert.match(result.code, /"href"/);
+  assert.match(result.code, /"action"/);
+  assert.match(result.code, /"poster"/);
+});
+
+test('keeps custom-element dynamic/spread attributes and inline event attributes guarded', () => {
   const cases = [
     [`<x-card value={value}></x-card>`, 'dynamic-custom-element-attribute'],
     [`<x-card {...attrs}></x-card>`, 'dynamic-custom-element-attribute'],
-    [`<a href={url}>link</a>`, 'dynamic-url-attribute-unvalidated'],
     [`<button onclick="alert(1)">Go</button>`, 'inline-event-attribute'],
   ];
 
