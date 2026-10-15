@@ -1,5 +1,6 @@
 import { createDomEffect, ownDom } from './reactivity.mjs';
 import {
+  assertSafeDynamicUrlAttributeValue,
   assertSafeSpreadHtmlAttributeName,
   isBooleanHtmlAttribute,
   normalizeHtmlAttributeName,
@@ -93,6 +94,7 @@ function normalizePlanEntry(element, entry, index) {
 }
 
 function attributeAction(name, value) {
+  assertSafeDynamicUrlAttributeValue(name, value);
   if (isBooleanHtmlAttribute(name)) return value ? { present: true, value: '' } : { present: false, value: null };
   return value === null || value === undefined
     ? { present: false, value: null }
@@ -100,6 +102,7 @@ function attributeAction(name, value) {
 }
 
 function applyAttributeValue(element, name, value, boolean) {
+  assertSafeDynamicUrlAttributeValue(name, value);
   if (boolean) {
     if (value) element.setAttribute(name, '');
     else element.removeAttribute(name);
