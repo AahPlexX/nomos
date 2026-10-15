@@ -131,7 +131,7 @@ All material repository changes are recorded here. This file tracks project stat
 - Added `tests/phase1-runtime-url-safety.test.mjs` covering helper normalization, independent `bindAttribute`, safe spread URL assignment, and pre-mutation grouped rejection.
 - Updated the legacy spread unsafe-name test so inline events remain name-guarded while URL safety is value-based.
 - Repository run `38662076485` passed parser, template DOM/Trusted Types, lowering, runtime, and Phase-1 machine-state gates with the URL runtime tests present.
-- The DOM-slice unit gate now explicitly includes the URL-safety test file; the synchronized documentation/machine-state commit is the next verification checkpoint.
+- Synchronized run `38662666873` then passed parser, the expanded DOM/Trusted Types slice with `tests/phase1-runtime-url-safety.test.mjs` included directly, lowering, runtime, and Phase-1 machine-state validation.
 
 ### Remaining URL work
 
