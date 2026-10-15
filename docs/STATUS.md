@@ -76,7 +76,7 @@ Current executable safety contract:
 
 The end-to-end PRD URL requirement is **not yet marked complete**. Statically named expression-derived URL attributes such as `<a href={url}>` are still deliberately compiler-guarded by `dynamic-url-attribute-unvalidated`, and the HTML index includes additional URL/list candidate grammars that require deliberate coverage rather than unsafe name-only assumptions. The next URL step is to wire known compiler bindings through the runtime validator and then close the remaining URL-bearing grammar audit.
 
-Focused URL TDD first failed on the intentionally missing validator export; the helper then passed **2/2** locally on Node `22.16.0`. Repository run `38662076485` passed parser, browser DOM/Trusted Types, lowering, runtime, and Phase-1 machine-state gates with the runtime URL tests present. The DOM-slice unit gate has subsequently been expanded to include the dedicated URL-safety test file; its synchronized-state run is the next verification checkpoint.
+Focused URL TDD first failed on the intentionally missing validator export; the helper then passed **2/2** locally on Node `22.16.0`. Repository run `38662076485` passed parser, browser DOM/Trusted Types, lowering, runtime, and Phase-1 machine-state gates with the runtime URL tests present. The expanded DOM-slice gate then passed in synchronized run `38662666873` with `tests/phase1-runtime-url-safety.test.mjs` included directly in the DOM unit slice.
 
 ## Safety boundaries that remain
 
@@ -106,7 +106,8 @@ Key evidence:
 - Spread behavioral RED `38637069602`: parser and the pre-existing browser path stayed green while runtime failed because `bindAttributes` was absent and compiler lowering still guarded spread.
 - Spread implementation GREEN `38638143259`: parser **66/66**, focused DOM/browser units **11/11**, real Chrome `154.0.8037.97` under Trusted Types, lowering **16/16**, runtime **26/26**.
 - Property-assignment table focused RED→GREEN: missing table exports failed first; immutable/type-sensitive policy then passed **5/5** on Node `22.16.0`.
-- Assignment-policy synchronized CI advanced through run `38662076485`; that run also includes the first dynamic-URL runtime safety core and passed every workflow step.
+- URL-safety code-bearing run `38662076485` passed every workflow step with the runtime URL tests present.
+- Synchronized checkpoint `38662666873` passed parser, the expanded DOM/Trusted Types slice, lowering, runtime, and Phase-1 machine-state validation after the URL-safety test was added directly to the DOM-slice gate.
 
 Development/CI regression evidence does **not** automatically promote normative `NCON-*` rows; ADR-0007 remains authoritative.
 
