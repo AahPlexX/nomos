@@ -8,6 +8,11 @@ import {
 test('property assignment table publishes current-state HTML properties and required binding targets', () => {
   assert.ok(Object.isFrozen(STANDARD_HTML_PROPERTY_ASSIGNMENTS));
   assert.ok(STANDARD_HTML_PROPERTY_ASSIGNMENTS.length >= 10);
+  for (const entry of STANDARD_HTML_PROPERTY_ASSIGNMENTS) {
+    assert.ok(Object.isFrozen(entry));
+    assert.ok(Object.isFrozen(entry.bindings));
+    if (entry.inputTypes) assert.ok(Object.isFrozen(entry.inputTypes));
+  }
 
   assert.deepEqual(resolveStandardHtmlPropertyAssignment('textarea', 'value'), {
     element: 'textarea', sourceName: 'value', property: 'value', authoredDynamic: 'property',
