@@ -3,7 +3,6 @@ import { lowerTemplateTextBindings } from './template-lowering.mjs';
 import { createSourceMapFromDecodedMappings } from './source-map.mjs';
 import {
   isBooleanHtmlAttribute,
-  isGuardedDynamicUrlAttribute,
   isInlineEventHtmlAttribute,
   normalizeHtmlAttributeName,
 } from '../../shared/src/html-attribute-policy.mjs';
@@ -275,9 +274,6 @@ function collectUnsupportedTemplateFeatures(component) {
         if (name && isInlineEventHtmlAttribute(name)) diagnostics.push(unsupportedDiagnostic('inline-event-attribute', attribute.span, 'Inline event-handler attributes are not emitted; use on: directives.'));
         if (runtimeAssigned && node.category !== 'html') {
           diagnostics.push(unsupportedDiagnostic('dynamic-custom-element-attribute', attribute.span, 'Dynamic non-standard-element attributes are guarded while custom-element assignment semantics remain unresolved.'));
-        }
-        if (attribute.kind !== 'spread' && runtimeAssigned && name && isGuardedDynamicUrlAttribute(name)) {
-          diagnostics.push(unsupportedDiagnostic('dynamic-url-attribute-unvalidated', attribute.span, `Dynamic ${name} requires the URL safety validator before lowering.`));
         }
       }
       const nextAncestors = [...ancestors, node.name.toLowerCase()];
