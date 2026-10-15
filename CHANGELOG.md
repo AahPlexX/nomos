@@ -80,3 +80,27 @@ All material repository changes are recorded here. This file tracks project stat
 - Publish/test the complete built-in standard-HTML attribute/property assignment table.
 - Implement the dynamic URL protocol safety validator.
 - Then proceed to `on:` event lowering and `bind:` native-control semantics without guessing custom-element behavior under `OD-008`.
+
+## 2026-10-14 — Standard-HTML property-assignment contract published
+
+### Standards-backed contract
+
+- Added immutable `STANDARD_HTML_PROPERTY_ASSIGNMENTS` and `resolveStandardHtmlPropertyAssignment()` to the existing shared HTML policy module rather than creating a second compiler/runtime policy source.
+- The table distinguishes current-state IDL properties from ordinary reflected/content attributes and records the intended authored-dynamic and `bind:` seams without yet changing the existing DOM mutation path.
+- Input `value` handling is type-sensitive: Text/Search/Tel/URL/Email/Password and date/time/numeric/range/color states use current-value property semantics; omitted or invalid types resolve as Text; hidden, checkbox/radio, file, and button-like states are not misclassified.
+- Checkbox/radio `checked` records current checkedness and the `bind:checked` / `bind:group` seam; file `files` is binding-only for `bind:files`.
+- `textarea.value`, `select.value`, `option.selected`, `output.value`, and audio/video `muted` are recorded as current-state property assignments.
+- `details.open` and `dialog.open` remain authored-attribute-oriented because the IDL properties reflect the content attribute, while the table exposes the `bind:open` property seam.
+- Ordinary names such as `class`, `for`, `tabindex`, `aria-*`, `data-*`, reflected booleans, and reflected numeric values retain attribute-oriented behavior.
+
+### TDD and compatibility boundary
+
+- Focused TDD first failed on the intentionally missing table exports, then passed **5/5** after implementation under Node `22.16.0`.
+- Table objects, binding arrays, and input-type condition arrays are frozen and contract-tested.
+- Existing dynamic/mixed/shorthand/spread DOM mutation remains unchanged in this slice. Property mutation activation is deferred until cleanup, source-order interaction, and two-way native-control semantics are explicit.
+- No dependency was added. Current registry checks reconfirmed `@typescript/typescript6@6.0.2` and planned `lightningcss@1.33.0` with no known vulnerabilities in the configured npm security source.
+
+### Next frontier
+
+- Implement dynamic URL protocol safety validation before enabling expression-derived URL-bearing attributes.
+- Then consume the published table in the dedicated property/native-control implementation and proceed into `on:` / `bind:` integration.
