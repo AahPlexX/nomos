@@ -5,6 +5,7 @@ const checks = [
     'tests/phase1-template-dom-materialization.test.mjs',
     'tests/phase1-template-attribute-lowering.test.mjs',
     'tests/phase1-runtime-attribute-binding.test.mjs',
+    'tests/phase1-runtime-url-safety.test.mjs',
   ]],
   ['browser', [process.execPath, 'tools/verify-browser-dom.mjs']],
 ];
