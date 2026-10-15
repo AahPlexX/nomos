@@ -77,9 +77,10 @@
       "authoredPropertyMutation": "pending-dedicated-property-native-control-slice"
     },
     "dynamicUrlSafety": {
-      "status": "runtime-core-implemented-compiler-and-full-grammar-coverage-in-progress",
+      "status": "initial-single-url-set-end-to-end-implemented-full-html-coverage-in-progress",
       "validatorExport": "assertSafeDynamicUrlAttributeValue",
       "implementationFile": "packages/shared/src/html-attribute-policy.mjs",
+      "compilerIntegrationFile": "packages/compiler/src/template-dom-lowering.mjs",
       "testFile": "tests/phase1-runtime-url-safety.test.mjs",
       "focusedTests": 4,
       "initialSingleUrlNames": ["action", "cite", "formaction", "href", "poster", "src"],
@@ -90,8 +91,10 @@
       "bindAttributeValidation": "before-dom-mutation",
       "bindAttributesValidation": "complete-desired-plan-before-dom-mutation",
       "spreadSafeUrlsEnabled": true,
-      "staticExpressionCompilerGuard": "dynamic-url-attribute-unvalidated",
-      "remaining": ["static-expression-lowering-enable", "remaining-html-url-list-token-candidate-grammar-audit"]
+      "staticallyNamedDynamicUrlsEnabled": true,
+      "staticExpressionCompilerGuard": null,
+      "browserSafeDynamicUrlVerified": true,
+      "remaining": ["remaining-html-url-bearing-grammar-audit"]
     },
     "spreadSemantics": {
       "precedence": "authored-left-to-right-later-entry-wins",
@@ -112,7 +115,7 @@
       "hostCspMustAllowPolicyName": true
     },
     "browserVerification": {
-      "run": 38662666873,
+      "run": 38670385218,
       "chrome": "154.0.8037.97",
       "trustedTypesEnforced": true,
       "verifiedBehaviors": [
@@ -125,13 +128,14 @@
         "spread-overrides-earlier-explicit-attribute",
         "later-explicit-attribute-overrides-spread",
         "spread-only-ordinary-attribute-assignment",
+        "statically-named-safe-dynamic-url-assignment",
         "temporary-element-marker-removal",
         "owned-root-disposal"
       ]
     },
     "guarded": [
       "dynamic-custom-element-assignment-od-008",
-      "statically-named-dynamic-url-compiler-enable-and-remaining-url-grammars",
+      "remaining-html-url-bearing-grammars",
       "inline-event-attributes",
       "property-assignment-activation-and-native-control-bindings"
     ]
@@ -175,12 +179,13 @@
     "owner-backed-standard-html-dynamic-mixed-shorthand-attribute-binding",
     "owner-backed-source-ordered-standard-html-spread-attribute-binding",
     "published-tested-standard-html-property-assignment-policy",
-    "dynamic-url-javascript-scheme-runtime-safety-core"
+    "dynamic-url-javascript-scheme-runtime-safety-core",
+    "dynamic-url-initial-single-url-set-end-to-end"
   ],
   "remaining": [
     "state-snapshot-contract-and-implementation",
     "request-ownership-and-cancellation",
-    "dynamic-url-static-compiler-enable-and-remaining-url-grammar-coverage",
+    "remaining-html-url-bearing-grammar-coverage",
     "property-assignment-activation-and-event-native-control-binding-integration",
     "structural-block-and-component-dom-ownership"
   ],
