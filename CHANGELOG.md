@@ -104,3 +104,36 @@ All material repository changes are recorded here. This file tracks project stat
 
 - Implement dynamic URL protocol safety validation before enabling expression-derived URL-bearing attributes.
 - Then consume the published table in the dedicated property/native-control implementation and proceed into `on:` / `bind:` integration.
+
+## 2026-10-14 — Dynamic URL scheme-safety runtime core
+
+### Standards-backed safety core
+
+- Added `assertSafeDynamicUrlAttributeValue()` to the shared HTML attribute policy without introducing a sanitizer dependency or a second URL parser.
+- The initial guarded single-URL attribute set is `action`, `cite`, `formaction`, `href`, `poster`, and `src`.
+- Dynamic values are classified with the platform WHATWG `URL` parser against an inert HTTPS base used only for scheme classification.
+- Values whose normalized protocol is `javascript:` are refused. This catches mixed ASCII case, leading/trailing controls/spaces, and embedded ASCII tab/newline obfuscation handled by the URL parser.
+- Safe absolute, relative, fragment, and `mailto:` values remain allowed, as do ordinary URLs whose path/query merely contains the text `javascript:`.
+- Invalid/non-parseable values are not reclassified as dangerous by a heuristic substring test; existing browser/content-attribute behavior remains authoritative outside the explicit `javascript:` refusal contract.
+
+### DOM integration
+
+- `bindAttribute` validates URL-valued updates before `setAttribute`/`removeAttribute` mutation.
+- Grouped `bindAttributes` validates URL values while building the complete desired source-order map, before stale-key removals or attribute sets.
+- Spread-provided URL names in the initial safety set are therefore allowed when safe instead of being rejected solely by name.
+- Inline `on*` spread keys remain name-blocked and continue to require dedicated `on:` semantics.
+- Existing compiler guard `dynamic-url-attribute-unvalidated` remains for statically visible expression-derived URL attributes until their lowering path is deliberately routed through the runtime safety seam.
+
+### TDD and verification
+
+- URL safety focused RED: the test contract initially failed because `assertSafeDynamicUrlAttributeValue` did not exist.
+- Focused helper GREEN: **2/2** on Node `22.16.0` for normalized `javascript:` refusal plus safe/misleading-substring acceptance.
+- Added `tests/phase1-runtime-url-safety.test.mjs` covering helper normalization, independent `bindAttribute`, safe spread URL assignment, and pre-mutation grouped rejection.
+- Updated the legacy spread unsafe-name test so inline events remain name-guarded while URL safety is value-based.
+- Repository run `38662076485` passed parser, template DOM/Trusted Types, lowering, runtime, and Phase-1 machine-state gates with the URL runtime tests present.
+- The DOM-slice unit gate now explicitly includes the URL-safety test file; the synchronized documentation/machine-state commit is the next verification checkpoint.
+
+### Remaining URL work
+
+- Remove the statically named URL compiler guard only after wiring those bindings through the shared runtime validator and adding lowering/browser evidence.
+- Audit and explicitly support remaining HTML URL-bearing list/token/candidate grammars rather than broadening the name set heuristically; the PRD-wide URL requirement remains in progress until that coverage is closed.
