@@ -122,7 +122,6 @@ All material repository changes are recorded here. This file tracks project stat
 - Grouped `bindAttributes` validates URL values while building the complete desired source-order map, before stale-key removals or attribute sets.
 - Spread-provided URL names in the initial safety set are therefore allowed when safe instead of being rejected solely by name.
 - Inline `on*` spread keys remain name-blocked and continue to require dedicated `on:` semantics.
-- Existing compiler guard `dynamic-url-attribute-unvalidated` remains for statically visible expression-derived URL attributes until their lowering path is deliberately routed through the runtime safety seam.
 
 ### TDD and verification
 
@@ -133,7 +132,22 @@ All material repository changes are recorded here. This file tracks project stat
 - Repository run `38662076485` passed parser, template DOM/Trusted Types, lowering, runtime, and Phase-1 machine-state gates with the URL runtime tests present.
 - Synchronized run `38662666873` then passed parser, the expanded DOM/Trusted Types slice with `tests/phase1-runtime-url-safety.test.mjs` included directly, lowering, runtime, and Phase-1 machine-state validation.
 
-### Remaining URL work
+## 2026-10-14 — Statically named initial dynamic URL path enabled
 
-- Remove the statically named URL compiler guard only after wiring those bindings through the shared runtime validator and adding lowering/browser evidence.
-- Audit and explicitly support remaining HTML URL-bearing list/token/candidate grammars rather than broadening the name set heuristically; the PRD-wide URL requirement remains in progress until that coverage is closed.
+### Compiler/runtime integration
+
+- Removed only the obsolete `dynamic-url-attribute-unvalidated` compiler guard and its unused policy import after the runtime URL validator existed and was already covered.
+- Dynamic, mixed, and shorthand values for the initial single-URL set (`action`, `cite`, `formaction`, `href`, `poster`, `src`) now lower through the same owner-backed `bindAttribute` / `bindAttributes` path as other standard-HTML runtime attributes.
+- The compiler does not duplicate URL parsing or scheme policy; runtime `assertSafeDynamicUrlAttributeValue()` remains the enforcement point before DOM mutation.
+- Custom-element assignment remains guarded under `OD-008`; inline event attributes remain rejected; property-backed current-state/native-control writes remain deferred to their dedicated table-driven slice.
+
+### TDD and browser verification
+
+- Behavioral RED `38670030444`: pinned toolchain and parser remained green; the DOM slice failed exactly because the statically named URL lowering expectation was blocked by the existing compiler guard.
+- Compiler GREEN `38670340262`: removing only that obsolete guard made the new lowering contract pass without changing runtime URL safety semantics.
+- Browser-confirmed GREEN `38670385218`: parser, expanded DOM/Trusted Types slice, lowering, runtime, and Phase-1 machine-state validation all passed; real Chrome materialized and assigned a safe expression-derived `href` through the compiler/runtime path.
+
+### Remaining URL boundary
+
+- The PRD-wide URL requirement remains in progress. Current HTML includes URL-bearing grammars that are not one URL string: `ping` is a whitespace-separated URL list, while `srcset`/`imagesrcset` are responsive-image candidate lists. Those require grammar-aware validation rather than broadening the single-URL helper by attribute name.
+- The next URL slice is therefore a standards audit and dedicated RED→GREEN contracts for remaining URL-bearing list/token/candidate grammars where expression-derived values can represent navigable/fetched URLs.
