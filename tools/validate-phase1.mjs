@@ -43,6 +43,7 @@ const required = [
   'tests/phase1-runtime-compiler-abi.test.mjs',
   'tests/phase1-runtime-text-binding.test.mjs',
   'tests/phase1-runtime-attribute-binding.test.mjs',
+  'tests/phase1-runtime-html-assignment-policy.test.mjs',
   'tests/phase1-compiler-reactive-lowering.test.mjs',
   'tests/phase1-template-expression-lowering.test.mjs',
   'tests/phase1-template-dom-materialization.test.mjs',
@@ -92,17 +93,22 @@ assert.ok(phase.phase1.parserImplemented.includes('browser-parsed-static-templat
 assert.ok(phase.phase1.parserImplemented.includes('standard-html-dynamic-mixed-shorthand-attribute-lowering'));
 assert.ok(phase.phase1.parserImplemented.includes('standard-html-source-ordered-spread-attribute-lowering'));
 assert.ok(phase.phase1.parserImplemented.includes('shared-standard-html-attribute-policy'));
+assert.ok(phase.phase1.parserImplemented.includes('published-standard-html-property-assignment-table'));
 assert.ok(phase.phase1.parserImplemented.includes('template-dom-text-attribute-and-spread-mapping'));
 assert.ok(!phase.phase1.parserRemaining.some((entry) => entry.includes('spread-attribute')));
-assert.ok(phase.phase1.parserRemaining.includes('attribute-property-assignment-table'));
+assert.ok(!phase.phase1.parserRemaining.includes('attribute-property-assignment-table'));
 assert.ok(phase.phase1.parserRemaining.includes('dynamic-url-attribute-safety-validation'));
 assert.ok(phase.phase1.runtimeImplemented.includes('owner-backed-source-ordered-standard-html-spread-attribute-binding'));
+assert.ok(phase.phase1.runtimeImplemented.includes('published-standard-html-property-assignment-policy'));
 assert.ok(!phase.phase1.runtimeRemaining.some((entry) => entry.includes('spread-attribute')));
+assert.ok(!phase.phase1.runtimeRemaining.includes('attribute-property-assignment-table'));
 assert.ok(phase.phase1.runtimeRemaining.includes('state-snapshot-contract-and-implementation'));
 assert.equal(phase.phase1.attributeBindingFunctions.required, 4);
 assert.equal(phase.phase1.attributeBindingFunctions.complete, 4);
 assert.deepEqual(phase.phase1.attributeBindingFunctions.implemented, ['dynamic', 'mixed', 'shorthand', 'spread']);
 assert.deepEqual(phase.phase1.attributeBindingFunctions.remaining, []);
+assert.equal(phase.phase1.propertyAssignmentPolicy.status, 'published-tested-contract-activation-pending');
+assert.equal(phase.phase1.propertyAssignmentPolicy.focusedTests, 5);
 assert.equal(phase.phase1.verification.workflow, '.github/workflows/ci.yml');
 assert.equal(phase.phase1.verification.node, '22.16.0');
 assert.equal(phase.phase1.verification.pnpm, '12.10.1');
@@ -110,8 +116,9 @@ assert.equal(phase.phase1.verification.typescript6, '6.0.2');
 assert.equal(phase.phase1.verification.chrome, '154.0.8037.97');
 assert.equal(phase.phase1.verification.parserTests, 66);
 assert.equal(phase.phase1.verification.loweringAndAbiTests, 16);
-assert.equal(phase.phase1.verification.runtimeTests, 26);
+assert.equal(phase.phase1.verification.runtimeTests, 31);
 assert.equal(phase.phase1.verification.domSliceUnitTests, 11);
+assert.equal(phase.phase1.verification.propertyAssignmentPolicyTests, 5);
 assert.equal(phase.phase1.verification.browserDomRun, 38638143259);
 assert.equal(phase.phase1.verification.browserTrustedTypesEnforced, true);
 assert.equal(phase.phase1.verification.lastVerifiedRun, 38638143259);
@@ -136,6 +143,9 @@ assert.equal(frontEnd.templateDom.attributeBinding.spreadEnumeration, 'own-enume
 assert.equal(frontEnd.templateDom.attributeBinding.spreadNullishSource, 'no-op');
 assert.equal(frontEnd.templateDom.attributeBinding.spreadDroppedKeys, 'restore-earlier-source-order-fallback-or-remove');
 assert.equal(frontEnd.templateDom.attributeBinding.spreadUnsafeNameValidation, 'on-and-guarded-url-names-rejected-before-dom-mutation');
+assert.equal(frontEnd.templateDom.attributeBinding.propertyAssignmentPolicy.status, 'published-tested-contract-activation-pending');
+assert.equal(frontEnd.templateDom.attributeBinding.propertyAssignmentPolicy.focusedTests, 5);
+assert.equal(frontEnd.templateDom.attributeBinding.propertyAssignmentPolicy.inputValueModeAware, true);
 assert.equal(frontEnd.templateDom.attributeBinding.customElementDynamicAssignment, 'guarded-od-008');
 assert.equal(frontEnd.templateDom.attributeBinding.dynamicUrlAttributes, 'guarded-until-protocol-validator');
 assert.equal(frontEnd.templateDom.trustedTypes.policyName, 'nomos');
@@ -145,10 +155,12 @@ assert.ok(frontEnd.templateDom.browserVerification.verifiedBehaviors.includes('l
 assert.ok(frontEnd.templateDom.browserVerification.verifiedBehaviors.includes('spread-only-ordinary-attribute-assignment'));
 assert.equal(frontEnd.reactiveLowering.verification.parserTests, 66);
 assert.equal(frontEnd.reactiveLowering.verification.domSliceUnitTests, 11);
-assert.equal(frontEnd.reactiveLowering.verification.runtimeTests, 26);
+assert.equal(frontEnd.reactiveLowering.verification.runtimeTests, 31);
+assert.equal(frontEnd.reactiveLowering.verification.propertyAssignmentPolicyTests, 5);
 assert.equal(frontEnd.reactiveLowering.verification.lastVerifiedRun, 38638143259);
 assert.ok(!frontEnd.reactiveLowering.remaining.some((entry) => entry.includes('spread-attribute')));
-assert.ok(frontEnd.reactiveLowering.remaining.includes('attribute-property-assignment-table'));
+assert.ok(!frontEnd.reactiveLowering.remaining.includes('attribute-property-assignment-table'));
+assert.ok(frontEnd.reactiveLowering.remaining.includes('dynamic-url-attribute-safety'));
 
 const runtime = JSON.parse(await readFile(new URL('spec/runtime-core.json', root), 'utf8'));
 assert.equal(runtime.status, 'phase-1-runtime-browser-template-dom-and-all-standard-html-runtime-attribute-forms-implemented');
@@ -162,6 +174,9 @@ assert.equal(runtime.domBindings.attributeForms.requiredDynamicForms, 4);
 assert.equal(runtime.domBindings.attributeForms.implementedCount, 4);
 assert.deepEqual(runtime.domBindings.attributeForms.implemented, ['dynamic', 'mixed', 'shorthand', 'spread']);
 assert.deepEqual(runtime.domBindings.attributeForms.remaining, []);
+assert.equal(runtime.domBindings.propertyAssignmentPolicy.status, 'published-tested-contract-activation-pending');
+assert.equal(runtime.domBindings.propertyAssignmentPolicy.focusedTests, 5);
+assert.equal(runtime.domBindings.propertyAssignmentPolicy.inputValueModes, 'type-sensitive-value-vs-default-default-on-filename');
 assert.equal(runtime.domBindings.spreadSemantics.precedence, 'authored-left-to-right-later-entry-wins');
 assert.equal(runtime.domBindings.spreadSemantics.enumeration, 'own-enumerable-string-keys');
 assert.equal(runtime.domBindings.spreadSemantics.nullishSource, 'no-op');
@@ -171,7 +186,8 @@ assert.equal(runtime.domBindings.trustedTypes.policyName, 'nomos');
 assert.equal(runtime.domBindings.browserVerification.run, 38638143259);
 assert.ok(runtime.domBindings.browserVerification.verifiedBehaviors.includes('spread-overrides-earlier-explicit-attribute'));
 assert.ok(!runtime.remaining.some((entry) => entry.includes('spread-attribute')));
-assert.ok(runtime.remaining.includes('attribute-property-assignment-table'));
+assert.ok(!runtime.remaining.includes('attribute-property-assignment-table'));
+assert.ok(runtime.remaining.includes('dynamic-url-attribute-safety'));
 assert.equal(runtime.openDecisionImpact, 'none');
 
 const packageJson = JSON.parse(await readFile(new URL('package.json', root), 'utf8'));
@@ -190,4 +206,4 @@ assert.equal(conformance.browserSubstitutionAllowed, false);
 assert.equal(conformance.seedTest.status, 'wired-unverified');
 assert.deepEqual(conformance.passingRequirements, []);
 
-console.log(`Phase 1 check passed: ${required.length} required artifacts; compiler foundations, typed five-form attribute IR, 21 HTML ownership scenarios, browser-parsed template DOM, live text interpolation, and 4/4 standard-HTML runtime attribute forms including source-ordered spread are implemented while the attribute/property assignment table, URL safety, events/native controls, structural/component lowering, snapshot semantics, CSS adapter work, and public green evidence remain in progress.`);
+console.log(`Phase 1 check passed: ${required.length} required artifacts; compiler foundations, typed five-form attribute IR, 21 HTML ownership scenarios, browser-parsed template DOM, live text interpolation, 4/4 standard-HTML runtime attribute forms, and the published/tested standard-HTML property-assignment contract are implemented while property-write activation, URL safety, events/native controls, structural/component lowering, snapshot semantics, CSS adapter work, and public green evidence remain in progress.`);
