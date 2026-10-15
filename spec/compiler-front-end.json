@@ -149,18 +149,20 @@
         "authoredPropertyMutation": "pending-dedicated-property-native-control-slice"
       },
       "dynamicUrlSafety": {
-        "status": "runtime-core-implemented-static-compiler-enable-and-full-grammar-audit-pending",
+        "status": "initial-single-url-set-end-to-end-implemented-full-html-coverage-in-progress",
         "validator": "assertSafeDynamicUrlAttributeValue",
         "test": "tests/phase1-runtime-url-safety.test.mjs",
         "focusedTests": 4,
         "initialSingleUrlNames": ["action", "cite", "formaction", "href", "poster", "src"],
         "refusedProtocol": "javascript:",
         "spreadSafeUrlsEnabled": true,
-        "staticExpressionDiagnostic": "dynamic-url-attribute-unvalidated",
-        "remaining": ["static-expression-lowering-enable", "remaining-html-url-list-token-candidate-grammar-audit"]
+        "staticallyNamedDynamicUrlsEnabled": true,
+        "staticExpressionDiagnostic": null,
+        "browserSafeDynamicUrlVerified": true,
+        "remaining": ["remaining-html-url-bearing-grammar-audit"]
       },
       "customElementDynamicAssignment": "guarded-od-008",
-      "dynamicUrlAttributes": "runtime-spread-core-safe-statically-named-expression-bindings-still-compiler-guarded",
+      "dynamicUrlAttributes": "initial-single-url-set-end-to-end-safe-remaining-html-url-grammars-under-audit",
       "inlineEventAttributes": "rejected-use-on-directive"
     },
     "ownedRootCleanup": true,
@@ -170,7 +172,7 @@
       "hostMustAllowPolicyName": true
     },
     "browserVerification": {
-      "run": 38662666873,
+      "run": 38670385218,
       "chrome": "154.0.8037.97",
       "trustedTypesEnforced": true,
       "verifiedBehaviors": [
@@ -183,13 +185,13 @@
         "spread-overrides-earlier-explicit-attribute",
         "later-explicit-attribute-overrides-spread",
         "spread-only-ordinary-attribute-assignment",
+        "statically-named-safe-dynamic-url-assignment",
         "temporary-element-marker-removal",
         "owned-root-disposal"
       ]
     },
     "explicitlyRejectedUntilDedicatedLowering": [
       "dynamic-custom-element-attributes-including-spread",
-      "statically-named-expression-derived-url-attributes-until-runtime-validator-wiring",
       "inline-event-attributes",
       "property-backed-authored-current-state-assignment-before-dedicated-activation",
       "directives",
@@ -237,16 +239,17 @@
       "parserTests": 66,
       "loweringAndAbiTests": 16,
       "runtimeTests": 35,
-      "domSliceUnitTests": 15,
+      "domSliceUnitTests": 16,
       "propertyAssignmentPolicyTests": 5,
       "urlSafetyTests": 4,
       "domSliceIncludesUrlSafety": true,
-      "browserDomRun": 38662666873,
-      "lastVerifiedRun": 38662666873
+      "browserDynamicUrlBindingVerified": true,
+      "browserDomRun": 38670385218,
+      "lastVerifiedRun": 38670385218
     },
     "remaining": [
       "destructuring-assignment-target-edge-cases",
-      "dynamic-url-static-expression-lowering-enable-and-remaining-url-grammar-audit",
+      "remaining-html-url-bearing-grammar-audit",
       "property-assignment-activation-and-event-native-control-lowering",
       "structural-block-lowering",
       "component-lowering",
