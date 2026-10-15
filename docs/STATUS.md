@@ -10,7 +10,7 @@
 
 ## Current compiler/runtime state
 
-The front end has lossless sections, exact UTF-16 positions, flat/hierarchical template structures, typed exact-span five-form attribute IR, 21 certified WHATWG ownership scenarios, ECMA-426 mapping primitives, TypeScript-backed script/expression lowering, browser-parsed DOM/text interpolation, executable standard-HTML assignment for all four required runtime attribute forms, a published/tested standard-HTML property-assignment table, and the first executable dynamic-URL safety core.
+The front end has lossless sections, exact UTF-16 positions, flat/hierarchical template structures, typed exact-span five-form attribute IR, 21 certified WHATWG ownership scenarios, ECMA-426 mapping primitives, TypeScript-backed script/expression lowering, browser-parsed DOM/text interpolation, executable standard-HTML assignment for all four required runtime attribute forms, a published/tested standard-HTML property-assignment table, and an end-to-end dynamic-URL safety path for the initial single-URL attribute set.
 
 Runtime retains the single ADR-0008 owner/dependency/scheduler model. `mountTemplate`, `bindText`, `bindAttribute`, and grouped `bindAttributes` all use that same ownership/scheduling path; no second DOM-reactivity system was introduced.
 
@@ -60,35 +60,41 @@ This table still publishes/tests the contract before property mutation activatio
 
 Focused table TDD produced the intended RED on missing exports and then **5/5** green under Node `22.16.0`.
 
-## Dynamic URL safety — runtime core implemented, compiler/full grammar coverage still in progress
+## Dynamic URL safety — initial single-URL set end-to-end; broader HTML grammar audit still in progress
 
-The PRD requires expression-derived `javascript:` URLs in URL-bearing attributes to be refused. The shared HTML policy now exposes `assertSafeDynamicUrlAttributeValue()` and the runtime invokes it before URL-valued DOM mutation.
+The PRD requires expression-derived `javascript:` URLs in URL-bearing attributes to be refused. The shared HTML policy exposes `assertSafeDynamicUrlAttributeValue()` and the runtime invokes it before URL-valued DOM mutation.
 
 Current executable safety contract:
 
-- the initial guarded single-URL name set remains `action`, `cite`, `formaction`, `href`, `poster`, and `src`;
+- the initial single-URL name set is `action`, `cite`, `formaction`, `href`, `poster`, and `src`;
 - values are classified with the platform `URL` parser against an inert HTTPS base used only to determine the resulting scheme;
-- WHATWG URL normalization therefore catches ASCII-case changes, leading/trailing controls/spaces, and embedded ASCII tab/newline obfuscation before checking `protocol === "javascript:"`;
+- WHATWG URL normalization catches ASCII-case changes, leading/trailing controls/spaces, and embedded ASCII tab/newline obfuscation before checking `protocol === "javascript:"`;
 - ordinary safe absolute URLs, relative URLs, fragments, `mailto:` URLs, and strings that merely contain `javascript:` in a path/query remain allowed;
 - `bindAttribute` validates before mutation;
 - grouped `bindAttributes` computes and validates the full desired spread plan before any removals/sets, so a rejected URL cannot partially update safe sibling attributes;
-- spread-discovered URL names in the initial set are now allowed when their winning values are safe.
+- spread-discovered URL names in the initial set are allowed when their winning values are safe;
+- statically named dynamic, mixed, and shorthand bindings for the same initial set now lower through the same `bindAttribute` / `bindAttributes` runtime seam rather than a compiler-only guard;
+- real Chrome under Trusted Types enforcement verifies a safe expression-derived `href` is compiled, mounted, and assigned through that path.
 
-The end-to-end PRD URL requirement is **not yet marked complete**. Statically named expression-derived URL attributes such as `<a href={url}>` are still deliberately compiler-guarded by `dynamic-url-attribute-unvalidated`, and the HTML index includes additional URL/list candidate grammars that require deliberate coverage rather than unsafe name-only assumptions. The next URL step is to wire known compiler bindings through the runtime validator and then close the remaining URL-bearing grammar audit.
+The PRD-wide URL requirement remains **in progress** because current HTML contains additional URL-bearing grammars that are not equivalent to one URL string. In particular, `ping` is a whitespace-separated URL list and responsive-image attributes such as `srcset`/`imagesrcset` are image-candidate lists. Those need dedicated grammar-aware validation rather than being pushed through the single-URL helper or broadened by name heuristics.
 
-Focused URL TDD first failed on the intentionally missing validator export; the helper then passed **2/2** locally on Node `22.16.0`. Repository run `38662076485` passed parser, browser DOM/Trusted Types, lowering, runtime, and Phase-1 machine-state gates with the runtime URL tests present. The expanded DOM-slice gate then passed in synchronized run `38662666873` with `tests/phase1-runtime-url-safety.test.mjs` included directly in the DOM unit slice.
+TDD/evidence for this stage:
+
+- runtime URL helper RED→GREEN established normalized `javascript:` refusal and safe value behavior;
+- static-URL lowering RED `38670030444`: toolchain/parser stayed green and the DOM slice failed on the new statically named URL expectation while the old compiler guard remained;
+- compiler GREEN `38670340262`: removing only the obsolete static URL guard made that lowering expectation pass while retaining runtime validation as the safety enforcement point;
+- browser-confirmed GREEN `38670385218`: parser, DOM/Trusted Types, lowering, runtime, and Phase-1 machine-state steps all passed with a safe dynamic `href` materialized in real Chrome.
 
 ## Safety boundaries that remain
 
 - dynamic custom-element assignment, including spread, remains guarded while `OD-008` is open;
-- statically named expression-derived URL attributes remain compiler-guarded until they are routed through the runtime validator;
-- URL-bearing grammars beyond the initial six-name single-URL set remain under active audit;
+- remaining HTML URL-bearing list/token/candidate grammars remain under active standards audit and do not yet claim the single-URL helper applies to them;
 - inline event-handler attributes remain rejected; event behavior belongs to `on:`;
 - property-backed authored/current-state writes and two-way native-control behavior remain a dedicated follow-on slice that must consume the published table.
 
 **Attribute-binding function status: 4/4 runtime forms complete.**  
 **Property-assignment policy status: published/tested; mutation activation pending dedicated lowering/runtime work.**  
-**Dynamic URL status: runtime scheme-safety core implemented; compiler enablement and complete HTML URL-bearing coverage still in progress.**
+**Dynamic URL status: initial six-name single-URL set compiler→runtime→browser verified; broader HTML URL-bearing grammar coverage still in progress.**
 
 ## Browser-parsed DOM
 
@@ -106,8 +112,9 @@ Key evidence:
 - Spread behavioral RED `38637069602`: parser and the pre-existing browser path stayed green while runtime failed because `bindAttributes` was absent and compiler lowering still guarded spread.
 - Spread implementation GREEN `38638143259`: parser **66/66**, focused DOM/browser units **11/11**, real Chrome `154.0.8037.97` under Trusted Types, lowering **16/16**, runtime **26/26**.
 - Property-assignment table focused RED→GREEN: missing table exports failed first; immutable/type-sensitive policy then passed **5/5** on Node `22.16.0`.
-- URL-safety code-bearing run `38662076485` passed every workflow step with the runtime URL tests present.
-- Synchronized checkpoint `38662666873` passed parser, the expanded DOM/Trusted Types slice, lowering, runtime, and Phase-1 machine-state validation after the URL-safety test was added directly to the DOM-slice gate.
+- URL-safety code-bearing run `38662076485` passed every workflow step with runtime URL tests present.
+- Synchronized URL-safety checkpoint `38662666873` passed parser, expanded DOM/Trusted Types, lowering, runtime, and Phase-1 machine-state validation.
+- Static URL lowering RED `38670030444`, compiler GREEN `38670340262`, and browser-confirmed GREEN `38670385218` establish the statically named initial single-URL path without weakening the runtime `javascript:` refusal boundary.
 
 Development/CI regression evidence does **not** automatically promote normative `NCON-*` rows; ADR-0007 remains authoritative.
 
@@ -117,7 +124,7 @@ Development/CI regression evidence does **not** automatically promote normative 
 
 ## Dependency state
 
-No dependency was added for either the assignment-table or URL-safety work. Current registry verification on 2026-10-14 confirmed `@typescript/typescript6@6.0.2` and planned `lightningcss@1.33.0` remain current stable package baselines with no known vulnerabilities reported by the configured npm security source.
+No dependency was added for the assignment-table or URL-safety work. Current registry verification on 2026-10-14 confirmed `@typescript/typescript6@6.0.2` and planned `lightningcss@1.33.0` remain current stable package baselines with no known vulnerabilities reported by the configured npm security source.
 
 ## Wayfinder / Handoff
 
@@ -129,8 +136,8 @@ Canonical durable facts are repository machine specs, ADRs, CI, and this status 
 
 ## Immediate next action
 
-1. Finish the dynamic-URL slice by removing the statically named compiler guard only where the runtime validator applies, and add lowering/browser evidence that safe expression-derived URLs work while normalized `javascript:` values fail before mutation.
-2. Complete the standards audit for remaining HTML URL-bearing list/token candidate attributes rather than broadening the name set heuristically.
+1. Complete the standards audit for the remaining HTML URL-bearing grammars. Keep single URLs, whitespace-separated URL lists such as `ping`, image-candidate lists such as `srcset`/`imagesrcset`, and microdata URL-token semantics distinct rather than broadening the current validator heuristically.
+2. Add grammar-specific RED→GREEN safety contracts only where expression-derived values can represent URLs and the PRD's `javascript:` refusal applies.
 3. Consume the published property-assignment table in the dedicated authored-current-state/native-control slice, with cleanup/source-order behavior specified before enabling property writes.
-4. Begin `on:` events and `bind:` native-control semantics once URL safety and property-write mechanics are executable end-to-end.
+4. Begin `on:` events and `bind:` native-control semantics once the property-write mechanics are executable.
 5. Continue structural blocks/components, reactive destructuring, and the CSS adapter as prerequisites permit; keep `state.snapshot` blocked until its explicit contract/`OD-004` is resolved.
