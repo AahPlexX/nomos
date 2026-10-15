@@ -52,6 +52,30 @@
     },
     "ordinaryAttributeSemantics": "winning-nullish-removes-otherwise-String-and-setAttribute",
     "booleanAttributeSemantics": "winning-truthy-presence-empty-string-falsy-absence",
+    "propertyAssignmentPolicy": {
+      "status": "published-tested-contract-activation-pending",
+      "tableExport": "STANDARD_HTML_PROPERTY_ASSIGNMENTS",
+      "resolverExport": "resolveStandardHtmlPropertyAssignment",
+      "implementationFile": "packages/shared/src/html-attribute-policy.mjs",
+      "testFile": "tests/phase1-runtime-html-assignment-policy.test.mjs",
+      "focusedTests": 5,
+      "currentStateRows": [
+        "input.value-value-mode-types",
+        "input.checked-checkbox-radio",
+        "input.files-file-binding-only",
+        "textarea.value",
+        "select.value",
+        "option.selected",
+        "output.value",
+        "audio.muted",
+        "video.muted",
+        "details.open-reflected-bind-seam",
+        "dialog.open-reflected-bind-seam"
+      ],
+      "inputValueModes": "type-sensitive-value-vs-default-default-on-filename",
+      "ordinaryReflectedNames": "remain-content-attribute-oriented",
+      "authoredPropertyMutation": "pending-dedicated-property-native-control-slice"
+    },
     "spreadSemantics": {
       "precedence": "authored-left-to-right-later-entry-wins",
       "enumeration": "own-enumerable-string-keys",
@@ -92,7 +116,7 @@
       "dynamic-custom-element-assignment-od-008",
       "dynamic-url-attribute-protocol-validation",
       "inline-event-attributes",
-      "native-control-property-backed-bindings"
+      "property-assignment-activation-and-native-control-bindings"
     ]
   },
   "scheduler": {
@@ -132,14 +156,14 @@
     "owner-backed-text-binding-helper",
     "owner-backed-browser-parsed-static-template-mount",
     "owner-backed-standard-html-dynamic-mixed-shorthand-attribute-binding",
-    "owner-backed-source-ordered-standard-html-spread-attribute-binding"
+    "owner-backed-source-ordered-standard-html-spread-attribute-binding",
+    "published-tested-standard-html-property-assignment-policy"
   ],
   "remaining": [
     "state-snapshot-contract-and-implementation",
     "request-ownership-and-cancellation",
-    "attribute-property-assignment-table",
     "dynamic-url-attribute-safety",
-    "event-and-native-control-binding-integration",
+    "property-assignment-activation-and-event-native-control-binding-integration",
     "structural-block-and-component-dom-ownership"
   ],
   "openDecisionImpact": "none"
