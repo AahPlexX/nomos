@@ -112,7 +112,7 @@
       "hostCspMustAllowPolicyName": true
     },
     "browserVerification": {
-      "run": 38662076485,
+      "run": 38662666873,
       "chrome": "154.0.8037.97",
       "trustedTypesEnforced": true,
       "verifiedBehaviors": [
