@@ -23,6 +23,7 @@ Status keys: `[x]` verified complete, `[>]` in progress, `[ ]` not complete, `[!
   - [x] TypeScript-backed `EmbeddedScript` and `EmbeddedExpression` lowering.
   - [x] Browser-parsed static template DOM + live text interpolation.
   - [x] Lower all four required standard-HTML runtime attribute forms from typed IR: dynamic, mixed, shorthand, spread.
+  - [x] Publish/test the built-in standard-HTML property-assignment table and type-sensitive native-control seams without changing existing attribute mutation semantics.
   - [ ] Finish only material remaining active-formatting/special insertion-mode gaps.
   - [ ] Implement `EmbeddedStylesheet` with exact-pinned Lightning CSS when executable CSS code consumes it.
 - [>] State, derivation, synchronization, ownership.
@@ -43,13 +44,15 @@ Status keys: `[x]` verified complete, `[>]` in progress, `[ ]` not complete, `[!
   - [x] When spread keys disappear, earlier source-order fallbacks are restored and stale keys are removed.
   - [x] Runtime spread validation blocks `on*` and currently-unvalidated URL-bearing keys before DOM mutation.
   - [x] Ordinary content attributes remove on nullish values and otherwise stringify; certified boolean attributes use presence/absence.
+  - [x] Built-in property table covers current-state `value`, `checked`, `files`, `selected`, `muted`, and reflected `open` seams, including HTML input `type`-specific value modes.
   - [!] Dynamic custom-element assignment remains guarded while `OD-008` is open.
   - [ ] Dynamic URL protocol validator before expression-derived URL-bearing attributes are enabled.
-  - [ ] Publish/test built-in attribute/property assignment table before property-backed native-control expansion.
+  - [ ] Activate property-backed authored/native-control assignment only through the published table with explicit cleanup/two-way semantics.
 - [>] Verification.
   - [x] CI pins Ubuntu 24.04, Node `22.16.0`, pnpm `12.10.1`, exact dependencies, and verifies Chrome.
   - [x] Spread behavioral RED `38637069602`: parser/previous browser path green; grouped spread runtime/lowering absent as intended.
   - [x] Spread implementation GREEN `38638143259`: parser **66/66**, focused DOM **11/11 + Chrome/Trusted Types**, lowering **16/16**, runtime **26/26**.
+  - [x] Property-table focused TDD: RED on missing exports, then **5/5** green on Node `22.16.0`; repository CI evidence is recorded after the synchronized state commit.
 - [>] Public conformance infrastructure.
   - [x] ADR-0007 + manifest/runner/validator foundation; `NCON-NREQ-0145` wired.
   - [ ] Promote only under complete ADR-0007 evidence; passing requirement count remains zero.
