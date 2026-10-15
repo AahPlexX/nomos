@@ -44,6 +44,7 @@ const required = [
   'tests/phase1-runtime-text-binding.test.mjs',
   'tests/phase1-runtime-attribute-binding.test.mjs',
   'tests/phase1-runtime-html-assignment-policy.test.mjs',
+  'tests/phase1-runtime-url-safety.test.mjs',
   'tests/phase1-compiler-reactive-lowering.test.mjs',
   'tests/phase1-template-expression-lowering.test.mjs',
   'tests/phase1-template-dom-materialization.test.mjs',
@@ -97,18 +98,26 @@ assert.ok(phase.phase1.parserImplemented.includes('published-standard-html-prope
 assert.ok(phase.phase1.parserImplemented.includes('template-dom-text-attribute-and-spread-mapping'));
 assert.ok(!phase.phase1.parserRemaining.some((entry) => entry.includes('spread-attribute')));
 assert.ok(!phase.phase1.parserRemaining.includes('attribute-property-assignment-table'));
-assert.ok(phase.phase1.parserRemaining.includes('dynamic-url-attribute-safety-validation'));
+assert.ok(phase.phase1.parserRemaining.includes('dynamic-url-static-binding-enable-and-remaining-url-grammar-audit'));
 assert.ok(phase.phase1.runtimeImplemented.includes('owner-backed-source-ordered-standard-html-spread-attribute-binding'));
 assert.ok(phase.phase1.runtimeImplemented.includes('published-standard-html-property-assignment-policy'));
+assert.ok(phase.phase1.runtimeImplemented.includes('dynamic-url-javascript-scheme-runtime-safety-core'));
 assert.ok(!phase.phase1.runtimeRemaining.some((entry) => entry.includes('spread-attribute')));
 assert.ok(!phase.phase1.runtimeRemaining.includes('attribute-property-assignment-table'));
 assert.ok(phase.phase1.runtimeRemaining.includes('state-snapshot-contract-and-implementation'));
+assert.ok(phase.phase1.runtimeRemaining.includes('dynamic-url-static-compiler-enable-and-remaining-url-grammar-coverage'));
 assert.equal(phase.phase1.attributeBindingFunctions.required, 4);
 assert.equal(phase.phase1.attributeBindingFunctions.complete, 4);
 assert.deepEqual(phase.phase1.attributeBindingFunctions.implemented, ['dynamic', 'mixed', 'shorthand', 'spread']);
 assert.deepEqual(phase.phase1.attributeBindingFunctions.remaining, []);
 assert.equal(phase.phase1.propertyAssignmentPolicy.status, 'published-tested-contract-activation-pending');
 assert.equal(phase.phase1.propertyAssignmentPolicy.focusedTests, 5);
+assert.equal(phase.phase1.dynamicUrlSafety.status, 'runtime-core-implemented-compiler-and-full-grammar-coverage-in-progress');
+assert.equal(phase.phase1.dynamicUrlSafety.focusedTests, 4);
+assert.deepEqual(phase.phase1.dynamicUrlSafety.initialSingleUrlNames, ['action', 'cite', 'formaction', 'href', 'poster', 'src']);
+assert.equal(phase.phase1.dynamicUrlSafety.dangerousProtocol, 'javascript:');
+assert.equal(phase.phase1.dynamicUrlSafety.spreadSafeUrlsEnabled, true);
+assert.equal(phase.phase1.dynamicUrlSafety.staticExpressionCompilerGuard, 'dynamic-url-attribute-unvalidated');
 assert.equal(phase.phase1.verification.workflow, '.github/workflows/ci.yml');
 assert.equal(phase.phase1.verification.node, '22.16.0');
 assert.equal(phase.phase1.verification.pnpm, '12.10.1');
@@ -116,12 +125,14 @@ assert.equal(phase.phase1.verification.typescript6, '6.0.2');
 assert.equal(phase.phase1.verification.chrome, '154.0.8037.97');
 assert.equal(phase.phase1.verification.parserTests, 66);
 assert.equal(phase.phase1.verification.loweringAndAbiTests, 16);
-assert.equal(phase.phase1.verification.runtimeTests, 31);
-assert.equal(phase.phase1.verification.domSliceUnitTests, 11);
+assert.equal(phase.phase1.verification.runtimeTests, 35);
+assert.equal(phase.phase1.verification.domSliceUnitTests, 15);
 assert.equal(phase.phase1.verification.propertyAssignmentPolicyTests, 5);
-assert.equal(phase.phase1.verification.browserDomRun, 38638143259);
+assert.equal(phase.phase1.verification.urlSafetyTests, 4);
+assert.equal(phase.phase1.verification.domSliceIncludesUrlSafety, true);
+assert.equal(phase.phase1.verification.browserDomRun, 38662076485);
 assert.equal(phase.phase1.verification.browserTrustedTypesEnforced, true);
-assert.equal(phase.phase1.verification.lastVerifiedRun, 38638143259);
+assert.equal(phase.phase1.verification.lastVerifiedRun, 38662076485);
 assert.deepEqual(phase.phase1.openWayfinderDecisions, []);
 assert.equal(phase.phase1.conformance.seedTestStatus, 'wired-unverified');
 assert.equal(phase.phase1.conformance.passingRequirementCount, 0);
@@ -142,25 +153,30 @@ assert.equal(frontEnd.templateDom.attributeBinding.spreadPrecedence, 'authored-l
 assert.equal(frontEnd.templateDom.attributeBinding.spreadEnumeration, 'own-enumerable-string-keys');
 assert.equal(frontEnd.templateDom.attributeBinding.spreadNullishSource, 'no-op');
 assert.equal(frontEnd.templateDom.attributeBinding.spreadDroppedKeys, 'restore-earlier-source-order-fallback-or-remove');
-assert.equal(frontEnd.templateDom.attributeBinding.spreadUnsafeNameValidation, 'on-and-guarded-url-names-rejected-before-dom-mutation');
+assert.equal(frontEnd.templateDom.attributeBinding.spreadUnsafeNameValidation, 'inline-event-names-rejected-initial-url-set-value-validated-before-dom-mutation');
 assert.equal(frontEnd.templateDom.attributeBinding.propertyAssignmentPolicy.status, 'published-tested-contract-activation-pending');
 assert.equal(frontEnd.templateDom.attributeBinding.propertyAssignmentPolicy.focusedTests, 5);
 assert.equal(frontEnd.templateDom.attributeBinding.propertyAssignmentPolicy.inputValueModeAware, true);
+assert.equal(frontEnd.templateDom.attributeBinding.dynamicUrlSafety.status, 'runtime-core-implemented-static-compiler-enable-and-full-grammar-audit-pending');
+assert.equal(frontEnd.templateDom.attributeBinding.dynamicUrlSafety.focusedTests, 4);
+assert.equal(frontEnd.templateDom.attributeBinding.dynamicUrlSafety.spreadSafeUrlsEnabled, true);
 assert.equal(frontEnd.templateDom.attributeBinding.customElementDynamicAssignment, 'guarded-od-008');
-assert.equal(frontEnd.templateDom.attributeBinding.dynamicUrlAttributes, 'guarded-until-protocol-validator');
+assert.equal(frontEnd.templateDom.attributeBinding.dynamicUrlAttributes, 'runtime-spread-core-safe-statically-named-expression-bindings-still-compiler-guarded');
 assert.equal(frontEnd.templateDom.trustedTypes.policyName, 'nomos');
-assert.equal(frontEnd.templateDom.browserVerification.run, 38638143259);
+assert.equal(frontEnd.templateDom.browserVerification.run, 38662076485);
 assert.ok(frontEnd.templateDom.browserVerification.verifiedBehaviors.includes('spread-overrides-earlier-explicit-attribute'));
 assert.ok(frontEnd.templateDom.browserVerification.verifiedBehaviors.includes('later-explicit-attribute-overrides-spread'));
 assert.ok(frontEnd.templateDom.browserVerification.verifiedBehaviors.includes('spread-only-ordinary-attribute-assignment'));
 assert.equal(frontEnd.reactiveLowering.verification.parserTests, 66);
-assert.equal(frontEnd.reactiveLowering.verification.domSliceUnitTests, 11);
-assert.equal(frontEnd.reactiveLowering.verification.runtimeTests, 31);
+assert.equal(frontEnd.reactiveLowering.verification.domSliceUnitTests, 15);
+assert.equal(frontEnd.reactiveLowering.verification.runtimeTests, 35);
 assert.equal(frontEnd.reactiveLowering.verification.propertyAssignmentPolicyTests, 5);
-assert.equal(frontEnd.reactiveLowering.verification.lastVerifiedRun, 38638143259);
+assert.equal(frontEnd.reactiveLowering.verification.urlSafetyTests, 4);
+assert.equal(frontEnd.reactiveLowering.verification.domSliceIncludesUrlSafety, true);
+assert.equal(frontEnd.reactiveLowering.verification.lastVerifiedRun, 38662076485);
 assert.ok(!frontEnd.reactiveLowering.remaining.some((entry) => entry.includes('spread-attribute')));
 assert.ok(!frontEnd.reactiveLowering.remaining.includes('attribute-property-assignment-table'));
-assert.ok(frontEnd.reactiveLowering.remaining.includes('dynamic-url-attribute-safety'));
+assert.ok(frontEnd.reactiveLowering.remaining.includes('dynamic-url-static-expression-lowering-enable-and-remaining-url-grammar-audit'));
 
 const runtime = JSON.parse(await readFile(new URL('spec/runtime-core.json', root), 'utf8'));
 assert.equal(runtime.status, 'phase-1-runtime-browser-template-dom-and-all-standard-html-runtime-attribute-forms-implemented');
@@ -177,22 +193,30 @@ assert.deepEqual(runtime.domBindings.attributeForms.remaining, []);
 assert.equal(runtime.domBindings.propertyAssignmentPolicy.status, 'published-tested-contract-activation-pending');
 assert.equal(runtime.domBindings.propertyAssignmentPolicy.focusedTests, 5);
 assert.equal(runtime.domBindings.propertyAssignmentPolicy.inputValueModes, 'type-sensitive-value-vs-default-default-on-filename');
+assert.equal(runtime.domBindings.dynamicUrlSafety.status, 'runtime-core-implemented-compiler-and-full-grammar-coverage-in-progress');
+assert.equal(runtime.domBindings.dynamicUrlSafety.focusedTests, 4);
+assert.equal(runtime.domBindings.dynamicUrlSafety.refusedProtocol, 'javascript:');
+assert.equal(runtime.domBindings.dynamicUrlSafety.spreadSafeUrlsEnabled, true);
+assert.equal(runtime.domBindings.dynamicUrlSafety.staticExpressionCompilerGuard, 'dynamic-url-attribute-unvalidated');
 assert.equal(runtime.domBindings.spreadSemantics.precedence, 'authored-left-to-right-later-entry-wins');
 assert.equal(runtime.domBindings.spreadSemantics.enumeration, 'own-enumerable-string-keys');
 assert.equal(runtime.domBindings.spreadSemantics.nullishSource, 'no-op');
 assert.equal(runtime.domBindings.spreadSemantics.droppedKeyBehavior, 'restore-earlier-source-order-fallback-or-remove');
-assert.equal(runtime.domBindings.spreadSemantics.unsafeNameValidation, 'validate-complete-plan-before-dom-mutation');
+assert.equal(runtime.domBindings.spreadSemantics.unsafeNameValidation, 'inline-event-names-blocked-and-initial-url-set-value-validated-before-dom-mutation');
 assert.equal(runtime.domBindings.trustedTypes.policyName, 'nomos');
-assert.equal(runtime.domBindings.browserVerification.run, 38638143259);
+assert.equal(runtime.domBindings.browserVerification.run, 38662076485);
 assert.ok(runtime.domBindings.browserVerification.verifiedBehaviors.includes('spread-overrides-earlier-explicit-attribute'));
 assert.ok(!runtime.remaining.some((entry) => entry.includes('spread-attribute')));
 assert.ok(!runtime.remaining.includes('attribute-property-assignment-table'));
-assert.ok(runtime.remaining.includes('dynamic-url-attribute-safety'));
+assert.ok(runtime.remaining.includes('dynamic-url-static-compiler-enable-and-remaining-url-grammar-coverage'));
 assert.equal(runtime.openDecisionImpact, 'none');
 
 const packageJson = JSON.parse(await readFile(new URL('package.json', root), 'utf8'));
 assert.equal(packageJson.scripts['check:phase1:dom-slice'], 'node tools/verify-dom-slice.mjs');
 assert.equal(packageJson.scripts['check:phase1:parser'], 'node --test "tests/phase1-parser*.test.mjs" "tests/phase1-table-*.test.mjs" "tests/phase1-formatting-*.test.mjs"');
+
+const domSlice = await readFile(new URL('tools/verify-dom-slice.mjs', root), 'utf8');
+assert.match(domSlice, /tests\/phase1-runtime-url-safety\.test\.mjs/);
 
 const workflow = await readFile(new URL('.github/workflows/ci.yml', root), 'utf8');
 assert.match(workflow, /runs-on: ubuntu-24\.04/);
@@ -206,4 +230,4 @@ assert.equal(conformance.browserSubstitutionAllowed, false);
 assert.equal(conformance.seedTest.status, 'wired-unverified');
 assert.deepEqual(conformance.passingRequirements, []);
 
-console.log(`Phase 1 check passed: ${required.length} required artifacts; compiler foundations, typed five-form attribute IR, 21 HTML ownership scenarios, browser-parsed template DOM, live text interpolation, 4/4 standard-HTML runtime attribute forms, and the published/tested standard-HTML property-assignment contract are implemented while property-write activation, URL safety, events/native controls, structural/component lowering, snapshot semantics, CSS adapter work, and public green evidence remain in progress.`);
+console.log(`Phase 1 check passed: ${required.length} required artifacts; compiler foundations, typed five-form attribute IR, 21 HTML ownership scenarios, browser-parsed template DOM, live text interpolation, 4/4 standard-HTML runtime attribute forms, the published/tested standard-HTML property-assignment contract, and the dynamic-URL javascript-scheme runtime safety core are implemented while static URL lowering/full URL-grammar coverage, property-write activation, events/native controls, structural/component lowering, snapshot semantics, CSS adapter work, and public green evidence remain in progress.`);
