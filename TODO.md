@@ -24,6 +24,11 @@ Status keys: `[x]` verified complete, `[>]` in progress, `[ ]` not complete, `[!
   - [x] Browser-parsed static template DOM + live text interpolation.
   - [x] Lower all four required standard-HTML runtime attribute forms from typed IR: dynamic, mixed, shorthand, spread.
   - [x] Publish/test the built-in standard-HTML property-assignment table and type-sensitive native-control seams without changing existing attribute mutation semantics.
+  - [>] Wire dynamic URL safety end-to-end.
+    - [x] Runtime scheme-classification core refuses normalized `javascript:` values for the initial guarded single-URL attribute set and validates spread plans before DOM mutation.
+    - [x] Safe URL-valued spread entries are no longer rejected solely by attribute name.
+    - [ ] Remove the compiler guard for statically named expression-derived URL attributes and route those bindings through the same runtime validator.
+    - [ ] Audit/cover remaining HTML URL-bearing list/token grammars (for example `ping` and responsive-image candidate attributes) before marking the PRD-wide URL requirement complete.
   - [ ] Finish only material remaining active-formatting/special insertion-mode gaps.
   - [ ] Implement `EmbeddedStylesheet` with exact-pinned Lightning CSS when executable CSS code consumes it.
 - [>] State, derivation, synchronization, ownership.
@@ -42,17 +47,20 @@ Status keys: `[x]` verified complete, `[>]` in progress, `[ ]` not complete, `[!
   - [x] Spread `{...expr}` assignment with authored-left-to-right precedence; later entries win.
   - [x] Spread consumes enumerable own string keys; nullish spread sources are no-ops.
   - [x] When spread keys disappear, earlier source-order fallbacks are restored and stale keys are removed.
-  - [x] Runtime spread validation blocks `on*` and currently-unvalidated URL-bearing keys before DOM mutation.
+  - [x] Runtime spread validation blocks `on*` before DOM mutation and routes the initial URL-bearing set through value-level scheme safety.
   - [x] Ordinary content attributes remove on nullish values and otherwise stringify; certified boolean attributes use presence/absence.
   - [x] Built-in property table covers current-state `value`, `checked`, `files`, `selected`, `muted`, and reflected `open` seams, including HTML input `type`-specific value modes.
+  - [x] Runtime URL scheme safety rejects `javascript:` after WHATWG URL normalization for `action`, `cite`, `formaction`, `href`, `poster`, and `src` without rejecting safe values containing a misleading `javascript:` substring.
   - [!] Dynamic custom-element assignment remains guarded while `OD-008` is open.
-  - [ ] Dynamic URL protocol validator before expression-derived URL-bearing attributes are enabled.
+  - [>] Complete compiler enablement and full HTML URL-bearing grammar coverage for dynamic URL protocol safety.
   - [ ] Activate property-backed authored/native-control assignment only through the published table with explicit cleanup/two-way semantics.
 - [>] Verification.
   - [x] CI pins Ubuntu 24.04, Node `22.16.0`, pnpm `12.10.1`, exact dependencies, and verifies Chrome.
   - [x] Spread behavioral RED `38637069602`: parser/previous browser path green; grouped spread runtime/lowering absent as intended.
   - [x] Spread implementation GREEN `38638143259`: parser **66/66**, focused DOM **11/11 + Chrome/Trusted Types**, lowering **16/16**, runtime **26/26**.
-  - [x] Property-table focused TDD: RED on missing exports, then **5/5** green on Node `22.16.0`; repository CI evidence is recorded after the synchronized state commit.
+  - [x] Property-table focused TDD: RED on missing exports, then **5/5** green on Node `22.16.0`.
+  - [x] URL-safety core TDD: RED on missing validator export; focused helper **2/2** green locally on Node `22.16.0`; repository run `38662076485` then passed parser, DOM/Trusted Types, lowering, runtime, and machine-state gates with URL runtime tests included.
+  - [>] The DOM-slice unit gate now explicitly includes `tests/phase1-runtime-url-safety.test.mjs`; verify the synchronized documentation/spec commit before recording its final run ID.
 - [>] Public conformance infrastructure.
   - [x] ADR-0007 + manifest/runner/validator foundation; `NCON-NREQ-0145` wired.
   - [ ] Promote only under complete ADR-0007 evidence; passing requirement count remains zero.
