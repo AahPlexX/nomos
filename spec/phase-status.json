@@ -16,7 +16,7 @@
     "name": "Vertical Slice",
     "status": "in-progress",
     "allowed": true,
-    "activeSlice": "compiler-runtime-browser-dom-attributes-and-conformance",
+    "activeSlice": "compiler-runtime-browser-dom-attributes-assignment-policy-and-conformance",
     "parserAndSourceMaps": "in-progress",
     "runtimeCore": "browser-template-dom-and-all-standard-html-runtime-attribute-forms-implemented",
     "conformanceInfrastructure": "foundation-implemented",
@@ -37,6 +37,7 @@
       "standard-html-dynamic-mixed-shorthand-attribute-lowering",
       "standard-html-source-ordered-spread-attribute-lowering",
       "shared-standard-html-attribute-policy",
+      "published-standard-html-property-assignment-table",
       "stage-local-source-map-composition-contract",
       "exact-decoded-segment-composer",
       "typescript-script-emitter-source-maps-to-original-nomos",
@@ -52,9 +53,8 @@
       "embedded-css-adapter-implementation",
       "remaining-reactive-destructuring-assignment-target-lowering",
       "remaining-active-formatting-reconstruction-and-low-frequency-special-insertion-mode-validation",
-      "attribute-property-assignment-table",
       "dynamic-url-attribute-safety-validation",
-      "event-native-control-structural-block-and-component-template-lowering",
+      "property-assignment-activation-and-event-native-control-structural-block-component-template-lowering",
       "complete-template-semantic-type-checking",
       "richer-token-level-template-generated-mapping-production"
     ],
@@ -79,14 +79,14 @@
       "internal-owner-backed-text-binding-helper",
       "owner-backed-browser-parsed-static-template-mount",
       "owner-backed-standard-html-dynamic-mixed-shorthand-attribute-binding",
-      "owner-backed-source-ordered-standard-html-spread-attribute-binding"
+      "owner-backed-source-ordered-standard-html-spread-attribute-binding",
+      "published-standard-html-property-assignment-policy"
     ],
     "runtimeRemaining": [
       "state-snapshot-contract-and-implementation",
       "request-ownership-and-cancellation",
-      "attribute-property-assignment-table",
       "dynamic-url-attribute-safety",
-      "event-native-control-binding-integration",
+      "property-assignment-activation-and-event-native-control-binding-integration",
       "structural-block-and-component-dom-ownership"
     ],
     "runtimeMachineSpec": "spec/runtime-core.json",
@@ -99,16 +99,24 @@
       "chrome": "154.0.8037.97",
       "parserTests": 66,
       "loweringAndAbiTests": 16,
-      "runtimeTests": 26,
+      "runtimeTests": 31,
       "domSliceUnitTests": 11,
       "browserDomRun": 38638143259,
-      "browserTrustedTypesEnforced": true
+      "browserTrustedTypesEnforced": true,
+      "propertyAssignmentPolicyTests": 5
     },
     "attributeBindingFunctions": {
       "required": 4,
       "complete": 4,
       "implemented": ["dynamic", "mixed", "shorthand", "spread"],
       "remaining": []
+    },
+    "propertyAssignmentPolicy": {
+      "status": "published-tested-contract-activation-pending",
+      "implementation": "packages/shared/src/html-attribute-policy.mjs",
+      "test": "tests/phase1-runtime-html-assignment-policy.test.mjs",
+      "focusedTests": 5,
+      "authoredMutationActivation": "pending-dedicated-property-native-control-slice"
     },
     "conformance": {
       "contract": "docs/adr/0007-public-conformance-promotion.md",
