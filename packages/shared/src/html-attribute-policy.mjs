@@ -7,6 +7,7 @@ const BOOLEAN_HTML_ATTRIBUTE_NAMES = [
 const GUARDED_DYNAMIC_URL_ATTRIBUTE_NAMES = [
   'action', 'cite', 'formaction', 'href', 'poster', 'src',
 ];
+const DYNAMIC_URL_CLASSIFICATION_BASE = 'https://nomos.invalid/';
 const INPUT_VALUE_MODE_TYPES = Object.freeze([
   'text', 'search', 'tel', 'url', 'email', 'password', 'date', 'month', 'week',
   'time', 'datetime-local', 'number', 'range', 'color',
@@ -118,6 +119,23 @@ export function isGuardedDynamicUrlAttribute(name) {
   return GUARDED_DYNAMIC_URL_ATTRIBUTES.has(normalizeHtmlAttributeName(name));
 }
 
+export function assertSafeDynamicUrlAttributeValue(name, value) {
+  const normalized = normalizeHtmlAttributeName(name);
+  if (!GUARDED_DYNAMIC_URL_ATTRIBUTES.has(normalized)) return value;
+  if (value === null || value === undefined) return value;
+
+  let parsed = null;
+  try {
+    parsed = new URL(String(value), DYNAMIC_URL_CLASSIFICATION_BASE);
+  } catch {
+    return value;
+  }
+  if (parsed.protocol === 'javascript:') {
+    throw new Error(`Dynamic URL attribute ${JSON.stringify(normalized)} refuses javascript: URLs.`);
+  }
+  return value;
+}
+
 export function isInlineEventHtmlAttribute(name) {
   return normalizeHtmlAttributeName(name).startsWith('on');
 }
@@ -126,9 +144,6 @@ export function assertSafeSpreadHtmlAttributeName(name) {
   const normalized = normalizeHtmlAttributeName(name);
   if (isInlineEventHtmlAttribute(normalized)) {
     throw new Error(`Spread attribute ${JSON.stringify(normalized)} is blocked. Use an on: directive for browser events.`);
-  }
-  if (isGuardedDynamicUrlAttribute(normalized)) {
-    throw new Error(`Spread attribute ${JSON.stringify(normalized)} is blocked until the dynamic URL protocol validator is implemented.`);
   }
   return normalized;
 }
