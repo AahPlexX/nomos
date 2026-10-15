@@ -60,7 +60,7 @@ Status keys: `[x]` verified complete, `[>]` in progress, `[ ]` not complete, `[!
   - [x] Spread implementation GREEN `38638143259`: parser **66/66**, focused DOM **11/11 + Chrome/Trusted Types**, lowering **16/16**, runtime **26/26**.
   - [x] Property-table focused TDD: RED on missing exports, then **5/5** green on Node `22.16.0`.
   - [x] URL-safety core TDD: RED on missing validator export; focused helper **2/2** green locally on Node `22.16.0`; repository run `38662076485` then passed parser, DOM/Trusted Types, lowering, runtime, and machine-state gates with URL runtime tests included.
-  - [>] The DOM-slice unit gate now explicitly includes `tests/phase1-runtime-url-safety.test.mjs`; verify the synchronized documentation/spec commit before recording its final run ID.
+  - [x] Synchronized URL-safety checkpoint `38662666873`: expanded DOM-slice gate includes `tests/phase1-runtime-url-safety.test.mjs`; parser, DOM/Trusted Types, lowering, runtime, and Phase-1 machine-state validation all passed.
 - [>] Public conformance infrastructure.
   - [x] ADR-0007 + manifest/runner/validator foundation; `NCON-NREQ-0145` wired.
   - [ ] Promote only under complete ADR-0007 evidence; passing requirement count remains zero.
