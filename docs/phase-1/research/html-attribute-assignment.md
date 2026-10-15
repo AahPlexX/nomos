@@ -5,17 +5,20 @@
 
 ## Primary sources
 
-- Preserved Nomos PRD — requires static, dynamic, mixed, shorthand, and spread attribute syntax; requires the compiler/runtime to publish and test the built-in property-assignment table; leaves custom-element pre-upgrade behavior open under `OD-008`.
+- Preserved Nomos PRD — requires static, dynamic, mixed, shorthand, and spread attribute syntax; requires the compiler/runtime to publish and test the built-in property-assignment table; requires expression-derived `javascript:` URLs in URL-bearing attributes to be refused; leaves custom-element pre-upgrade behavior open under `OD-008`.
 - WHATWG HTML — reflected content attributes / IDL attributes: https://html.spec.whatwg.org/multipage/common-dom-interfaces.html#reflecting-content-attributes-in-idl-attributes
 - WHATWG HTML — boolean attributes: https://html.spec.whatwg.org/multipage/common-microsyntaxes.html#boolean-attributes
 - WHATWG HTML — attribute index/classifications: https://html.spec.whatwg.org/multipage/indices.html#attributes-3
+- WHATWG HTML — URL terminology: https://html.spec.whatwg.org/multipage/urls-and-fetching.html#urls
 - WHATWG HTML — input states and value IDL modes: https://html.spec.whatwg.org/multipage/input.html#the-input-element
 - WHATWG HTML — select, option, textarea, output: https://html.spec.whatwg.org/multipage/form-elements.html
 - WHATWG HTML — media muted/defaultMuted: https://html.spec.whatwg.org/multipage/media.html
 - WHATWG HTML — details/dialog open reflection: https://html.spec.whatwg.org/multipage/interactive-elements.html
 - WHATWG HTML — `inert`: https://html.spec.whatwg.org/multipage/interaction.html#the-inert-attribute
+- WHATWG URL — basic URL parser and scheme normalization: https://url.spec.whatwg.org/#concept-basic-url-parser
 - WHATWG DOM — `Element` attribute APIs and HTML namespace name normalization: https://dom.spec.whatwg.org/#interface-element
 - ECMAScript — `CopyDataProperties` / object spread semantics: https://tc39.es/ecma262/#sec-copydataproperties
+- MDN — `javascript:` URL behavior and navigation-target risk: https://developer.mozilla.org/en-US/docs/Web/URI/Reference/Schemes/javascript
 
 ## Implemented ordinary attribute policy
 
@@ -38,7 +41,7 @@ The first-party boolean table is centralized in `packages/shared/src/html-attrib
 
 ## Published built-in property-assignment table
 
-The PRD requires a built-in element property-assignment table before property-backed native-control work. The table is now published from the same shared policy module as `STANDARD_HTML_PROPERTY_ASSIGNMENTS`, with `resolveStandardHtmlPropertyAssignment()` as the deterministic lookup surface.
+The PRD requires a built-in element property-assignment table before property-backed native-control work. The table is published from the same shared policy module as `STANDARD_HTML_PROPERTY_ASSIGNMENTS`, with `resolveStandardHtmlPropertyAssignment()` as the deterministic lookup surface.
 
 The table is intentionally a contract before it is a mutation mechanism. Existing 4/4 standard-HTML attribute bindings keep their already-verified behavior until the next slice consumes the table.
 
@@ -111,22 +114,69 @@ For standard HTML elements, attribute collision identity is ASCII-normalized thr
 An element containing any spread lowers to one `bindAttributes` plan rather than multiple independent `bindAttribute` observers. The grouped observer:
 
 1. evaluates the complete authored plan in source order;
-2. validates all runtime-discovered spread names;
+2. validates all runtime-discovered spread names and URL-valued winning contributions;
 3. computes the final desired attribute map;
 4. only then mutates the element.
 
-This makes precedence independent of scheduler ordering and allows dropped spread keys to restore earlier fallbacks deterministically.
+This makes precedence independent of scheduler ordering, allows dropped spread keys to restore earlier fallbacks deterministically, and ensures URL rejection cannot partially mutate safe sibling attributes.
 
 Static contributors inside a grouped plan capture their baseline value from the browser-parsed cloned element, preserving HTML entity decoding and browser parsing behavior.
+
+## Dynamic URL scheme safety
+
+### PRD security boundary
+
+The product contract requires Nomos to refuse expression-derived `javascript:` URLs in URL-bearing attributes. It does not require a home-grown URL grammar. The implementation therefore delegates scheme classification to the platform WHATWG `URL` parser rather than using substring checks or a custom parser.
+
+The initial runtime-protected single-URL name set is:
+
+- `action`;
+- `cite`;
+- `formaction`;
+- `href`;
+- `poster`;
+- `src`.
+
+This is intentionally the pre-existing guarded set, not a claim that those six exhaust every URL-bearing grammar in current HTML.
+
+### Scheme classification
+
+`assertSafeDynamicUrlAttributeValue(name, value)`:
+
+1. returns nullish values unchanged so ordinary remove semantics remain intact;
+2. parses the stringified value with `new URL(value, "https://nomos.invalid/")`;
+3. uses that inert HTTPS base only so relative URLs can be classified without depending on a document URL;
+4. refuses the value when the parsed protocol is exactly `javascript:`;
+5. otherwise returns the original value unchanged.
+
+The WHATWG URL parser removes leading/trailing C0 control or space characters and removes ASCII tab/newline code points before scheme-state parsing. Scheme code points are ASCII-lowercased. As a result, values such as ` JAVASCRIPT:...` and `java\nscript:...` classify as `javascript:` and are rejected without a framework-maintained normalization algorithm.
+
+A parse failure is not converted into a heuristic failure. This slice is specifically enforcing the PRD's dangerous-scheme requirement; it does not silently invent a stricter URL-validity policy. A safe URL containing the literal text `javascript:` in its path/query is likewise not rejected because its parsed protocol is not `javascript:`.
+
+### Runtime integration
+
+`bindAttribute` validates the computed value before mutating the element. `bindAttributes` calls the same validator while constructing its desired source-order map; all entries are therefore evaluated/validated before stale attributes are removed or new values are set.
+
+For spread expressions this changes the boundary from **name rejection** to **value safety** for the initial URL set:
+
+- `{...{ href: '/docs' }}` may set `href`;
+- `{...{ href: 'javascript:alert(1)' }}` throws before any DOM mutation;
+- `on*` spread keys remain blocked by name and must use `on:` semantics.
+
+### Why the URL slice remains in progress
+
+The compiler still emits `dynamic-url-attribute-unvalidated` for statically named expression-derived URL attributes. That guard remains until the lowering path is explicitly wired to rely on this shared runtime validator and receives behavioral/browser evidence.
+
+The current HTML attribute index also contains URL-bearing forms with grammars different from a single URL, including space-separated URL lists and responsive-image candidate lists. Those require explicit parsing/validation strategy rather than broad name-only treatment. The PRD-wide URL requirement must therefore remain **in progress** until statically named lowering and the remaining URL-bearing grammar audit are closed.
 
 ## Security boundaries
 
 ### Runtime-discovered spread keys
 
-A spread can introduce names the compiler cannot see statically. Before any DOM mutation in a recomputation, the grouped plan rejects:
+A spread can introduce names the compiler cannot see statically. Before any DOM mutation in a recomputation, the grouped plan:
 
-- names beginning with `on` — event behavior belongs to `on:` directives;
-- currently guarded URL-bearing names such as `href`, `src`, `action`, `formaction`, `poster`, and `cite` — these remain blocked until Nomos implements its URL protocol validator.
+- rejects names beginning with `on` — event behavior belongs to `on:` directives;
+- validates values for `href`, `src`, `action`, `formaction`, `poster`, and `cite` through the shared URL scheme classifier.
 
 The pre-mutation validation is contract-tested so an unsafe spread object cannot partially update safe attributes before throwing.
 
@@ -148,19 +198,21 @@ Live native-control state is not inferred merely because an element has a same-n
 - Spread-containing elements use one owner-backed `bindAttributes` observer.
 - Shared attribute/boolean/URL/event/property policy lives in `packages/shared/src/html-attribute-policy.mjs`.
 - Attribute and spread expression mapping points are emitted during the same lowering pass.
-- Property-table lookup is pure and immutable; no dependency or second runtime policy layer was introduced.
+- Property-table lookup and URL classification reuse platform semantics; no new dependency or second runtime policy layer was introduced.
 
 ## Current coverage
 
 Runtime-assigned ratified standard-HTML forms: **4/4**.
 
-- dynamic — implemented;
-- mixed — implemented;
+- dynamic — implemented for non-guarded standard-HTML names;
+- mixed — implemented for non-guarded standard-HTML names;
 - shorthand — implemented;
-- spread — implemented with source-order precedence and runtime name guards.
+- spread — implemented with source-order precedence, inline-event name guards, and value-level URL safety for the initial six-name set.
 
 Built-in standard-HTML property-assignment policy: **published/tested** with **5/5** focused tests.
 
-Still separate and incomplete: property-write activation/cleanup, dynamic URL protocol validation, `on:` events, `bind:` native controls, and custom-element policy under `OD-008`.
+Dynamic URL protocol safety: **runtime core implemented, end-to-end coverage in progress**. The helper's normalization contract is focused-tested; independent and grouped DOM bindings are covered; statically named compiler enablement and remaining URL-bearing grammars are still pending.
+
+Still separate and incomplete: property-write activation/cleanup, `on:` events, `bind:` native controls, and custom-element policy under `OD-008`.
 
 This slice resolves none of the eleven PRD Open Decisions.
