@@ -93,7 +93,7 @@
     "runtimeMachineSpec": "spec/runtime-core.json",
     "verification": {
       "workflow": ".github/workflows/ci.yml",
-      "lastVerifiedRun": 38662076485,
+      "lastVerifiedRun": 38662666873,
       "node": "22.16.0",
       "pnpm": "12.10.1",
       "typescript6": "6.0.2",
@@ -102,7 +102,7 @@
       "loweringAndAbiTests": 16,
       "runtimeTests": 35,
       "domSliceUnitTests": 15,
-      "browserDomRun": 38662076485,
+      "browserDomRun": 38662666873,
       "browserTrustedTypesEnforced": true,
       "propertyAssignmentPolicyTests": 5,
       "urlSafetyTests": 4,
