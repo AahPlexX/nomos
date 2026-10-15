@@ -76,6 +76,23 @@
       "ordinaryReflectedNames": "remain-content-attribute-oriented",
       "authoredPropertyMutation": "pending-dedicated-property-native-control-slice"
     },
+    "dynamicUrlSafety": {
+      "status": "runtime-core-implemented-compiler-and-full-grammar-coverage-in-progress",
+      "validatorExport": "assertSafeDynamicUrlAttributeValue",
+      "implementationFile": "packages/shared/src/html-attribute-policy.mjs",
+      "testFile": "tests/phase1-runtime-url-safety.test.mjs",
+      "focusedTests": 4,
+      "initialSingleUrlNames": ["action", "cite", "formaction", "href", "poster", "src"],
+      "classification": "platform-WHATWG-URL-parser-with-inert-https-base",
+      "refusedProtocol": "javascript:",
+      "normalizationCoverage": ["ascii-case", "leading-trailing-c0-control-or-space", "ascii-tab-or-newline"],
+      "safeMisleadingSubstring": "allowed-when-parsed-protocol-is-not-javascript",
+      "bindAttributeValidation": "before-dom-mutation",
+      "bindAttributesValidation": "complete-desired-plan-before-dom-mutation",
+      "spreadSafeUrlsEnabled": true,
+      "staticExpressionCompilerGuard": "dynamic-url-attribute-unvalidated",
+      "remaining": ["static-expression-lowering-enable", "remaining-html-url-list-token-candidate-grammar-audit"]
+    },
     "spreadSemantics": {
       "precedence": "authored-left-to-right-later-entry-wins",
       "enumeration": "own-enumerable-string-keys",
@@ -84,7 +101,7 @@
       "droppedKeyBehavior": "restore-earlier-source-order-fallback-or-remove",
       "staticFallbackSource": "browser-parsed-cloned-element",
       "observerModel": "one-dom-observer-per-spread-containing-element",
-      "unsafeNameValidation": "validate-complete-plan-before-dom-mutation"
+      "unsafeNameValidation": "inline-event-names-blocked-and-initial-url-set-value-validated-before-dom-mutation"
     },
     "scheduling": "dom-observer",
     "ownership": "cloned-root-nodes-owned-and-binding-observers-stop-on-disposal",
@@ -95,7 +112,7 @@
       "hostCspMustAllowPolicyName": true
     },
     "browserVerification": {
-      "run": 38638143259,
+      "run": 38662076485,
       "chrome": "154.0.8037.97",
       "trustedTypesEnforced": true,
       "verifiedBehaviors": [
@@ -114,7 +131,7 @@
     },
     "guarded": [
       "dynamic-custom-element-assignment-od-008",
-      "dynamic-url-attribute-protocol-validation",
+      "statically-named-dynamic-url-compiler-enable-and-remaining-url-grammars",
       "inline-event-attributes",
       "property-assignment-activation-and-native-control-bindings"
     ]
@@ -157,12 +174,13 @@
     "owner-backed-browser-parsed-static-template-mount",
     "owner-backed-standard-html-dynamic-mixed-shorthand-attribute-binding",
     "owner-backed-source-ordered-standard-html-spread-attribute-binding",
-    "published-tested-standard-html-property-assignment-policy"
+    "published-tested-standard-html-property-assignment-policy",
+    "dynamic-url-javascript-scheme-runtime-safety-core"
   ],
   "remaining": [
     "state-snapshot-contract-and-implementation",
     "request-ownership-and-cancellation",
-    "dynamic-url-attribute-safety",
+    "dynamic-url-static-compiler-enable-and-remaining-url-grammar-coverage",
     "property-assignment-activation-and-event-native-control-binding-integration",
     "structural-block-and-component-dom-ownership"
   ],
