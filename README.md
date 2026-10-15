@@ -14,7 +14,9 @@ PRD Amendment 0001 removes the unavailable five-external-reviewer requirement fr
 
 The current Phase 1 browser-DOM checkpoint implements text interpolation plus **4/4 required standard-HTML runtime attribute forms**: dynamic, mixed, shorthand, and source-ordered spread. Spread-containing elements use one owner-backed grouped plan with deterministic left-to-right precedence; runtime-discovered event-handler and currently-unvalidated URL-bearing spread keys remain blocked before DOM mutation. Custom-element dynamic/spread behavior is intentionally still guarded while `OD-008` is open.
 
-The immediate next frontier is the built-in standard-HTML attribute/property assignment table and dynamic URL protocol validator, followed by `on:` event lowering and `bind:` native-control semantics. Phase 1 overall still includes conditions/keyed lists, components/inputs, scoped CSS, Vite/HMR integration, and Levels 0–3. Its exit target remains a deterministic TodoMVC-class browser application with valid-state HMR preservation and complete owned-effect cleanup.
+The built-in standard-HTML property-assignment table is now published and tested. It records the browser current-state seams required for input/textarea/select values, checkedness, files, option selectedness, output values, media muting, and reflected `open`, including input-type-specific value modes. Existing dynamic/spread mutation remains attribute-oriented until the dedicated property/native-control implementation consumes that table with explicit cleanup and two-way semantics.
+
+The immediate next frontier is the dynamic URL protocol validator, followed by property-backed authored/native-control activation plus `on:` event lowering and `bind:` semantics. Phase 1 overall still includes conditions/keyed lists, components/inputs, scoped CSS, Vite/HMR integration, and Levels 0–3. Its exit target remains a deterministic TodoMVC-class browser application with valid-state HMR preservation and complete owned-effect cleanup.
 
 ## Verification
 
