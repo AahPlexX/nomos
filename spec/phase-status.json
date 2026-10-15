@@ -16,7 +16,7 @@
     "name": "Vertical Slice",
     "status": "in-progress",
     "allowed": true,
-    "activeSlice": "compiler-runtime-browser-dom-attributes-assignment-policy-and-conformance",
+    "activeSlice": "compiler-runtime-browser-dom-attributes-assignment-policy-dynamic-url-safety-and-conformance",
     "parserAndSourceMaps": "in-progress",
     "runtimeCore": "browser-template-dom-and-all-standard-html-runtime-attribute-forms-implemented",
     "conformanceInfrastructure": "foundation-implemented",
@@ -53,7 +53,7 @@
       "embedded-css-adapter-implementation",
       "remaining-reactive-destructuring-assignment-target-lowering",
       "remaining-active-formatting-reconstruction-and-low-frequency-special-insertion-mode-validation",
-      "dynamic-url-attribute-safety-validation",
+      "dynamic-url-static-binding-enable-and-remaining-url-grammar-audit",
       "property-assignment-activation-and-event-native-control-structural-block-component-template-lowering",
       "complete-template-semantic-type-checking",
       "richer-token-level-template-generated-mapping-production"
@@ -80,30 +80,33 @@
       "owner-backed-browser-parsed-static-template-mount",
       "owner-backed-standard-html-dynamic-mixed-shorthand-attribute-binding",
       "owner-backed-source-ordered-standard-html-spread-attribute-binding",
-      "published-standard-html-property-assignment-policy"
+      "published-standard-html-property-assignment-policy",
+      "dynamic-url-javascript-scheme-runtime-safety-core"
     ],
     "runtimeRemaining": [
       "state-snapshot-contract-and-implementation",
       "request-ownership-and-cancellation",
-      "dynamic-url-attribute-safety",
+      "dynamic-url-static-compiler-enable-and-remaining-url-grammar-coverage",
       "property-assignment-activation-and-event-native-control-binding-integration",
       "structural-block-and-component-dom-ownership"
     ],
     "runtimeMachineSpec": "spec/runtime-core.json",
     "verification": {
       "workflow": ".github/workflows/ci.yml",
-      "lastVerifiedRun": 38638143259,
+      "lastVerifiedRun": 38662076485,
       "node": "22.16.0",
       "pnpm": "12.10.1",
       "typescript6": "6.0.2",
       "chrome": "154.0.8037.97",
       "parserTests": 66,
       "loweringAndAbiTests": 16,
-      "runtimeTests": 31,
-      "domSliceUnitTests": 11,
-      "browserDomRun": 38638143259,
+      "runtimeTests": 35,
+      "domSliceUnitTests": 15,
+      "browserDomRun": 38662076485,
       "browserTrustedTypesEnforced": true,
-      "propertyAssignmentPolicyTests": 5
+      "propertyAssignmentPolicyTests": 5,
+      "urlSafetyTests": 4,
+      "domSliceIncludesUrlSafety": true
     },
     "attributeBindingFunctions": {
       "required": 4,
@@ -117,6 +120,19 @@
       "test": "tests/phase1-runtime-html-assignment-policy.test.mjs",
       "focusedTests": 5,
       "authoredMutationActivation": "pending-dedicated-property-native-control-slice"
+    },
+    "dynamicUrlSafety": {
+      "status": "runtime-core-implemented-compiler-and-full-grammar-coverage-in-progress",
+      "implementation": "packages/shared/src/html-attribute-policy.mjs",
+      "runtimeIntegration": "packages/runtime/src/dom-bindings.mjs",
+      "test": "tests/phase1-runtime-url-safety.test.mjs",
+      "focusedTests": 4,
+      "initialSingleUrlNames": ["action", "cite", "formaction", "href", "poster", "src"],
+      "dangerousProtocol": "javascript:",
+      "classification": "platform-WHATWG-URL-parser-with-inert-https-base",
+      "spreadSafeUrlsEnabled": true,
+      "staticExpressionCompilerGuard": "dynamic-url-attribute-unvalidated",
+      "remaining": ["static-expression-lowering-enable", "remaining-html-url-list-token-candidate-grammar-audit"]
     },
     "conformance": {
       "contract": "docs/adr/0007-public-conformance-promotion.md",
