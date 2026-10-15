@@ -138,6 +138,16 @@
       "spreadDroppedKeys": "restore-earlier-source-order-fallback-or-remove",
       "spreadObserverModel": "single-grouped-dom-observer-per-spread-containing-element",
       "spreadUnsafeNameValidation": "on-and-guarded-url-names-rejected-before-dom-mutation",
+      "propertyAssignmentPolicy": {
+        "status": "published-tested-contract-activation-pending",
+        "table": "STANDARD_HTML_PROPERTY_ASSIGNMENTS",
+        "resolver": "resolveStandardHtmlPropertyAssignment",
+        "test": "tests/phase1-runtime-html-assignment-policy.test.mjs",
+        "focusedTests": 5,
+        "inputValueModeAware": true,
+        "ordinaryReflectedAttributesRemainAttributeOriented": true,
+        "authoredPropertyMutation": "pending-dedicated-property-native-control-slice"
+      },
       "customElementDynamicAssignment": "guarded-od-008",
       "dynamicUrlAttributes": "guarded-until-protocol-validator",
       "inlineEventAttributes": "rejected-use-on-directive"
@@ -170,6 +180,7 @@
       "dynamic-custom-element-attributes-including-spread",
       "dynamic-url-attributes-before-validator",
       "inline-event-attributes",
+      "property-backed-authored-current-state-assignment-before-dedicated-activation",
       "directives",
       "raw-html",
       "if-each-await-blocks",
@@ -210,16 +221,16 @@
       "chrome": "154.0.8037.97",
       "parserTests": 66,
       "loweringAndAbiTests": 16,
-      "runtimeTests": 26,
+      "runtimeTests": 31,
       "domSliceUnitTests": 11,
+      "propertyAssignmentPolicyTests": 5,
       "browserDomRun": 38638143259,
       "lastVerifiedRun": 38638143259
     },
     "remaining": [
       "destructuring-assignment-target-edge-cases",
       "dynamic-url-attribute-safety",
-      "attribute-property-assignment-table",
-      "event-and-native-control-lowering",
+      "property-assignment-activation-and-event-native-control-lowering",
       "structural-block-lowering",
       "component-lowering",
       "complete-template-semantic-type-checking"
