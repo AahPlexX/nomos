@@ -170,7 +170,7 @@
       "hostMustAllowPolicyName": true
     },
     "browserVerification": {
-      "run": 38662076485,
+      "run": 38662666873,
       "chrome": "154.0.8037.97",
       "trustedTypesEnforced": true,
       "verifiedBehaviors": [
@@ -202,7 +202,11 @@
   "reactiveLowering": {
     "status": "script-core-browser-template-text-and-all-four-standard-html-runtime-attribute-forms-implemented",
     "bindingRecognition": "typescript-symbol-resolution",
-    "supportedDeclarations": ["state", "state.raw", "derive"],
+    "supportedDeclarations": [
+      "state",
+      "state.raw",
+      "derive"
+    ],
     "supportedRootWrites": [
       "assignment",
       "compound-assignment",
@@ -237,8 +241,8 @@
       "propertyAssignmentPolicyTests": 5,
       "urlSafetyTests": 4,
       "domSliceIncludesUrlSafety": true,
-      "browserDomRun": 38662076485,
-      "lastVerifiedRun": 38662076485
+      "browserDomRun": 38662666873,
+      "lastVerifiedRun": 38662666873
     },
     "remaining": [
       "destructuring-assignment-target-edge-cases",
