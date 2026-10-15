@@ -10,6 +10,8 @@
 - WHATWG HTML — boolean attributes: https://html.spec.whatwg.org/multipage/common-microsyntaxes.html#boolean-attributes
 - WHATWG HTML — attribute index/classifications: https://html.spec.whatwg.org/multipage/indices.html#attributes-3
 - WHATWG HTML — URL terminology: https://html.spec.whatwg.org/multipage/urls-and-fetching.html#urls
+- WHATWG HTML — hyperlinks and `ping`: https://html.spec.whatwg.org/multipage/links.html
+- WHATWG HTML — responsive images / image candidate lists: https://html.spec.whatwg.org/multipage/images.html
 - WHATWG HTML — input states and value IDL modes: https://html.spec.whatwg.org/multipage/input.html#the-input-element
 - WHATWG HTML — select, option, textarea, output: https://html.spec.whatwg.org/multipage/form-elements.html
 - WHATWG HTML — media muted/defaultMuted: https://html.spec.whatwg.org/multipage/media.html
@@ -43,7 +45,7 @@ The first-party boolean table is centralized in `packages/shared/src/html-attrib
 
 The PRD requires a built-in element property-assignment table before property-backed native-control work. The table is published from the same shared policy module as `STANDARD_HTML_PROPERTY_ASSIGNMENTS`, with `resolveStandardHtmlPropertyAssignment()` as the deterministic lookup surface.
 
-The table is intentionally a contract before it is a mutation mechanism. Existing 4/4 standard-HTML attribute bindings keep their already-verified behavior until the next slice consumes the table.
+The table is intentionally a contract before it is a mutation mechanism. Existing 4/4 standard-HTML attribute bindings keep their already-verified behavior until the dedicated property/native-control slice consumes the table.
 
 ### Current-state property rows
 
@@ -126,9 +128,9 @@ Static contributors inside a grouped plan capture their baseline value from the 
 
 ### PRD security boundary
 
-The product contract requires Nomos to refuse expression-derived `javascript:` URLs in URL-bearing attributes. It does not require a home-grown URL grammar. The implementation therefore delegates scheme classification to the platform WHATWG `URL` parser rather than using substring checks or a custom parser.
+The product contract requires Nomos to refuse expression-derived `javascript:` URLs in URL-bearing attributes. It does not require a home-grown URL grammar. For values whose HTML grammar is one URL string, the implementation delegates scheme classification to the platform WHATWG `URL` parser rather than using substring checks or a custom URL parser.
 
-The initial runtime-protected single-URL name set is:
+The initial end-to-end single-URL name set is:
 
 - `action`;
 - `cite`;
@@ -137,7 +139,7 @@ The initial runtime-protected single-URL name set is:
 - `poster`;
 - `src`.
 
-This is intentionally the pre-existing guarded set, not a claim that those six exhaust every URL-bearing grammar in current HTML.
+This is intentionally the first certified set, not a claim that those six exhaust every URL-bearing context in current HTML.
 
 ### Scheme classification
 
@@ -163,11 +165,29 @@ For spread expressions this changes the boundary from **name rejection** to **va
 - `{...{ href: 'javascript:alert(1)' }}` throws before any DOM mutation;
 - `on*` spread keys remain blocked by name and must use `on:` semantics.
 
-### Why the URL slice remains in progress
+### Compiler integration for statically named URLs
 
-The compiler still emits `dynamic-url-attribute-unvalidated` for statically named expression-derived URL attributes. That guard remains until the lowering path is explicitly wired to rely on this shared runtime validator and receives behavioral/browser evidence.
+The former `dynamic-url-attribute-unvalidated` compiler guard is retired for the initial single-URL set. Dynamic, mixed, and shorthand standard-HTML bindings now lower through the ordinary owner-backed attribute path and rely on the shared runtime validator before mutation.
 
-The current HTML attribute index also contains URL-bearing forms with grammars different from a single URL, including space-separated URL lists and responsive-image candidate lists. Those require explicit parsing/validation strategy rather than broad name-only treatment. The PRD-wide URL requirement must therefore remain **in progress** until statically named lowering and the remaining URL-bearing grammar audit are closed.
+This is intentionally a routing change, not a second safety implementation:
+
+- `template-dom-lowering.mjs` no longer imports or checks `isGuardedDynamicUrlAttribute`;
+- compiler output continues to call `bindAttribute` or grouped `bindAttributes`;
+- runtime `assertSafeDynamicUrlAttributeValue()` remains the one scheme-classification enforcement point;
+- custom-element dynamic assignment and inline-event attributes retain their independent guards.
+
+Behavioral RED `38670030444` proved the old guard blocked the new statically named URL expectation while parser/toolchain remained healthy. GREEN `38670340262` verified the minimal guard removal. Browser-confirmed GREEN `38670385218` then verified a safe expression-derived `href` materializes in real Chrome under Trusted Types enforcement through the compiler/runtime path.
+
+### Remaining HTML URL-bearing grammar taxonomy
+
+The PRD-wide URL requirement remains in progress because not every HTML URL-bearing value has the grammar “one URL string.” The remaining audit must classify each context before choosing a validator. At minimum the current standards expose materially different families:
+
+1. **Single URL strings.** The current helper is certified for the initial six-name set. Other single-URL contexts must be audited by element/attribute semantics before being added; name coincidence alone is insufficient.
+2. **Whitespace-separated URL lists.** `ping` is a space-separated list of URLs used for hyperlink auditing, with HTTP(S)-specific processing. Passing the entire raw list to `new URL(...)` would validate the wrong grammar.
+3. **Image candidate lists.** `srcset` and `imagesrcset` contain image candidate strings with descriptors and parsing rules distinct from a URL list or a single URL. Each candidate URL must be considered within that grammar rather than by string-prefix heuristics.
+4. **Microdata / URL-token semantics.** HTML microdata attributes and item values can involve URL concepts with context-specific tokenization and resolution. They require a separate relevance/security determination rather than automatic inclusion in the navigation/fetch URL helper.
+
+The next URL slice must therefore produce an explicit machine-readable or code-level grammar table plus RED→GREEN tests for any newly covered categories. It must not broaden `GUARDED_DYNAMIC_URL_ATTRIBUTE_NAMES` merely because the HTML index labels an attribute “URL.”
 
 ## Security boundaries
 
@@ -176,7 +196,7 @@ The current HTML attribute index also contains URL-bearing forms with grammars d
 A spread can introduce names the compiler cannot see statically. Before any DOM mutation in a recomputation, the grouped plan:
 
 - rejects names beginning with `on` — event behavior belongs to `on:` directives;
-- validates values for `href`, `src`, `action`, `formaction`, `poster`, and `cite` through the shared URL scheme classifier.
+- validates values for `href`, `src`, `action`, `formaction`, `poster`, and `cite` through the shared single-URL scheme classifier.
 
 The pre-mutation validation is contract-tested so an unsafe spread object cannot partially update safe attributes before throwing.
 
@@ -194,25 +214,25 @@ Live native-control state is not inferred merely because an element has a same-n
 - Attribute/spread expressions reuse the TypeScript 6 `EmbeddedExpression` adapter.
 - Runtime-assigned elements receive collision-free temporary marker attributes in the browser-parsed skeleton.
 - `mountTemplate` collects those elements after cloning and removes markers immediately.
-- Non-spread elements continue using focused `bindAttribute` observers.
+- Non-spread elements continue using focused `bindAttribute` observers, including statically named initial-set dynamic URLs.
 - Spread-containing elements use one owner-backed `bindAttributes` observer.
 - Shared attribute/boolean/URL/event/property policy lives in `packages/shared/src/html-attribute-policy.mjs`.
 - Attribute and spread expression mapping points are emitted during the same lowering pass.
-- Property-table lookup and URL classification reuse platform semantics; no new dependency or second runtime policy layer was introduced.
+- Property-table lookup and single-URL scheme classification reuse platform semantics; no new dependency or second runtime policy layer was introduced.
 
 ## Current coverage
 
 Runtime-assigned ratified standard-HTML forms: **4/4**.
 
-- dynamic — implemented for non-guarded standard-HTML names;
-- mixed — implemented for non-guarded standard-HTML names;
-- shorthand — implemented;
+- dynamic — implemented on standard HTML, including the initial single-URL set;
+- mixed — implemented on standard HTML, including the initial single-URL set;
+- shorthand — implemented on standard HTML, including the initial single-URL set;
 - spread — implemented with source-order precedence, inline-event name guards, and value-level URL safety for the initial six-name set.
 
 Built-in standard-HTML property-assignment policy: **published/tested** with **5/5** focused tests.
 
-Dynamic URL protocol safety: **runtime core implemented, end-to-end coverage in progress**. The helper's normalization contract is focused-tested; independent and grouped DOM bindings are covered; statically named compiler enablement and remaining URL-bearing grammars are still pending.
+Dynamic URL protocol safety: **initial single-URL set implemented end-to-end; full HTML URL-grammar coverage in progress**. The helper normalization contract and independent/grouped DOM bindings are covered; statically named lowering is enabled; a safe statically named `href` is real-browser verified. Remaining URL list/candidate/token grammars are deliberately not claimed complete.
 
-Still separate and incomplete: property-write activation/cleanup, `on:` events, `bind:` native controls, and custom-element policy under `OD-008`.
+Still separate and incomplete: broader URL grammar coverage, property-write activation/cleanup, `on:` events, `bind:` native controls, and custom-element policy under `OD-008`.
 
 This slice resolves none of the eleven PRD Open Decisions.
